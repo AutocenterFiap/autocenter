@@ -9,12 +9,12 @@ import java.util.List;
 
 public class Usuario implements UserDetails {
 
-    private String email;
+    private String usuario;
     private String senha;
     private List<Perfil> perfis = new ArrayList<>();
 
-    public Usuario(String email, String senha) {
-        this.email = email;
+    public Usuario(String usuario, String senha) {
+        this.usuario = usuario;
         this.senha = senha;
     }
 
@@ -30,7 +30,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return usuario;
     }
 
 }

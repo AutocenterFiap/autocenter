@@ -1,5 +1,7 @@
 package br.com.autocenterfiap.security.service;
 
+import br.com.autocenterfiap.security.exception.FalhaCriacaoTokenException;
+import br.com.autocenterfiap.security.exception.TokenInvalidoException;
 import br.com.autocenterfiap.security.model.Usuario;
 import br.com.autocenterfiap.security.exception.RegraDeNegocioException;
 import com.auth0.jwt.JWT;
@@ -18,38 +20,38 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
     @Value("${sistema.seguranca.chave.secreta}")
-    private String secret;
+    private String chaveSecreta;
 
     public String gerarToken(Usuario usuario){
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(chaveSecreta);
             return JWT.create()
                     .withIssuer("Auto Center Fiap")
                     .withSubject(usuario.getUsername())
                     .withExpiresAt(expiracao(30))
                     .sign(algorithm);
         } catch (JWTCreationException exception){
-            throw new RegraDeNegocioException("Erro ao gerar token JWT de acesso!");
+            throw new FalhaCriacaoTokenException("Erro ao gerar token JWT de acesso!", exception);
         }
     }
 
     public String gerarRefreshToken(Usuario usuario) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(chaveSecreta);
             return JWT.create()
                     .withIssuer("Auto Center Fiap")
                     .withSubject(usuario.getUsername())
                     .withExpiresAt(expiracao(120))
                     .sign(algorithm);
         } catch (JWTCreationException exception){
-            throw new RegraDeNegocioException("Erro ao gerar Refresh token JWT de acesso!");
+            throw new FalhaCriacaoTokenException("Erro ao gerar Refresh token JWT de acesso!", exception);
         }
     }
 
     public String verificarToken(String token){
         DecodedJWT decodedJWT;
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(chaveSecreta);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Auto Center Fiap")
                     .build();
@@ -57,7 +59,7 @@ public class TokenService {
             decodedJWT = verifier.verify(token);
             return decodedJWT.getSubject();
         } catch (JWTVerificationException exception){
-            throw new RegraDeNegocioException("Erro ao verificar token JWT de acesso!");
+            throw new TokenInvalidoException("Erro ao verificar token JWT de acesso!", exception);
         }
     }
 

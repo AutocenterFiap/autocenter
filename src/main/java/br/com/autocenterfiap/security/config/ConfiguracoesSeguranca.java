@@ -2,6 +2,7 @@ package br.com.autocenterfiap.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,7 +28,40 @@ public class ConfiguracoesSeguranca {
         return http
                 .authorizeHttpRequests(
                         req -> {
-                            req.requestMatchers("/token", "/atualizar-token").permitAll();
+                            req.requestMatchers("/token", "/refresh-token").permitAll();
+//                            req.requestMatchers(HttpMethod.GET, "/").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/").authenticated();
+
+                            req.requestMatchers(HttpMethod.GET, "/clientes/**").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/clientes").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/clientes/{idCliente}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/clientes/{idCliente}").hasRole("ADMIN");
+
+                            req.requestMatchers(HttpMethod.GET, "/veiculos").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.POST, "/veiculos").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/veiculos/{idVeiculo}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/veiculos/{idVeiculo}").hasRole("ADMIN");
+
+                            req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/servicos/{idServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/servicos/{idServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.POST, "/servicos").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/servicos/{idServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/servicos/{idServico}").hasRole("ADMIN");
+
+                            req.requestMatchers(HttpMethod.GET, "/produtos").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/produtos/{idProduto}").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/produtos").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/produtos/{idProduto}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/produtos/{idProduto}").hasRole("ADMIN");
+
+                            req.requestMatchers(HttpMethod.GET, "/ordem-servicos").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/ordem-servicos/{idOrdemServico}").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/ordem-servicos").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
+
                             req.anyRequest().authenticated();
                         }
                 )

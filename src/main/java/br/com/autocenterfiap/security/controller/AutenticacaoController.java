@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,15 +38,19 @@ public class AutenticacaoController {
         return ResponseEntity.ok(new Token(tokenAcesso, refreshToken));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<Token> atualizarToken(@Valid @RequestBody RefreshToken dados){
-        var refreshToken = dados.refreshToken();
-        String nomeUsuario = tokenService.verificarToken(refreshToken);
-        var usuario = usuarioRepository.findByClientId(nomeUsuario).orElseThrow();
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Token> atualizarToken(@Valid @RequestBody RefreshToken refreshToken){
+        String nomeUsuario = tokenService.verificarToken(refreshToken.refreshToken());
+        var usuario = usuarioRepository.findByUsuario(nomeUsuario).orElseThrow();
 
-        String tokenAcesso = tokenService.gerarToken(usuario);
-        String tokenAtualizacao = tokenService.gerarRefreshToken(usuario);
+        String novoTokenAcesso = tokenService.gerarToken(usuario);
+        String novoRefreshToken = tokenService.gerarRefreshToken(usuario);
 
-        return ResponseEntity.ok(new Token(tokenAcesso, tokenAtualizacao));
+        return ResponseEntity.ok(new Token(novoTokenAcesso, novoRefreshToken));
+    }
+
+    @GetMapping
+    public ResponseEntity<String> teste(){
+        return ResponseEntity.ok("permitido");
     }
 }

@@ -2,7 +2,6 @@ package br.com.autocenterfiap.security.config;
 
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import br.com.autocenterfiap.security.service.TokenService;
-import br.com.autocenterfiap.security.model.Usuario;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +32,7 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
 
         if(token != null){
             String clientId = tokenService.verificarToken(token);
-            var usuario = usuarioRepository.findByClientId(clientId).orElseThrow();
+            var usuario = usuarioRepository.findByUsuario(clientId).orElseThrow();
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

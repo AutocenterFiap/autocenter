@@ -29,7 +29,7 @@ public class AutenticacaoController {
 
     @PostMapping("/token")
     public ResponseEntity<Token> efetuarLogin(@Valid @RequestBody Login loginRequest){
-        var autenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.clientId(), loginRequest.clientSecret());
+        var autenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.usuario(), loginRequest.senha());
         var authentication = authenticationManager.authenticate(autenticationToken);
 
         String tokenAcesso = tokenService.gerarToken((Usuario) authentication.getPrincipal());
@@ -51,6 +51,11 @@ public class AutenticacaoController {
 
     @GetMapping
     public ResponseEntity<String> teste(){
+        return ResponseEntity.ok("permitido");
+    }
+
+    @GetMapping("/clientes/{clienteId}")
+    public ResponseEntity<String> teste(String clienteId){
         return ResponseEntity.ok("permitido");
     }
 }

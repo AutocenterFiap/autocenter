@@ -33,34 +33,33 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.GET, "/").authenticated();
 
                             req.requestMatchers(HttpMethod.GET, "/clientes/**").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/clientes").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/clientes/{idCliente}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/clientes/{idCliente}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.POST, "/clientes").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.PUT, "/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/veiculos").permitAll();
-                            req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.POST, "/veiculos").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/veiculos/{idVeiculo}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/veiculos/{idVeiculo}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.POST, "/veiculos").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PUT, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();
-                            req.requestMatchers(HttpMethod.GET, "/servicos/{idServico}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.GET, "/servicos/{idServico}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.POST, "/servicos").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/servicos/{idServico}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/servicos/{idServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/servicos/{idServico}").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.POST, "/servicos").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PUT, "/servicos/{idServico}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/servicos/{idServico}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/produtos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/produtos/{idProduto}").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/produtos").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/produtos/{idProduto}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/produtos/{idProduto}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.POST, "/produtos").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PUT, "/produtos/{idProduto}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/produtos/{idProduto}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/ordem-servicos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/ordem-servicos/{idOrdemServico}").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/ordem-servicos").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.POST, "/ordem-servicos").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PUT, "/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "WRITE");
 
                             req.anyRequest().authenticated();
                         }

@@ -4,11 +4,14 @@ import br.com.autocenterfiap.security.enums.PerfilType;
 import org.springframework.security.core.GrantedAuthority;
 
 public class Perfil implements GrantedAuthority {
-
     private PerfilType nome;
+
+    public Perfil(PerfilType nome) {
+        this.nome = nome;
+    }
 
     @Override
     public String getAuthority() {
-        return "ROLE_" + nome;
+        return nome.name();
     }
 }

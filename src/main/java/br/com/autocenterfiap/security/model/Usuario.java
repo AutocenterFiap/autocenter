@@ -13,9 +13,10 @@ public class Usuario implements UserDetails {
     private String senha;
     private List<Perfil> perfis = new ArrayList<>();
 
-    public Usuario(String usuario, String senha) {
+    public Usuario(String usuario, String senha, List<Perfil> perfis) {
         this.usuario = usuario;
         this.senha = senha;
+        this.perfis = perfis;
     }
 
     @Override

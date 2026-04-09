@@ -41,6 +41,7 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasRole("ADMIN");
                             req.requestMatchers(HttpMethod.POST, "/veiculos").hasRole("ADMIN");
                             req.requestMatchers(HttpMethod.PUT, "/veiculos/{idVeiculo}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/veiculos/placa/{placa}").hasRole("ADMIN");
                             req.requestMatchers(HttpMethod.DELETE, "/veiculos/{idVeiculo}").hasRole("ADMIN");
 
                             req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();

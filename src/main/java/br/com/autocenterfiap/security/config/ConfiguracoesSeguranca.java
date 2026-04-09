@@ -32,10 +32,10 @@ public class ConfiguracoesSeguranca {
 //                            req.requestMatchers(HttpMethod.GET, "/").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/").authenticated();
 
-                            req.requestMatchers(HttpMethod.GET, "/clientes/**").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/clientes").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PUT, "/clientes/{idCliente}").hasRole("ADMIN");
-                            req.requestMatchers(HttpMethod.DELETE, "/clientes/{idCliente}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/api/clientes/**").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/api/clientes").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/api/clientes/{idCliente}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/api/clientes/{idCliente}").hasRole("ADMIN");
 
                             req.requestMatchers(HttpMethod.GET, "/veiculos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasRole("ADMIN");
@@ -62,11 +62,20 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.PUT, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
                             req.requestMatchers(HttpMethod.DELETE, "/ordem-servicos/{idOrdemServico}").hasRole("ADMIN");
 
+                            // Swagger - público para documentação
+                            req.requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll();
+                            req.requestMatchers("/v3/api-docs/**", "/api-docs/**").permitAll();
+                            req.requestMatchers("/swagger-resources/**", "/webjars/**").permitAll();
+
+                            // H2 Console - público (apenas para desenvolvimento)
+                            req.requestMatchers("/h2-console/**").permitAll();
+
                             req.anyRequest().authenticated();
                         }
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Para H2 Console
                 .addFilterBefore(filtroTokenAcesso, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -1,9 +1,6 @@
 package br.com.autocenterfiap.veiculo.validator;
 
-import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
-import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
 import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +15,13 @@ public class ChassiValidator implements VeiculoValidator{
     @Override
     public void validate(VeiculoValidationContext context) {
         String chassi = context.getVeiculoDTO().chassi();
-        TipoOperacao operacao = context.getOperation();
 
         if (chassi != null && !chassi.matches("^[A-HJ-NPR-Z0-9]{17}$")) {
             throw new IllegalArgumentException("Chassi inválido");
         }
 
-        if(operacao.equals(TipoOperacao.UPDATE)){
-            Long veiculoId = context.getEntity().getId();
+        if(context.isUpdate()){
+            Long veiculoId = context.getVeiculoId();
             validarChassiUnicoNaAtualizacao(chassi,veiculoId);
         } else {
             validarChassiUnico(chassi);

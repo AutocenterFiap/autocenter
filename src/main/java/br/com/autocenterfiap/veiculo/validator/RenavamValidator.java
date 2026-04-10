@@ -1,6 +1,5 @@
 package br.com.autocenterfiap.veiculo.validator;
 
-import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
 import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ public class RenavamValidator implements VeiculoValidator{
 
     @Override
     public void validate(VeiculoValidationContext context) {
-        TipoOperacao operacao = context.getOperation();
         String renavam = context.getVeiculoDTO().renavam();
 
         if (renavam == null || renavam.isBlank()) return;
@@ -24,8 +22,8 @@ public class RenavamValidator implements VeiculoValidator{
             throw new IllegalArgumentException("RENAVAM inválido");
         }
 
-        if(operacao.equals(TipoOperacao.UPDATE)){
-            Long veiculoId = context.getEntity().getId();
+        if(context.isUpdate()){
+            Long veiculoId = context.getVeiculoId();
             validarRenavamUnicoNaAtualizacao(renavam,veiculoId);
         } else {
             validarRenavamUnico(renavam);

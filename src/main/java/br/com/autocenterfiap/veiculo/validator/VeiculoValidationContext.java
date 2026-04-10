@@ -6,19 +6,22 @@ import br.com.autocenterfiap.veiculo.model.Veiculo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.internal.engine.validationcontext.ValidationContext;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class VeiculoValidationContext {
-    private Veiculo entity;
+    private Long veiculoId;
     private VeiculoDTO veiculoDTO;
     private TipoOperacao operation;
 
     public VeiculoValidationContext(VeiculoDTO veiculoDTO, TipoOperacao operation) {
         this.veiculoDTO = veiculoDTO;
         this.operation = operation;
+    }
+
+    public boolean isUpdate(){
+        return operation.equals(TipoOperacao.UPDATE);
     }
 
 }

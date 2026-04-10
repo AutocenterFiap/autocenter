@@ -51,7 +51,7 @@ public class VeiculoService {
     public VeiculoResponseDTO atualizar(Long id,VeiculoDTO veiculoDTO){
         Veiculo veiculo = this.findById(id);
 
-        var validationContext = new VeiculoValidationContext(veiculo,veiculoDTO,TipoOperacao.UPDATE);
+        var validationContext = new VeiculoValidationContext(id,veiculoDTO,TipoOperacao.UPDATE);
         validators.forEach(v -> v.validate(validationContext));
 
         veiculo.atualizarDados(veiculoDTO);

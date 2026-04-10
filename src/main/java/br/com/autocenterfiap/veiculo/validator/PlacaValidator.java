@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.veiculo.validator;
 
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
-import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
 import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Component;
@@ -19,8 +18,8 @@ public class PlacaValidator implements VeiculoValidator{
     public void validate(VeiculoValidationContext context) {
         VeiculoDTO veiculoDTO = context.getVeiculoDTO();
 
-        if(context.getOperation().equals(TipoOperacao.UPDATE)){
-            Long veiculoId = context.getEntity().getId();
+        if(context.isUpdate()){
+            Long veiculoId = context.getVeiculoId();
             validarPlacaUnicaNaAtualizacao(veiculoDTO.placa(), veiculoId);
         } else {
             validarPlacaUnica(veiculoDTO.placa());

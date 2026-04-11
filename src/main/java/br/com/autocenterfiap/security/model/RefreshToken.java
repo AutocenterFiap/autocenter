@@ -1,4 +1,6 @@
 package br.com.autocenterfiap.security.model;
 
-public record RefreshToken (String refreshToken){
+import jakarta.validation.constraints.NotBlank;
+
+public record RefreshToken (@NotBlank String refreshToken){
 }

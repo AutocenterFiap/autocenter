@@ -32,7 +32,7 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
 
         if(token != null){
             String nomeUsuario = tokenService.verificarToken(token);
-            var usuario = usuarioRepository.findByUsuario(nomeUsuario).orElseThrow();
+            var usuario = usuarioRepository.findByNomeWithPerfis(nomeUsuario).orElseThrow();
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

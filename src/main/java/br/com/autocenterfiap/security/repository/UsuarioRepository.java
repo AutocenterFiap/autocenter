@@ -1,29 +1,18 @@
 package br.com.autocenterfiap.security.repository;
 
-import br.com.autocenterfiap.security.enums.PerfilType;
-import br.com.autocenterfiap.security.model.Perfil;
-import br.com.autocenterfiap.security.model.Usuario;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import br.com.autocenterfiap.security.entity.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UsuarioRepository {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    public Optional<Usuario> findByUsuario(String usuario){
-        Usuario usuarioMock = getUsuarioMock(usuario);
-        return usuarioMock == null ? Optional.empty(): Optional.of(usuarioMock);
-   }
+    Optional<Usuario> findByNome(String nome);
 
-   private Usuario getUsuarioMock(String usuario){
-       String SENHA_MOCK = "admin";
-       String USUARIO_MOCK = "admin";
-       if (usuario.equals(USUARIO_MOCK)){
-           String senhaEncoded = new BCryptPasswordEncoder().encode(SENHA_MOCK);
-           return new Usuario(usuario, senhaEncoded, List.of(new Perfil(PerfilType.ADMIN)));
-       }
-       return null;
-   }
+    @Query("SELECT u FROM Usuario u JOIN FETCH u.perfis WHERE u.nome = :nome")
+    Optional<Usuario> findByNomeWithPerfis(@Param("nome") String nome);
 }

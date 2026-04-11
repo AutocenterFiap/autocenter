@@ -2,7 +2,7 @@ package br.com.autocenterfiap.security.service;
 
 import br.com.autocenterfiap.security.exception.FalhaCriacaoTokenException;
 import br.com.autocenterfiap.security.exception.TokenInvalidoException;
-import br.com.autocenterfiap.security.model.Usuario;
+import br.com.autocenterfiap.security.entity.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -49,7 +49,7 @@ public class TokenService {
                     .withSubject(usuario.getUsername())
                     .withExpiresAt(expiracao(tempoExpiracao + 60))
                     .sign(algorithm);
-        } catch (JWTCreationException exception){
+        } catch (FalhaCriacaoTokenException exception){
             throw new FalhaCriacaoTokenException("Erro ao gerar Refresh token JWT de acesso!", exception);
         }
     }

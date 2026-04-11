@@ -26,11 +26,19 @@ public class ConfiguracoesSeguranca {
     @Bean
     public SecurityFilterChain filtrosSeguranca(HttpSecurity http) throws Exception {
         return http
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(
                         req -> {
+                             req.requestMatchers("/h2-console/**").permitAll();// Libera o console H2
+
                             req.requestMatchers("/token", "/refresh-token").permitAll();
-//                            req.requestMatchers(HttpMethod.GET, "/").permitAll();
-                            req.requestMatchers(HttpMethod.GET, "/").authenticated();
+                            req.requestMatchers(HttpMethod.GET, "/usuarios/permitido").permitAll();
+//                            req.requestMatchers(HttpMethod.GET, "/usuarios/permitido").authenticated();
+
+                            req.requestMatchers(HttpMethod.GET, "/usuarios/{nome}").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/usuarios").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PATCH, "/usuarios/senha/alteracao").hasRole("ADMIN");
+
 
                             req.requestMatchers(HttpMethod.GET, "/clientes/**").permitAll();
                             req.requestMatchers(HttpMethod.POST, "/clientes").hasAnyRole("ADMIN", "READ");

@@ -1,14 +1,18 @@
 package br.com.autocenterfiap.cliente.validator;
 
-public class CpfValidator {
+public class CpfValidator implements DocumentoValidator {
 
-    public static boolean isValid(String cpf) {
-        if (cpf == null || cpf.length() != 11) {
+    private static final int TAMANHO_CPF = 11;
+    private static final String TIPO = "CPF";
+
+    @Override
+    public boolean isValid(String cpf) {
+        if (cpf == null || cpf.length() != TAMANHO_CPF) {
             return false;
         }
 
         // Verifica se todos os caracteres são dígitos
-        if (!cpf.matches("\\d{11}")) {
+        if (!cpf.matches("\\d{" + TAMANHO_CPF + "}")) {
             return false;
         }
 
@@ -17,15 +21,23 @@ public class CpfValidator {
             return false;
         }
 
+        // Calcula e valida os dígitos verificadores
+        return validarDigitosVerificadores(cpf);
+    }
+
+    @Override
+    public String getTipoDocumento() {
+        return TIPO;
+    }
+
+    @Override
+    public int getTamanhoEsperado() {
+        return TAMANHO_CPF;
+    }
+
+    private boolean validarDigitosVerificadores(String cpf) {
         // Calcula o primeiro dígito verificador
-        int soma = 0;
-        for (int i = 0; i < 9; i++) {
-            soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
-        }
-        int primeiroDigito = 11 - (soma % 11);
-        if (primeiroDigito >= 10) {
-            primeiroDigito = 0;
-        }
+        int primeiroDigito = calcularDigitoVerificador(cpf, 9, 10);
 
         // Verifica o primeiro dígito
         if (Character.getNumericValue(cpf.charAt(9)) != primeiroDigito) {
@@ -33,16 +45,18 @@ public class CpfValidator {
         }
 
         // Calcula o segundo dígito verificador
-        soma = 0;
-        for (int i = 0; i < 10; i++) {
-            soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
-        }
-        int segundoDigito = 11 - (soma % 11);
-        if (segundoDigito >= 10) {
-            segundoDigito = 0;
-        }
+        int segundoDigito = calcularDigitoVerificador(cpf, 10, 11);
 
         // Verifica o segundo dígito
         return Character.getNumericValue(cpf.charAt(10)) == segundoDigito;
+    }
+
+    private int calcularDigitoVerificador(String cpf, int limite, int pesoInicial) {
+        int soma = 0;
+        for (int i = 0; i < limite; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (pesoInicial - i);
+        }
+        int digito = 11 - (soma % 11);
+        return digito >= 10 ? 0 : digito;
     }
 }

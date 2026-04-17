@@ -16,7 +16,9 @@ public class ChassiValidator implements VeiculoValidator{
     public void validate(VeiculoValidationContext context) {
         String chassi = context.getVeiculoDTO().chassi();
 
-        if (chassi != null && !chassi.matches("^[A-HJ-NPR-Z0-9]{17}$")) {
+        if (chassi == null || chassi.isBlank()) return;
+
+        if (!chassi.matches("^[A-HJ-NPR-Z0-9]{17}$")) {
             throw new IllegalArgumentException("Chassi inválido");
         }
 

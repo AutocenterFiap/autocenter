@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static br.com.autocenterfiap.util.PerfilMockUtil.*;
+import static br.com.autocenterfiap.util.UsuarioMockUtil.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,16 +51,16 @@ class UsuarioControllerTest {
 
     @BeforeEach
     void setUp() {
-        perfisMock = getPerfisMock();
-        perfisResponseMock = getPerfisResponseMock();
-        perfisRequestMock = getPerfisRequestMock();
+        perfisMock = createPerfisMock();
+        perfisResponseMock = createPerfisResponseMock();
+        perfisRequestMock = createPerfisRequestMock();
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveObterUsuarioPorNome() throws Exception {
-        var usuario = new Usuario(1L, "joao", "senha123", perfisMock);
-        var usuarioResponse = new UsuarioResponse(1L, "joao", perfisResponseMock);
+        var usuario = createUsuarioMock(1L, "joao", "senha123", perfisMock);
+        var usuarioResponse = createUsuarioResponseMock(1L, "joao", perfisResponseMock);
         when(usuarioService.findByNome("joao")).thenReturn(usuario);
         when(usuarioMapper.toUsuarioResponse(usuario)).thenReturn(usuarioResponse);
 
@@ -70,10 +72,10 @@ class UsuarioControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCadastrarUsuario() throws Exception {
-        var usuarioRequest = new UsuarioRequest("maria", "senha123", perfisRequestMock);
-        var usuario = new Usuario(1l,"maria", "senha123", perfisMock);
-        var usuarioSalvo =  new Usuario(1l,"maria", "senha123", perfisMock);
-        var usuarioResponse = new UsuarioResponse(1l,"maria", perfisResponseMock);
+        var usuarioRequest = createUsuarioRequestMock("maria", "senha123", perfisRequestMock);
+        var usuario = createUsuarioMock(1l,"maria", "senha123", perfisMock);
+        var usuarioSalvo =  createUsuarioMock(1l,"maria", "senha123", perfisMock);
+        var usuarioResponse = createUsuarioResponseMock(1l,"maria", perfisResponseMock);
 
         when(usuarioMapper.toUsuario(usuarioRequest)).thenReturn(usuario);
         when(usuarioService.salvar(usuario)).thenReturn(usuarioSalvo);
@@ -90,9 +92,9 @@ class UsuarioControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveAlterarSenha() throws Exception {
         var alteracaoRequest = new AlteracaoSenhaRequest("joao", "novaSenha");
-        var usuario = new Usuario(1l, "joao", "novaSenha", perfisMock);
-        var usuarioAtualizado = new Usuario(1l, "joao", "novaSenha", perfisMock);
-        var usuarioResponse = new UsuarioResponse(1l,"joao", perfisResponseMock);
+        var usuario = createUsuarioMock(1l, "joao", "novaSenha", perfisMock);
+        var usuarioAtualizado = createUsuarioMock(1l, "joao", "novaSenha", perfisMock);
+        var usuarioResponse = createUsuarioResponseMock(1l,"joao", perfisResponseMock);
 
         when(usuarioMapper.toUsuario(alteracaoRequest)).thenReturn(usuario);
         when(usuarioService.alterarSenha(usuario)).thenReturn(usuarioAtualizado);
@@ -105,16 +107,5 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.nome").value("joao"));
     }
 
-    private List<Perfil> getPerfisMock() {
-        return List.of(new Perfil(1L, PerfilType.ADMIN, null));
-    }
-
-    private List<PerfilRequest> getPerfisRequestMock() {
-        return List.of(new PerfilRequest(PerfilType.ADMIN));
-    }
-
-    private List<PerfilResponse> getPerfisResponseMock() {
-        return List.of(new PerfilResponse(PerfilType.ADMIN));
-    }
 }
 

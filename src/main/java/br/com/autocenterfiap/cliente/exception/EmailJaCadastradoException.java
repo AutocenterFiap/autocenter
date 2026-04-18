@@ -1,0 +1,8 @@
+package br.com.autocenterfiap.cliente.exception;
+
+public class EmailJaCadastradoException extends InformacaoJaCadastradaException {
+
+    public EmailJaCadastradoException(String email) {
+        super("Já existe um cliente cadastrado com o email: " + email);
+    }
+}

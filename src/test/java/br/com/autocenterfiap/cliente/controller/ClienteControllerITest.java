@@ -88,7 +88,7 @@ class ClienteControllerITest {
         clienteRepository.save(clientePF);
         clienteRepository.save(clientePJ);
 
-        mockMvc.perform(get("/api/clientes")
+        mockMvc.perform(get("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -99,7 +99,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornarListaVaziaQuandoNaoHouverClientes() throws Exception {
-        mockMvc.perform(get("/api/clientes")
+        mockMvc.perform(get("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
@@ -110,7 +110,7 @@ class ClienteControllerITest {
     void deveBuscarClientePorIdComSucesso() throws Exception {
         Cliente clienteSalvo = clienteRepository.save(clientePF);
 
-        mockMvc.perform(get("/api/clientes/{id}", clienteSalvo.getId())
+        mockMvc.perform(get("/v1/api/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(clienteSalvo.getId().intValue())))
@@ -122,7 +122,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarClienteInexistentePorId() throws Exception {
-        mockMvc.perform(get("/api/clientes/{id}", 999L)
+        mockMvc.perform(get("/v1/api/clientes/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -132,7 +132,7 @@ class ClienteControllerITest {
     void deveBuscarClientePorDocumentoComSucesso() throws Exception {
         clienteRepository.save(clientePF);
 
-        mockMvc.perform(get("/api/clientes/documento/{documento}", "11144477735")
+        mockMvc.perform(get("/v1/api/clientes/documento/{documento}", "11144477735")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome", is("João da Silva")))
@@ -142,7 +142,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarClienteInexistentePorDocumento() throws Exception {
-        mockMvc.perform(get("/api/clientes/documento/{documento}", "99999999999")
+        mockMvc.perform(get("/v1/api/clientes/documento/{documento}", "99999999999")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -150,7 +150,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarClientePessoaFisicaComSucesso() throws Exception {
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientePF)))
                 .andExpect(status().isCreated())
@@ -164,7 +164,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarClientePessoaJuridicaComSucesso() throws Exception {
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientePJ)))
                 .andExpect(status().isCreated())
@@ -182,7 +182,7 @@ class ClienteControllerITest {
         clienteInvalido.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteInvalido.setDocumento("11144477735");
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteInvalido)))
                 .andExpect(status().isBadRequest());
@@ -201,7 +201,7 @@ class ClienteControllerITest {
         clienteDuplicado.setTelefone("11888887777");
         clienteDuplicado.setEndereco(endereco);
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteDuplicado)))
                 .andExpect(status().isConflict());
@@ -220,7 +220,7 @@ class ClienteControllerITest {
         clienteDuplicado.setTelefone("11888887777");
         clienteDuplicado.setEndereco(endereco);
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteDuplicado)))
                 .andExpect(status().isConflict());
@@ -231,7 +231,7 @@ class ClienteControllerITest {
     void deveRetornar400AoCriarClientePFComCpfInvalido() throws Exception {
         clientePF.setDocumento("12345678901"); // CPF inválido
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientePF)))
                 .andExpect(status().isBadRequest());
@@ -242,7 +242,7 @@ class ClienteControllerITest {
     void deveRetornar400AoCriarClientePJComCnpjInvalido() throws Exception {
         clientePJ.setDocumento("12345678901234"); // CNPJ inválido
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientePJ)))
                 .andExpect(status().isBadRequest());
@@ -256,7 +256,7 @@ class ClienteControllerITest {
         clienteSalvo.setNome("João da Silva Updated");
         clienteSalvo.setTelefone("11999998888");
 
-        mockMvc.perform(put("/api/clientes/{id}", clienteSalvo.getId())
+        mockMvc.perform(put("/v1/api/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteSalvo)))
                 .andExpect(status().isOk())
@@ -268,7 +268,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoAtualizarClienteInexistente() throws Exception {
-        mockMvc.perform(put("/api/clientes/{id}", 999L)
+        mockMvc.perform(put("/v1/api/clientes/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientePF)))
                 .andExpect(status().isNotFound());
@@ -289,7 +289,7 @@ class ClienteControllerITest {
         clienteComDocumentoAlterado.setEndereco(clienteSalvo.getEndereco());
         clienteComDocumentoAlterado.setDataNascimento(clienteSalvo.getDataNascimento());
 
-        mockMvc.perform(put("/api/clientes/{id}", clienteSalvo.getId())
+        mockMvc.perform(put("/v1/api/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteComDocumentoAlterado)))
                 .andExpect(status().isBadRequest());
@@ -300,11 +300,11 @@ class ClienteControllerITest {
     void deveDeletarClienteComSucesso() throws Exception {
         Cliente clienteSalvo = clienteRepository.save(clientePF);
 
-        mockMvc.perform(delete("/api/clientes/{id}", clienteSalvo.getId())
+        mockMvc.perform(delete("/v1/api/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/clientes/{id}", clienteSalvo.getId())
+        mockMvc.perform(get("/v1/api/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -312,7 +312,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoDeletarClienteInexistente() throws Exception {
-        mockMvc.perform(delete("/api/clientes/{id}", 999L)
+        mockMvc.perform(delete("/v1/api/clientes/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

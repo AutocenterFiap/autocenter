@@ -40,10 +40,10 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.PATCH, "/usuarios/senha/alteracao").hasRole("ADMIN");
 
 
-                            req.requestMatchers(HttpMethod.GET, "/api/clientes/**").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/api/clientes").hasAnyRole("ADMIN", "READ");
-                            req.requestMatchers(HttpMethod.PUT, "/api/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.DELETE, "/api/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.GET, "/v1/api/clientes/**").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/v1/api/clientes").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.PUT, "/v1/api/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/v1/api/clientes/{idCliente}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/veiculos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "READ");

@@ -1,14 +1,20 @@
 package br.com.autocenterfiap.cliente.validator;
 
-public class CnpjValidator {
+public class CnpjValidator implements DocumentoValidator {
 
-    public static boolean isValid(String cnpj) {
-        if (cnpj == null || cnpj.length() != 14) {
+    private static final int TAMANHO_CNPJ = 14;
+    private static final String TIPO = "CNPJ";
+    private static final int[] PESOS_PRIMEIRO_DIGITO = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+    private static final int[] PESOS_SEGUNDO_DIGITO = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+
+    @Override
+    public boolean isValid(String cnpj) {
+        if (cnpj == null || cnpj.length() != TAMANHO_CNPJ) {
             return false;
         }
 
         // Verifica se todos os caracteres são dígitos
-        if (!cnpj.matches("\\d{14}")) {
+        if (!cnpj.matches("\\d{" + TAMANHO_CNPJ + "}")) {
             return false;
         }
 
@@ -17,14 +23,23 @@ public class CnpjValidator {
             return false;
         }
 
+        // Calcula e valida os dígitos verificadores
+        return validarDigitosVerificadores(cnpj);
+    }
+
+    @Override
+    public String getTipoDocumento() {
+        return TIPO;
+    }
+
+    @Override
+    public int getTamanhoEsperado() {
+        return TAMANHO_CNPJ;
+    }
+
+    private boolean validarDigitosVerificadores(String cnpj) {
         // Calcula o primeiro dígito verificador
-        int[] pesosPrimeiro = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-        int soma = 0;
-        for (int i = 0; i < 12; i++) {
-            soma += Character.getNumericValue(cnpj.charAt(i)) * pesosPrimeiro[i];
-        }
-        int primeiroDigito = soma % 11;
-        primeiroDigito = primeiroDigito < 2 ? 0 : 11 - primeiroDigito;
+        int primeiroDigito = calcularDigitoVerificador(cnpj, PESOS_PRIMEIRO_DIGITO, 12);
 
         // Verifica o primeiro dígito
         if (Character.getNumericValue(cnpj.charAt(12)) != primeiroDigito) {
@@ -32,15 +47,18 @@ public class CnpjValidator {
         }
 
         // Calcula o segundo dígito verificador
-        int[] pesosSegundo = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-        soma = 0;
-        for (int i = 0; i < 13; i++) {
-            soma += Character.getNumericValue(cnpj.charAt(i)) * pesosSegundo[i];
-        }
-        int segundoDigito = soma % 11;
-        segundoDigito = segundoDigito < 2 ? 0 : 11 - segundoDigito;
+        int segundoDigito = calcularDigitoVerificador(cnpj, PESOS_SEGUNDO_DIGITO, 13);
 
         // Verifica o segundo dígito
         return Character.getNumericValue(cnpj.charAt(13)) == segundoDigito;
+    }
+
+    private int calcularDigitoVerificador(String cnpj, int[] pesos, int limite) {
+        int soma = 0;
+        for (int i = 0; i < limite; i++) {
+            soma += Character.getNumericValue(cnpj.charAt(i)) * pesos[i];
+        }
+        int resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
 }

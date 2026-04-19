@@ -7,6 +7,8 @@ import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import br.com.autocenterfiap.veiculo.validator.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +34,8 @@ public class VeiculoService {
         return new VeiculoResponseDTO(veiculo);
     }
 
-    public List<VeiculoResponseDTO> listarTodos(){
-        return veiculoRepository.findAll().stream().map(VeiculoResponseDTO::new).toList();
+    public Page<VeiculoResponseDTO> listarTodos(Pageable pageable){
+        return veiculoRepository.findAll(pageable).map(VeiculoResponseDTO::new);
     }
 
     @Transactional

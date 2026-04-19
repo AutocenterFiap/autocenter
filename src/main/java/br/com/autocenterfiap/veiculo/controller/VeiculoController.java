@@ -3,6 +3,7 @@ package br.com.autocenterfiap.veiculo.controller;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.dto.VeiculoResponseDTO;
+import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.service.VeiculoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,8 +85,8 @@ public class VeiculoController {
             description = "Lista de veículos retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<List<VeiculoResponseDTO>> listarTodos(){
-        List<VeiculoResponseDTO> veiculos = veiculoService.listarTodos();
+    public ResponseEntity<Page<VeiculoResponseDTO>> listarTodos(Pageable pageable){
+        Page<VeiculoResponseDTO> veiculos = veiculoService.listarTodos(pageable);
         return ResponseEntity.ok(veiculos);
     }
 
@@ -94,7 +98,7 @@ public class VeiculoController {
             @ApiResponse(
                     responseCode = "201",
                     description = "Veículo criado com sucesso",
-                    content = @Content(schema = @Schema(implementation = Cliente.class))
+                    content = @Content(schema = @Schema(implementation = Veiculo.class))
             ),
             @ApiResponse(
                     responseCode = "400",

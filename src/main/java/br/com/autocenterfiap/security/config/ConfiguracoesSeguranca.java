@@ -49,7 +49,7 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.GET, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.POST, "/veiculos").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PUT, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.PUT, "/veiculos/placa/{placa}").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/veiculos/placa/{placa}").hasAnyRole("ADMIN","READ");
                             req.requestMatchers(HttpMethod.DELETE, "/veiculos/{idVeiculo}").hasAnyRole("ADMIN", "WRITE");
 
                             req.requestMatchers(HttpMethod.GET, "/servicos").permitAll();

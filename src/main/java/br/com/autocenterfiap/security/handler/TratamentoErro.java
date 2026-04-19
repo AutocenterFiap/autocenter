@@ -1,6 +1,8 @@
 package br.com.autocenterfiap.security.handler;
 
-import br.com.autocenterfiap.security.exception.RegraDeNegocioException;
+import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
+import br.com.autocenterfiap.security.model.ErroResposta;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,8 +13,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
-public class TratadorDeErros {
+public class TratamentoErro {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> tratarErro400(MethodArgumentNotValidException ex) {
@@ -21,8 +26,26 @@ public class TratadorDeErros {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> tratarErro400(HttpMessageNotReadableException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<ErroResposta> tratarErro400(HttpMessageNotReadableException ex,
+        HttpServletRequest request) {
+            Map<String, String> error = new HashMap<>();
+
+            String message = null;
+
+            if (ex.getMessage().contains("PerfilType")) {
+                message = "O perfil informado é inválido. Valores aceitos: [READ, ADMIN, WRITE]";
+            } else {
+                message = "Verifique a sintaxe dos campos.";
+            }
+
+            ErroResposta erro = new ErroResposta(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Erro na leitura do JSON",
+                    message,
+                    request.getRequestURI()
+            );
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -35,9 +58,17 @@ public class TratadorDeErros {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
-    @ExceptionHandler(RegraDeNegocioException.class)
-    public ResponseEntity<String> tratarErroRegraDeNegocio(RegraDeNegocioException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    @ExceptionHandler(InformacaoNaoEncontradaException.class)
+    public ResponseEntity<ErroResposta> tratarErroRegraDeNegocio(InformacaoNaoEncontradaException ex,
+                                                                 HttpServletRequest request) {
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.NOT_FOUND.value(),
+                "Recurso Não Encontrado",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
 
     @ExceptionHandler(Exception.class)

@@ -31,8 +31,8 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
         String token = recuperarTokenRequisicao(request);
 
         if(token != null){
-            String clientId = tokenService.verificarToken(token);
-            var usuario = usuarioRepository.findByUsuario(clientId).orElseThrow();
+            String nomeUsuario = tokenService.verificarToken(token);
+            var usuario = usuarioRepository.findByNomeWithPerfis(nomeUsuario).orElseThrow();
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

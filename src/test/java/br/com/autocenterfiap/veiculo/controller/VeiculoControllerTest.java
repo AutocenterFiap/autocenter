@@ -85,8 +85,8 @@ class VeiculoControllerTest {
         mockMvc.perform(get("/veiculos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].placa", notNullValue()));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].placa", notNullValue()));
     }
 
     @Test
@@ -95,7 +95,7 @@ class VeiculoControllerTest {
         mockMvc.perform(get("/veiculos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
 

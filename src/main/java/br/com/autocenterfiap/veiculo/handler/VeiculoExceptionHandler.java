@@ -1,10 +1,7 @@
 package br.com.autocenterfiap.veiculo.handler;
 
 import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
-import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,20 @@ public class VeiculoExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
+    @ExceptionHandler({
+            ChassiInvalidoException.class,
+            RenavamInvalidoException.class
+    })
+    public ResponseEntity<ErroResposta> handleDadoInvalido(Exception ex, HttpServletRequest request){
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de Validação",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
     @ExceptionHandler(VeiculoNaoEncontradoException.class)

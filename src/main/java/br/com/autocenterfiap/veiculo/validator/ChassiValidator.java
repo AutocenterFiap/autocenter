@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.veiculo.validator;
 
+import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
 import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class ChassiValidator implements VeiculoValidator{
         if (chassi == null || chassi.isBlank()) return;
 
         if (!chassi.matches("^[A-HJ-NPR-Z0-9]{17}$")) {
-            throw new IllegalArgumentException("Chassi inválido");
+            throw new ChassiInvalidoException("Chassi inválido");
         }
 
         if(context.isUpdate()){

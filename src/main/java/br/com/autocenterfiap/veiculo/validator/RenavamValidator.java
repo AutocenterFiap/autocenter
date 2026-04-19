@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.veiculo.validator;
 
+import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
 import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class RenavamValidator implements VeiculoValidator{
         if (renavam == null || renavam.isBlank()) return;
 
         if (!isValidRenavam(renavam)) {
-            throw new IllegalArgumentException("RENAVAM inválido");
+            throw new RenavamInvalidoException("RENAVAM inválido");
         }
 
         if(context.isUpdate()){

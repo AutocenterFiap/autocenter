@@ -1,5 +1,5 @@
 -- ========================================
--- Migration: V1__criar_tabela_veiculos
+-- Migration: V2__criar_tabela_veiculos
 -- Descrição: Cria a tabela de veículos da oficina
 -- Data: 2026-04-09
 -- Autor: Auto Center FIAP Team

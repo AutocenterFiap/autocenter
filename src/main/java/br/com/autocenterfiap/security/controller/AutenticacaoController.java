@@ -1,24 +1,25 @@
 package br.com.autocenterfiap.security.controller;
 
+import br.com.autocenterfiap.security.entity.Usuario;
 import br.com.autocenterfiap.security.model.LoginRequest;
 import br.com.autocenterfiap.security.model.RefreshToken;
 import br.com.autocenterfiap.security.model.Token;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import br.com.autocenterfiap.security.service.TokenService;
-import br.com.autocenterfiap.security.entity.Usuario;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/v1/oauth")
 public class AutenticacaoController {
     private final UsuarioRepository usuarioRepository;
     private final AuthenticationManager authenticationManager;
@@ -46,11 +47,4 @@ public class AutenticacaoController {
 
         return ResponseEntity.ok(new Token(novoTokenAcesso, novoRefreshToken));
     }
-
-    @GetMapping("/clientes/{clienteId}")
-    public ResponseEntity<String> teste(String clienteId){
-        return ResponseEntity.ok("permitido");
-    }
-
-
 }

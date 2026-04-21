@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/v1/usuarios")
 public class UsuarioController {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioService usuarioService;
@@ -51,12 +51,4 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuarioResponse);
     }
-
-    @GetMapping("/permitido")
-    public ResponseEntity<String> teste(){
-
-        System.out.println( passwordEncoder.encode("ADMIN") );
-        return ResponseEntity.ok("permitido");
-    }
-
 }

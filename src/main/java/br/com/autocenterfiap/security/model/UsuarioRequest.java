@@ -11,5 +11,6 @@ public record UsuarioRequest(@NotBlank String nome,
                              @NotBlank String senha,
                              @NotEmpty(message = "A lista de perfis não pode estar vazia")
                              @Valid
-                             @JsonProperty("perfis")  List<PerfilRequest> perfis) {
+                             @JsonProperty("perfis")
+                             List<PerfilRequest> perfis) {
 }

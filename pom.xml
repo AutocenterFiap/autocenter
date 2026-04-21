@@ -192,6 +192,7 @@
 						<exclude>**/dto/**</exclude>
 						<exclude>**/enums/**</exclude>
 						<exclude>**/security/model/**</exclude>
+						<exclude>**/security/entity/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

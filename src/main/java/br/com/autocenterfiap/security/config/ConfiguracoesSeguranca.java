@@ -31,13 +31,12 @@ public class ConfiguracoesSeguranca {
                         req -> {
                              req.requestMatchers("/h2-console/**").permitAll();// Libera o console H2
 
-                            req.requestMatchers("/token", "/refresh-token").permitAll();
-                            req.requestMatchers(HttpMethod.GET, "/usuarios/permitido").permitAll();
-//                            req.requestMatchers(HttpMethod.GET, "/usuarios/permitido").authenticated();
+                            req.requestMatchers("/v1/oauth/token", "/v1/oauth/refresh-token").permitAll();
+                            req.requestMatchers(HttpMethod.GET, "/v1/usuarios/permitido").permitAll();
 
-                            req.requestMatchers(HttpMethod.GET, "/usuarios/{nome}").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/usuarios").hasAnyRole("ADMIN");
-                            req.requestMatchers(HttpMethod.PATCH, "/usuarios/senha/alteracao").hasRole("ADMIN");
+                            req.requestMatchers(HttpMethod.GET, "/v1/usuarios/{nome}").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/v1/usuarios").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PATCH, "/v1/usuarios/senha/alteracao").hasRole("ADMIN");
 
 
                             req.requestMatchers(HttpMethod.GET, "/v1/api/clientes/**").permitAll();

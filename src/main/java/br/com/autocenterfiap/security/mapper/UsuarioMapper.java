@@ -9,6 +9,8 @@ import br.com.autocenterfiap.security.model.UsuarioResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
     Usuario toUsuario(UsuarioRequest usuarioRequest);
@@ -17,4 +19,7 @@ public interface UsuarioMapper {
     Usuario toUsuario(AlteracaoSenhaRequest alteracaoSenhaRequest);
 
     UsuarioResponse toUsuarioResponse(Usuario usuario);
+
+    Perfil toPerfil(PerfilRequest perfilRequest);
+    List<Perfil> toPerfis(List<PerfilRequest> perfisRequest);
 }

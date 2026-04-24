@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/veiculos")
+@RequestMapping("/v1/veiculos")
 @Tag(name = "Veículos", description = "API para gerenciamento de veículos da oficina")
 public class VeiculoController {
     private final VeiculoService veiculoService;

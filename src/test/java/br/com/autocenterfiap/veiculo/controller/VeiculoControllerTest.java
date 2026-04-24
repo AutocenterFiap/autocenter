@@ -82,7 +82,7 @@ class VeiculoControllerTest {
     void deveListarTodosOsVeiculos() throws Exception {
         repository.save(veiculo);
 
-        mockMvc.perform(get("/veiculos")
+        mockMvc.perform(get("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
@@ -92,7 +92,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornarListaVaziaQuandoNaoHouverVeiculos() throws Exception {
-        mockMvc.perform(get("/veiculos")
+        mockMvc.perform(get("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)));
@@ -103,7 +103,7 @@ class VeiculoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarVeiculoPorIdComSucesso() throws Exception {
         repository.save(veiculo);
-        mockMvc.perform(get("/veiculos/{id}", 1L)
+        mockMvc.perform(get("/v1/veiculos/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(veiculo.getId().intValue())))
@@ -123,7 +123,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarVeiculoInexistentePorId() throws Exception {
-        mockMvc.perform(get("/veiculos/{id}", 999L)
+        mockMvc.perform(get("/v1/veiculos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -132,7 +132,7 @@ class VeiculoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarVeiculoPorPlacaComSucesso() throws Exception {
         repository.save(veiculo);
-        mockMvc.perform(get("/veiculos/placa/{placa}", "ABC1D23")
+        mockMvc.perform(get("/v1/veiculos/placa/{placa}", "ABC1D23")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(veiculo.getId().intValue())))
@@ -152,7 +152,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarVeiculoInexistentePorPlaca() throws Exception {
-        mockMvc.perform(get("/veiculos/placa/{placa}", "XDXDXD")
+        mockMvc.perform(get("/v1/veiculos/placa/{placa}", "XDXDXD")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -173,7 +173,7 @@ class VeiculoControllerTest {
                 TipoCombustivel.DIESEL,
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoValido);
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
@@ -209,7 +209,7 @@ class VeiculoControllerTest {
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoInvalido);
 
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
@@ -233,7 +233,7 @@ class VeiculoControllerTest {
                 TipoCombustivel.DIESEL,
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoConflito);
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -257,7 +257,7 @@ class VeiculoControllerTest {
                 TipoCombustivel.DIESEL,
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoConflito);
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -281,7 +281,7 @@ class VeiculoControllerTest {
                 TipoCombustivel.DIESEL,
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoConflito);
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -304,7 +304,7 @@ class VeiculoControllerTest {
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoInvalido);
 
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
@@ -327,7 +327,7 @@ class VeiculoControllerTest {
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoInvalido);
 
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
@@ -350,7 +350,7 @@ class VeiculoControllerTest {
                 CategoriaVeiculo.CARRO);
         String json = objectMapper.writeValueAsString(veiculoInvalido);
 
-        mockMvc.perform(post("/veiculos")
+        mockMvc.perform(post("/v1/veiculos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
@@ -376,7 +376,7 @@ class VeiculoControllerTest {
         String json = objectMapper.writeValueAsString(veiculoUpdate);
 
 
-        mockMvc.perform(put("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(put("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -404,7 +404,7 @@ class VeiculoControllerTest {
                 veiculoSalvo.getCategoriaVeiculo());
         String json = objectMapper.writeValueAsString(veiculoUpdate);
 
-        mockMvc.perform(put("/veiculos/{id}", 999L)
+        mockMvc.perform(put("/v1/veiculos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isNotFound());
@@ -431,7 +431,7 @@ class VeiculoControllerTest {
         String json = objectMapper.writeValueAsString(veiculoUpdate);
 
 
-        mockMvc.perform(put("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(put("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -458,7 +458,7 @@ class VeiculoControllerTest {
         String json = objectMapper.writeValueAsString(veiculoUpdate);
 
 
-        mockMvc.perform(put("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(put("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -483,7 +483,7 @@ class VeiculoControllerTest {
                 veiculoSalvo.getCategoriaVeiculo());
         String json = objectMapper.writeValueAsString(veiculoUpdate);
 
-        mockMvc.perform(put("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(put("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict());
@@ -494,11 +494,11 @@ class VeiculoControllerTest {
     void deveDeletarVeiculoComSucesso() throws Exception {
         Veiculo veiculoSalvo = repository.save(veiculo);
 
-        mockMvc.perform(delete("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(delete("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/veiculos/{id}", veiculoSalvo.getId())
+        mockMvc.perform(get("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -506,7 +506,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoDeletarVeiculoInexistente() throws Exception {
-        mockMvc.perform(delete("/veiculos/{id}", 999L)
+        mockMvc.perform(delete("/v1/veiculos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

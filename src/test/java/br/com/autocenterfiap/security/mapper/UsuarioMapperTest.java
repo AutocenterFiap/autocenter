@@ -9,8 +9,10 @@ import br.com.autocenterfiap.security.model.PerfilRequest;
 import br.com.autocenterfiap.security.model.UsuarioRequest;
 import br.com.autocenterfiap.security.model.UsuarioResponse;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -19,11 +21,9 @@ import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisRequestMock;
 import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioMock;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 class UsuarioMapperTest {
 
-    @Autowired
-    private UsuarioMapper usuarioMapper;
+    private UsuarioMapper usuarioMapper = Mappers.getMapper(UsuarioMapper.class);
 
     @Test
     void deveMapearUsuarioRequestParaUsuario() {

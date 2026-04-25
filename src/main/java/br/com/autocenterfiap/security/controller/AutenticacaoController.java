@@ -4,7 +4,6 @@ import br.com.autocenterfiap.security.entity.Usuario;
 import br.com.autocenterfiap.security.model.LoginRequest;
 import br.com.autocenterfiap.security.model.RefreshToken;
 import br.com.autocenterfiap.security.model.Token;
-import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import br.com.autocenterfiap.security.service.TokenService;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;

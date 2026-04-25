@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.orcamento.repository.entity;
 
+import br.com.autocenterfiap.orcamento.controller.OrcamentoResponse;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
 import jakarta.persistence.Column;
@@ -86,5 +87,16 @@ public class Orcamento implements Serializable {
     @PreUpdate
     public void preUpdate(){
         this.dataUltimaAtualizacao = LocalDateTime.now();
+    }
+
+    public static OrcamentoResponse paraOrcamentoResponse(Orcamento orcamento) {
+        return OrcamentoResponse.builder()
+                .id(orcamento.getId())
+                .ordemServicoId(orcamento.getOrdemServico().getId())
+                .valorTotal(orcamento.getValorTotal())
+                .statusOrcamento(orcamento.getStatusOrcamento())
+                .dataCriacao(orcamento.getDataCriacao())
+                .dataUltimaAtualizacao(orcamento.getDataUltimaAtualizacao())
+                .build();
     }
 }

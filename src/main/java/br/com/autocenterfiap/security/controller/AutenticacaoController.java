@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.security.controller;
 
-import br.com.autocenterfiap.security.repository.entity.Usuario;
 import br.com.autocenterfiap.security.controller.request.LoginRequest;
 import br.com.autocenterfiap.security.controller.request.RefreshToken;
 import br.com.autocenterfiap.security.controller.response.Token;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import br.com.autocenterfiap.security.service.TokenService;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;

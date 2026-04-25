@@ -58,7 +58,7 @@ public class OrdemServico implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Schema(description = "Status atual da Ordem de Serviço", example = "RECEBIDA")
-    private StatusOS status;
+    private StatusOS statusOS;
 
     @Column(nullable = false, precision = 15, scale = 2)
     @Schema(description = "Valor total da Ordem de Serviço", example = "1500.50")
@@ -92,8 +92,8 @@ public class OrdemServico implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        if (this.status == null) {
-            this.status = StatusOS.RECEBIDA;
+        if (this.statusOS == null) {
+            this.statusOS = StatusOS.RECEBIDA;
         }
         this.dataCriacao = LocalDateTime.now();
         this.dataUltimaAtualizacao = LocalDateTime.now();

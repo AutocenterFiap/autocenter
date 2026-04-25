@@ -18,7 +18,7 @@ public record OrdemServicoResponseDTO(
         this(
             ordemServico.getId(),
             ordemServico.getNumeroOrdemServico(),
-            ordemServico.getStatus(),
+            ordemServico.getStatusOS(),
             ordemServico.getValorTotal(),
             ordemServico.getVeiculo().getId(),
             ordemServico.getCliente().getId()

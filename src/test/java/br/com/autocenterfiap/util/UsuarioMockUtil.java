@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.util;
 
+import br.com.autocenterfiap.security.controller.request.PerfilRequest;
+import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
+import br.com.autocenterfiap.security.controller.response.PerfilResponse;
+import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
 import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.repository.entity.Usuario;
-import br.com.autocenterfiap.security.controller.request.PerfilRequest;
-import br.com.autocenterfiap.security.controller.response.PerfilResponse;
-import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
-import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
 
 import java.util.List;
 

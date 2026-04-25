@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.security.repository;
 
-import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.enums.PerfilType;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

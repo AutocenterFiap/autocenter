@@ -1,7 +1,12 @@
 package br.com.autocenterfiap.veiculo.handler;
 
 import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.veiculo.exception.*;
+import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
+import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
+import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
+import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
+import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
+import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

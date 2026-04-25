@@ -1,15 +1,18 @@
 package br.com.autocenterfiap.orcamento.service;
 
 import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
+import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static br.com.autocenterfiap.orcamento.enums.StatusOrcamento.AGUARDANDO_APROVACAO;
 
 @Service
 @RequiredArgsConstructor
@@ -17,18 +20,18 @@ public class OrcamentoService {
     private final OrcamentoRepository orcamentoRepository;
     private final OrdemServicoRepository ordemServicoRepository;
 
-    public void aprovar(Long orcamentoId) {
+    public Orcamento aprovar(Long orcamentoId) {
         Orcamento orcamento = orcamentoRepository.findById(orcamentoId)
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(orcamentoId));
         orcamento.aprovar();
-        orcamentoRepository.save(orcamento);
+        return orcamentoRepository.save(orcamento);
     }
 
-    public void reprovar(Long orcamentoId) {
+    public Orcamento reprovar(Long orcamentoId) {
         Orcamento orcamento = orcamentoRepository.findById(orcamentoId)
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(orcamentoId));
         orcamento.reprovar();
-        orcamentoRepository.save(orcamento);
+        return orcamentoRepository.save(orcamento);
     }
 
     public void gerarOrcamento() {
@@ -43,8 +46,17 @@ public class OrcamentoService {
     private Orcamento salvarOrcamento(OrdemServico os) {
         Orcamento orcamento = Orcamento.builder()
                 .ordemServico(os)
+                .statusOrcamento(AGUARDANDO_APROVACAO)
                 .valorTotal(os.getValorTotal())
                 .build();
+        return orcamentoRepository.save(orcamento);
+    }
+
+    public Orcamento findById(Long id){
+        Orcamento orcamento = orcamentoRepository
+                .findById(id)
+                .orElseThrow();
+        orcamento.aprovar();
         return orcamentoRepository.save(orcamento);
     }
 }

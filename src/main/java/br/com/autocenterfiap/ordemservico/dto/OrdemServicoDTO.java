@@ -14,7 +14,7 @@ public record OrdemServicoDTO(
     @NotNull(message = "O ID do cliente é obrigatório")
     Long clienteId,
     
-    StatusOS status,
+    StatusOS statusOS,
     
     @PositiveOrZero(message = "O valor total não pode ser negativo")
     BigDecimal valorTotal

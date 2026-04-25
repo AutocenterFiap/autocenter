@@ -56,7 +56,7 @@ public class OrdemServico implements Serializable {
     private Long numeroOrdemServico;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "status_os",nullable = false, length = 20)
     @Schema(description = "Status atual da Ordem de Serviço", example = "RECEBIDA")
     private StatusOS statusOS;
 

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long> {
+    @Query("SELECT os FROM OrdemServico os WHERE os.statusOS = :statusOS")
     List<OrdemServico> findByStatus(StatusOS statusOS);
     Optional<OrdemServico> findByNumeroOrdemServico(Long numeroOrdemServico);
 }

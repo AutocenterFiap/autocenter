@@ -4,12 +4,11 @@ import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record OrdemServicoResponseDTO(
     Long id,
     Long numeroOrdemServico,
-    StatusOS status,
+    StatusOS statusOS,
     BigDecimal valorTotal,
     Long veiculoId,
     Long clienteId

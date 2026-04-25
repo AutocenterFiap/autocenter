@@ -1,32 +1,33 @@
 package br.com.autocenterfiap.security.service;
 
-import br.com.autocenterfiap.security.entity.Perfil;
-import br.com.autocenterfiap.security.entity.Usuario;
 import br.com.autocenterfiap.security.enums.PerfilType;
 import br.com.autocenterfiap.security.exception.PerfilNaoEncontradoException;
 import br.com.autocenterfiap.security.exception.UsuarioNaoEncontradoException;
 import br.com.autocenterfiap.security.repository.PerfilRepository;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
-import br.com.autocenterfiap.util.PerfilMockUtil;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfilMock;
 import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisMock;
 import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioMock;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioServiceTest {

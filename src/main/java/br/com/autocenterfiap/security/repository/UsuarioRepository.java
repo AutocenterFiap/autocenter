@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.security.repository;
 
-import br.com.autocenterfiap.security.entity.Usuario;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

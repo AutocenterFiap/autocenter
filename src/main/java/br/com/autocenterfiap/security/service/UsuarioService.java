@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.security.service;
 
-import br.com.autocenterfiap.security.entity.Perfil;
-import br.com.autocenterfiap.security.entity.Usuario;
 import br.com.autocenterfiap.security.exception.PerfilNaoEncontradoException;
 import br.com.autocenterfiap.security.exception.UsuarioNaoEncontradoException;
 import br.com.autocenterfiap.security.repository.PerfilRepository;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

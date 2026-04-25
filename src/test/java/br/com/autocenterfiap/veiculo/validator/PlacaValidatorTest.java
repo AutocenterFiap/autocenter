@@ -5,9 +5,7 @@ import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
 import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
-import br.com.autocenterfiap.veiculo.service.VeiculoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,9 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

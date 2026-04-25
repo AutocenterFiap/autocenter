@@ -4,8 +4,6 @@ import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
-import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
 import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
 import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
@@ -17,7 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

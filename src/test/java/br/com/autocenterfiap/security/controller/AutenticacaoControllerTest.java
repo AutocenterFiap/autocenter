@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.security.controller;
 
-import br.com.autocenterfiap.security.entity.Perfil;
-import br.com.autocenterfiap.security.entity.Usuario;
+import br.com.autocenterfiap.security.controller.request.PerfilRequest;
+import br.com.autocenterfiap.security.controller.response.PerfilResponse;
 import br.com.autocenterfiap.security.enums.PerfilType;
-import br.com.autocenterfiap.security.model.PerfilRequest;
-import br.com.autocenterfiap.security.model.PerfilResponse;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import br.com.autocenterfiap.security.service.TokenService;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;

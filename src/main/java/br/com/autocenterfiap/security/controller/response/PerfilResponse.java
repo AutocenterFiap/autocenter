@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.model;
+package br.com.autocenterfiap.security.controller.response;
 
 import br.com.autocenterfiap.security.enums.PerfilType;
 import lombok.AllArgsConstructor;

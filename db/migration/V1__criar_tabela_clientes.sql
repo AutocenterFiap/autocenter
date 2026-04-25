@@ -24,7 +24,11 @@ CREATE TABLE clientes (
     complemento VARCHAR(255),
     bairro VARCHAR(100),
     cidade VARCHAR(100) NOT NULL,
-    estado VARCHAR(2) NOT NULL
+    estado VARCHAR(2) NOT NULL,
+
+    -- Auditoria
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Criar índices para melhor performance

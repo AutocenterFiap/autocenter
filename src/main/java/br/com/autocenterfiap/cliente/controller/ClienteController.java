@@ -1,6 +1,7 @@
 package br.com.autocenterfiap.cliente.controller;
 
-import br.com.autocenterfiap.cliente.model.Cliente;
+import br.com.autocenterfiap.cliente.dto.ClienteDTO;
+import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.cliente.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,11 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/api/clientes")
@@ -27,15 +28,16 @@ public class ClienteController {
 
     @Operation(
             summary = "Listar todos os clientes",
-            description = "Retorna uma lista com todos os clientes cadastrados no sistema"
+            description = "Retorna uma lista paginada com todos os clientes cadastrados no sistema. " +
+                    "Por padrão retorna 20 clientes por página, ordenados por ID de forma crescente."
     )
     @ApiResponse(
             responseCode = "200",
             description = "Lista de clientes retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarTodos() {
-        List<Cliente> clientes = clienteService.listarTodos();
+    public ResponseEntity<Page<ClienteResponseDTO>> listarTodos(Pageable pageable) {
+        Page<ClienteResponseDTO> clientes = clienteService.listarTodos(pageable);
         return ResponseEntity.ok(clientes);
     }
 
@@ -47,7 +49,7 @@ public class ClienteController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Cliente encontrado",
-                    content = @Content(schema = @Schema(implementation = Cliente.class))
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -55,13 +57,11 @@ public class ClienteController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(
+    public ResponseEntity<ClienteResponseDTO> buscarPorId(
             @Parameter(description = "ID do cliente a ser buscado", required = true)
             @PathVariable Long id
     ) {
-        return clienteService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return clienteService.buscarPorId(id);
     }
 
     @Operation(
@@ -71,7 +71,8 @@ public class ClienteController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Cliente encontrado"
+                    description = "Cliente encontrado",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -79,13 +80,11 @@ public class ClienteController {
             )
     })
     @GetMapping("/documento/{documento}")
-    public ResponseEntity<Cliente> buscarPorDocumento(
+    public ResponseEntity<ClienteResponseDTO> buscarPorDocumento(
             @Parameter(description = "Documento do cliente - CPF (11 dígitos) ou CNPJ (14 dígitos)", required = true, example = "12345678901")
             @PathVariable String documento
     ) {
-        return clienteService.buscarPorDocumento(documento)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return clienteService.buscarPorDocumento(documento);
     }
 
     @Operation(
@@ -96,7 +95,7 @@ public class ClienteController {
             @ApiResponse(
                     responseCode = "201",
                     description = "Cliente criado com sucesso",
-                    content = @Content(schema = @Schema(implementation = Cliente.class))
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -108,12 +107,12 @@ public class ClienteController {
             )
     })
     @PostMapping
-    public ResponseEntity<Cliente> criar(
+    public ResponseEntity<ClienteResponseDTO> criar(
             @Parameter(description = "Dados do cliente a ser criado", required = true)
-            @Valid @RequestBody Cliente cliente
+            @Valid @RequestBody ClienteDTO clienteDTO
     ) {
-        Cliente clienteSalvo = clienteService.criar(cliente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteSalvo);
+        ClienteResponseDTO cliente = clienteService.criar(clienteDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cliente);
     }
 
     @Operation(
@@ -123,7 +122,8 @@ public class ClienteController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Cliente atualizado com sucesso"
+                    description = "Cliente atualizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -135,18 +135,18 @@ public class ClienteController {
             ),
             @ApiResponse(
                     responseCode = "409",
-                    description = "CPF ou email já cadastrado para outro cliente"
+                    description = "Email já cadastrado para outro cliente"
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(
+    public ResponseEntity<ClienteResponseDTO> atualizar(
             @Parameter(description = "ID do cliente a ser atualizado", required = true)
             @PathVariable Long id,
             @Parameter(description = "Novos dados do cliente", required = true)
-            @Valid @RequestBody Cliente cliente
+            @Valid @RequestBody ClienteDTO clienteDTO
     ) {
-        Cliente clienteAtualizado = clienteService.atualizar(id, cliente);
-        return ResponseEntity.ok(clienteAtualizado);
+        ClienteResponseDTO cliente = clienteService.atualizar(id, clienteDTO);
+        return ResponseEntity.ok(cliente);
     }
 
     @Operation(

@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.security.handler;
 
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
-import br.com.autocenterfiap.security.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +22,12 @@ import static org.mockito.Mockito.when;
 
 class TratamentoErroTest {
 
-    private TratamentoErro tratamentoErro;
+    private TratamentoErroAdvice tratamentoErro;
     private HttpServletRequest request;
 
     @BeforeEach
     void setUp() {
-        tratamentoErro = new TratamentoErro();
+        tratamentoErro = new TratamentoErroAdvice();
         request = Mockito.mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/api/teste");
     }

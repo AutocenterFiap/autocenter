@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.security.repository;
 
-import br.com.autocenterfiap.security.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.enums.PerfilType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

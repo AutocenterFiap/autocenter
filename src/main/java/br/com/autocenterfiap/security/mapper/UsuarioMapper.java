@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.security.mapper;
 
-import br.com.autocenterfiap.security.entity.Perfil;
-import br.com.autocenterfiap.security.entity.Usuario;
-import br.com.autocenterfiap.security.model.AlteracaoSenhaRequest;
-import br.com.autocenterfiap.security.model.PerfilRequest;
-import br.com.autocenterfiap.security.model.UsuarioRequest;
-import br.com.autocenterfiap.security.model.UsuarioResponse;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
+import br.com.autocenterfiap.security.controller.request.AlteracaoSenhaRequest;
+import br.com.autocenterfiap.security.controller.request.PerfilRequest;
+import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
+import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

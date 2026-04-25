@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.entity;
+package br.com.autocenterfiap.security.repository.entity;
 
 import br.com.autocenterfiap.security.enums.PerfilType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

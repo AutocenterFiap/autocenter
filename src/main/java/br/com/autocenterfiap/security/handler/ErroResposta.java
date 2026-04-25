@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.model;
+package br.com.autocenterfiap.security.handler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

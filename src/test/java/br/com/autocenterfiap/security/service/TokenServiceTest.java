@@ -1,8 +1,8 @@
 package br.com.autocenterfiap.security.service;
 
+import br.com.autocenterfiap.security.exception.TokenInvalidoException;
 import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.repository.entity.Usuario;
-import br.com.autocenterfiap.security.exception.TokenInvalidoException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,9 @@ import java.util.List;
 
 import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisMock;
 import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioMock;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

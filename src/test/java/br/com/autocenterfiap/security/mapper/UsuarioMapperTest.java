@@ -1,12 +1,12 @@
 package br.com.autocenterfiap.security.mapper;
 
-import br.com.autocenterfiap.security.repository.entity.Perfil;
-import br.com.autocenterfiap.security.repository.entity.Usuario;
-import br.com.autocenterfiap.security.enums.PerfilType;
 import br.com.autocenterfiap.security.controller.request.AlteracaoSenhaRequest;
 import br.com.autocenterfiap.security.controller.request.PerfilRequest;
 import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
 import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
+import br.com.autocenterfiap.security.enums.PerfilType;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 

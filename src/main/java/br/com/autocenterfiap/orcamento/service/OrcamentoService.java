@@ -1,17 +1,15 @@
 package br.com.autocenterfiap.orcamento.service;
 
 import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
+import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

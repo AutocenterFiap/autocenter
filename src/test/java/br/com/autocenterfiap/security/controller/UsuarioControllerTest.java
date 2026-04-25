@@ -3,8 +3,8 @@ package br.com.autocenterfiap.security.controller;
 import br.com.autocenterfiap.security.controller.request.AlteracaoSenhaRequest;
 import br.com.autocenterfiap.security.controller.request.PerfilRequest;
 import br.com.autocenterfiap.security.controller.response.PerfilResponse;
-import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.mapper.UsuarioMapper;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +20,16 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static br.com.autocenterfiap.util.PerfilMockUtil.*;
-import static br.com.autocenterfiap.util.UsuarioMockUtil.*;
+import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisMock;
+import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisRequestMock;
+import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisResponseMock;
+import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioMock;
+import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioRequestMock;
+import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioResponseMock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

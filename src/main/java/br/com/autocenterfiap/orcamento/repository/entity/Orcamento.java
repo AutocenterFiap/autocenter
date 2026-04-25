@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.orcamento.repository.entity;
 
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

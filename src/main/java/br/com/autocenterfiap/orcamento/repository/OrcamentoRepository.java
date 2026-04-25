@@ -1,13 +1,11 @@
 package br.com.autocenterfiap.orcamento.repository;
 
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

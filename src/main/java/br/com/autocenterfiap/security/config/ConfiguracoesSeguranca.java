@@ -66,9 +66,10 @@ public class ConfiguracoesSeguranca {
 
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/v1/ordem-servicos").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.PUT, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.DELETE, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/numero/{numeroOrdemServico}").permitAll();
+                            req.requestMatchers(HttpMethod.POST, "/v1/ordem-servicos").permitAll();
+                            req.requestMatchers(HttpMethod.PUT, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
+                            req.requestMatchers(HttpMethod.DELETE, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
 
                             // Swagger - público para documentação
                             req.requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll();

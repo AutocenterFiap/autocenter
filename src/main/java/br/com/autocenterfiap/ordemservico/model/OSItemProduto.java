@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.repository.entity;
+package br.com.autocenterfiap.ordemservico.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;

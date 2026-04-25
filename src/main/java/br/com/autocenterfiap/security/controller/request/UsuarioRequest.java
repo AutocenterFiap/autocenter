@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.model;
+package br.com.autocenterfiap.security.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;

@@ -2,7 +2,7 @@ package br.com.autocenterfiap.security.service;
 
 import br.com.autocenterfiap.security.exception.FalhaCriacaoTokenException;
 import br.com.autocenterfiap.security.exception.TokenInvalidoException;
-import br.com.autocenterfiap.security.entity.Usuario;
+import br.com.autocenterfiap.security.repository.entity.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;

@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.entity;
+package br.com.autocenterfiap.security.repository.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;

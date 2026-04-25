@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.security.handler;
 
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
-import br.com.autocenterfiap.security.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class TratamentoErro {
+public class TratamentoErroAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> tratarErro400(MethodArgumentNotValidException ex) {

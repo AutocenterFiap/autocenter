@@ -1,16 +1,15 @@
 package br.com.autocenterfiap.security.controller;
 
 import br.com.autocenterfiap.security.mapper.UsuarioMapper;
-import br.com.autocenterfiap.security.model.AlteracaoSenhaRequest;
-import br.com.autocenterfiap.security.model.UsuarioRequest;
-import br.com.autocenterfiap.security.model.UsuarioResponse;
+import br.com.autocenterfiap.security.controller.request.AlteracaoSenhaRequest;
+import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
+import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.model;
+package br.com.autocenterfiap.security.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 

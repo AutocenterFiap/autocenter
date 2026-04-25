@@ -1,10 +1,10 @@
 package br.com.autocenterfiap.security.controller;
 
-import br.com.autocenterfiap.security.entity.Perfil;
-import br.com.autocenterfiap.security.entity.Usuario;
-import br.com.autocenterfiap.security.enums.PerfilType;
+import br.com.autocenterfiap.security.controller.request.AlteracaoSenhaRequest;
+import br.com.autocenterfiap.security.controller.request.PerfilRequest;
+import br.com.autocenterfiap.security.controller.response.PerfilResponse;
+import br.com.autocenterfiap.security.repository.entity.Perfil;
 import br.com.autocenterfiap.security.mapper.UsuarioMapper;
-import br.com.autocenterfiap.security.model.*;
 import br.com.autocenterfiap.security.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -7,6 +7,7 @@ import br.com.autocenterfiap.security.exception.UsuarioNaoEncontradoException;
 import br.com.autocenterfiap.security.repository.PerfilRepository;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -52,5 +54,10 @@ public class UsuarioService implements UserDetailsService {
                 .orElseThrow(() -> new UsuarioNaoEncontradoException("O usuário não foi encontrado!"));
         usuarioEncontrado.setSenha(usuario.getSenha());
         return usuarioRepository.save(usuario);
+    }
+
+    public Usuario findByNomeWithPerfis(String nome){
+        return usuarioRepository.findByNomeWithPerfis(nome)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("O usuário não foi encontrado!"));
     }
 }

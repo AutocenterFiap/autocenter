@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.security.config;
+package br.com.autocenterfiap.security.filtros;
 
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import br.com.autocenterfiap.security.service.TokenService;

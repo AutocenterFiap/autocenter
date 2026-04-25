@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.security.config;
 
+import br.com.autocenterfiap.security.filtros.FiltroTokenAcesso;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Autenticação", description = "API para autenticação de usuários")
 public class AutenticacaoController {
-    private final UsuarioRepository usuarioRepository;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final UsuarioService usuarioService;

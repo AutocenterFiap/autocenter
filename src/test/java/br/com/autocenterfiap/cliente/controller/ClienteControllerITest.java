@@ -91,9 +91,12 @@ class ClienteControllerITest {
         mockMvc.perform(get("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].nome", notNullValue()))
-                .andExpect(jsonPath("$[1].nome", notNullValue()));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].nome", notNullValue()))
+                .andExpect(jsonPath("$.content[1].nome", notNullValue()))
+                .andExpect(jsonPath("$.totalElements", is(2)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.size", is(20)));
     }
 
     @Test
@@ -102,7 +105,9 @@ class ClienteControllerITest {
         mockMvc.perform(get("/v1/api/clientes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements", is(0)))
+                .andExpect(jsonPath("$.totalPages", is(0)));
     }
 
     @Test

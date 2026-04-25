@@ -1,20 +1,25 @@
 package br.com.autocenterfiap.cliente.service;
 
+import br.com.autocenterfiap.cliente.dto.ClienteDTO;
+import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoJaCadastradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
 import br.com.autocenterfiap.cliente.exception.EmailJaCadastradoException;
+import br.com.autocenterfiap.cliente.mapper.ClienteMapper;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
 import br.com.autocenterfiap.cliente.validator.DocumentoValidator;
 import br.com.autocenterfiap.cliente.validator.DocumentoValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,21 +29,37 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public List<Cliente> listarTodos() {
-        log.info("Listando todos os clientes");
-        List<Cliente> clientes = clienteRepository.findAll();
-        log.info("Total de {} clientes encontrados", clientes.size());
-        return clientes;
+    @Autowired
+    private ClienteMapper clienteMapper;
+
+    public Page<ClienteResponseDTO> listarTodos(Pageable pageable) {
+        log.info("Listando clientes com paginação - Página: {}, Tamanho: {}",
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        Page<Cliente> clientes = clienteRepository.findAll(pageable);
+
+        log.info("Total de {} clientes encontrados na página {} de {}",
+                clientes.getNumberOfElements(),
+                clientes.getNumber() + 1,
+                clientes.getTotalPages());
+
+        return clientes.map(clienteMapper::toResponseDTO);
     }
 
-    public Optional<Cliente> buscarPorId(Long id) {
+    public ResponseEntity<ClienteResponseDTO> buscarPorId(Long id) {
         log.info("Buscando cliente por ID: {}", id);
-        return clienteRepository.findById(id);
+        return clienteRepository.findById(id)
+                .map(clienteMapper::toResponseDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    public Optional<Cliente> buscarPorDocumento(String documento) {
+    public ResponseEntity<ClienteResponseDTO> buscarPorDocumento(String documento) {
         log.info("Buscando cliente por documento: {}", documento);
-        return clienteRepository.findByDocumento(documento);
+        return clienteRepository.findByDocumento(documento)
+                .map(clienteMapper::toResponseDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     public Optional<Cliente> buscarPorEmail(String email) {
@@ -55,9 +76,11 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente criar(Cliente cliente) {
+    public ClienteResponseDTO criar(ClienteDTO clienteDTO) {
         log.info("Iniciando criação de cliente: tipo={}, documento={}",
-            cliente.getTipoCliente(), cliente.getDocumento());
+            clienteDTO.getTipoCliente(), clienteDTO.getDocumento());
+
+        Cliente cliente = clienteMapper.toEntity(clienteDTO);
 
         try {
             // Validar consistência entre tipo de cliente e documento
@@ -84,7 +107,7 @@ public class ClienteService {
             log.info("Cliente criado com sucesso: ID={}, Nome={}, Documento={}",
                 clienteSalvo.getId(), clienteSalvo.getNome(), clienteSalvo.getDocumento());
 
-            return clienteSalvo;
+            return clienteMapper.toResponseDTO(clienteSalvo);
 
         } catch (DocumentoInvalidoException | DocumentoJaCadastradoException | EmailJaCadastradoException e) {
             log.error("Erro ao criar cliente: {}", e.getMessage());
@@ -126,8 +149,10 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente atualizar(Long id, Cliente clienteAtualizado) {
+    public ClienteResponseDTO atualizar(Long id, ClienteDTO clienteDTO) {
         log.info("Iniciando atualização do cliente ID: {}", id);
+
+        Cliente cliente = clienteMapper.toEntity(clienteDTO);
 
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> {
@@ -136,36 +161,36 @@ public class ClienteService {
                 });
 
         // REGRA: Documento não pode ser alterado após cadastro
-        if (!clienteExistente.getDocumento().equals(clienteAtualizado.getDocumento())) {
+        if (!clienteExistente.getDocumento().equals(cliente.getDocumento())) {
             log.warn("Tentativa de alterar documento do cliente ID={}: antigo={}, novo={}",
-                id, clienteExistente.getDocumento(), clienteAtualizado.getDocumento());
+                id, clienteExistente.getDocumento(), cliente.getDocumento());
             throw new DocumentoNaoPodeSerAlteradoException();
         }
 
         // REGRA: Tipo de cliente não pode ser alterado (pois está atrelado ao documento)
-        if (clienteExistente.getTipoCliente() != clienteAtualizado.getTipoCliente()) {
+        if (clienteExistente.getTipoCliente() != cliente.getTipoCliente()) {
             log.warn("Tentativa de alterar tipo de cliente ID={}: antigo={}, novo={}",
-                id, clienteExistente.getTipoCliente(), clienteAtualizado.getTipoCliente());
+                id, clienteExistente.getTipoCliente(), cliente.getTipoCliente());
             throw new IllegalArgumentException("O tipo de cliente não pode ser alterado.");
         }
 
         // Validar se email não está sendo usado por outro cliente
-        if (!clienteExistente.getEmail().equals(clienteAtualizado.getEmail())) {
+        if (!clienteExistente.getEmail().equals(cliente.getEmail())) {
             log.info("Email sendo alterado para cliente ID={}: antigo={}, novo={}",
-                id, clienteExistente.getEmail(), clienteAtualizado.getEmail());
-            if (existePorEmail(clienteAtualizado.getEmail())) {
-                log.warn("Tentativa de atualizar para email já cadastrado: {}", clienteAtualizado.getEmail());
-                throw new EmailJaCadastradoException(clienteAtualizado.getEmail());
+                id, clienteExistente.getEmail(), cliente.getEmail());
+            if (existePorEmail(cliente.getEmail())) {
+                log.warn("Tentativa de atualizar para email já cadastrado: {}", cliente.getEmail());
+                throw new EmailJaCadastradoException(cliente.getEmail());
             }
         }
 
         // Atualiza os dados
-        clienteAtualizado.setId(id);
-        Cliente clienteSalvo = clienteRepository.save(clienteAtualizado);
+        cliente.setId(id);
+        Cliente clienteSalvo = clienteRepository.save(cliente);
         log.info("Cliente atualizado com sucesso: ID={}, Nome={}",
             clienteSalvo.getId(), clienteSalvo.getNome());
 
-        return clienteSalvo;
+        return clienteMapper.toResponseDTO(clienteSalvo);
     }
 
     @Transactional

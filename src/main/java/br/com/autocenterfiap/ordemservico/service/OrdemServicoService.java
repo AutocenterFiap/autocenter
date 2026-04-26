@@ -3,6 +3,10 @@ package br.com.autocenterfiap.ordemservico.service;
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoDTO;
+import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoResponseDTO;
+import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
+import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
@@ -72,6 +76,53 @@ public class OrdemServicoService {
         ordemServicoRepository.delete(ordemServico);
     }
 
+    // ========================================
+    // Sub-recursos: Produtos
+    // ========================================
+
+    @Transactional
+    public OSItemProdutoResponseDTO adicionarProduto(Long ordemServicoId, OSItemProdutoDTO dto) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Mapear e adicionar OSItemProduto à OrdemServico
+        return null;
+    }
+
+    @Transactional
+    public OSItemProdutoResponseDTO atualizarProduto(Long ordemServicoId, Long produtoItemId, OSItemProdutoDTO dto) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Buscar o item, atualizar e salvar
+        return null;
+    }
+
+    @Transactional
+    public void removerProduto(Long ordemServicoId, Long produtoItemId) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Remover o item da lista e salvar
+    }
+
+    // ========================================
+    // Sub-recursos: Serviços
+    // ========================================
+
+    @Transactional
+    public OSItemServicoResponseDTO adicionarServico(Long ordemServicoId, OSItemServicoDTO dto) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Mapear e adicionar OSItemServico à OrdemServico
+        return null;
+    }
+
+    @Transactional
+    public OSItemServicoResponseDTO atualizarServico(Long ordemServicoId, Long servicoItemId, OSItemServicoDTO dto) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Buscar o item, atualizar e salvar
+        return null;
+    }
+
+    @Transactional
+    public void removerServico(Long ordemServicoId, Long servicoItemId) {
+        OrdemServico ordemServico = findById(ordemServicoId);
+        // TODO: Remover o item da lista e salvar
+    }
 
     // Funções auxiliares para buscar entidades relacionadas e validar a existência de OS
 

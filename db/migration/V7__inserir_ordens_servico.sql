@@ -10,7 +10,7 @@ INSERT INTO ordem_servico (
     numero_ordem_servico, status_os, valor_total, veiculo_id, cliente_id,
     data_criacao, data_ultima_atualizacao
 ) VALUES (
-    1001, 'RECEBIDA', 1500.50, 1, 1, NOW(), NOW()
+    1001, 'CANCELADA', 1500.50, 1, 1, NOW(), NOW()
 );
 
 -- OS 2: Maria Santos (Cliente 2) com o Honda Civic (Veiculo 2)

@@ -7,5 +7,6 @@ public enum StatusOS {
     EM_DIAGNOSTICO,
     AGUARDANDO_APROVACAO,
     FINALIZADA,
-    ENTREGUE
+    ENTREGUE,
+    CANCELADA
 }

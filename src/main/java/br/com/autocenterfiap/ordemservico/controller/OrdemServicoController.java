@@ -48,7 +48,8 @@ public class OrdemServicoController {
 
     @PostMapping
     public ResponseEntity<OrdemServicoResponseDTO> criar(@RequestBody @Valid OrdemServicoDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordemServicoService.criar(dto));
+        OrdemServicoResponseDTO responseDTO = ordemServicoService.criar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PutMapping("/{id}")

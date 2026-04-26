@@ -90,17 +90,13 @@ public class OrdemServico implements Serializable {
     @Schema(description = "Data e hora da última atualização do registro", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataUltimaAtualizacao;
 
-    @PrePersist
-    public void prePersist() {
-        if (this.statusOS == null) {
-            this.statusOS = StatusOS.RECEBIDA;
-        }
-        this.dataCriacao = LocalDateTime.now();
-        this.dataUltimaAtualizacao = LocalDateTime.now();
+    public OrdemServico(OrdemServicoDTO dto,Veiculo veiculo,Cliente cliente) {
+        this.numeroOrdemServico = dto.numeroOrdemServico();
+        this.cliente = cliente;
+        this.veiculo = veiculo;
+        this.statusOS = StatusOS.RECEBIDA; // Status inicial padrão
+        this.valorTotal = dto.valorTotal();
     }
 
-    public OrdemServico(OrdemServicoDTO dto){
-
-    }
 
 }

@@ -1,11 +1,11 @@
 -- ========================================
--- Migration: V6__criar_tabela_pecas
--- Descrição: Cria tabelas de peças/insumos e itens de peça na OS
+-- Migration: V6__criar_tabela_produtos
+-- Descrição: Cria tabelas de produtos/insumos e itens de produto na OS
 -- Data: 2026-04-25
 -- Autor: Auto Center FIAP Team
 -- ========================================
 
-CREATE TABLE pecas (
+CREATE TABLE produtos (
     id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
     nome                  VARCHAR(255)   NOT NULL,
     codigo                VARCHAR(100)   NOT NULL UNIQUE,
@@ -21,22 +21,22 @@ CREATE TABLE pecas (
     data_ultima_atualizacao TIMESTAMP
 );
 
-CREATE INDEX idx_pecas_codigo    ON pecas (codigo);
-CREATE INDEX idx_pecas_categoria ON pecas (categoria);
-CREATE INDEX idx_pecas_ativo     ON pecas (ativo);
+CREATE INDEX idx_produtos_codigo    ON produtos (codigo);
+CREATE INDEX idx_produtos_categoria ON produtos (categoria);
+CREATE INDEX idx_produtos_ativo     ON produtos (ativo);
 
--- Tabela de itens de peça vinculados a uma Ordem de Serviço
+-- Tabela de itens de produto vinculados a uma Ordem de Serviço
 -- NOTA: a FK para ordem_servico será adicionada quando essa tabela existir
-CREATE TABLE os_item_peca (
+CREATE TABLE os_item_produto (
     id                        BIGINT AUTO_INCREMENT PRIMARY KEY,
     ordem_servico_id          BIGINT         NOT NULL,
-    peca_id                   BIGINT         NOT NULL,
+    produto_id                BIGINT         NOT NULL,
     quantidade                INT            NOT NULL,
     preco_unitario_no_momento NUMERIC(15, 2) NOT NULL,
     data_criacao              TIMESTAMP,
     data_ultima_atualizacao   TIMESTAMP,
-    CONSTRAINT fk_os_item_peca_peca FOREIGN KEY (peca_id) REFERENCES pecas (id)
+    CONSTRAINT fk_os_item_produto_produto FOREIGN KEY (produto_id) REFERENCES produtos (id)
 );
 
-CREATE INDEX idx_os_item_peca_os   ON os_item_peca (ordem_servico_id);
-CREATE INDEX idx_os_item_peca_peca ON os_item_peca (peca_id);
+CREATE INDEX idx_os_item_produto_os      ON os_item_produto (ordem_servico_id);
+CREATE INDEX idx_os_item_produto_produto ON os_item_produto (produto_id);

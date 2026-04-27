@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.peca.dto;
+package br.com.autocenterfiap.produto.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;

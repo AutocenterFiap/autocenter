@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.peca.model;
+package br.com.autocenterfiap.produto.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -24,9 +24,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "os_item_peca")
-@Schema(description = "Representa uma peça vinculada a uma Ordem de Serviço")
-public class OSItemPeca implements Serializable {
+@Table(name = "os_item_produto")
+@Schema(description = "Representa um produto vinculado a uma Ordem de Serviço")
+public class OSItemProduto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -41,9 +41,9 @@ public class OSItemPeca implements Serializable {
     private Long ordemServicoId;
 
     @ManyToOne
-    @JoinColumn(name = "peca_id", nullable = false)
-    @Schema(description = "Peça vinculada")
-    private Peca peca;
+    @JoinColumn(name = "produto_id", nullable = false)
+    @Schema(description = "Produto vinculado")
+    private Produto produto;
 
     @Column(nullable = false)
     @Schema(description = "Quantidade utilizada", example = "2")

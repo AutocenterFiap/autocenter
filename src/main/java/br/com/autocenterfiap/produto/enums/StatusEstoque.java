@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.peca.enums;
+package br.com.autocenterfiap.produto.enums;
 
 public enum StatusEstoque {
     NORMAL,

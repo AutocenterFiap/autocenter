@@ -1,10 +1,10 @@
-package br.com.autocenterfiap.peca.model;
+package br.com.autocenterfiap.produto.model;
 
-import br.com.autocenterfiap.peca.dto.PecaRequestDTO;
-import br.com.autocenterfiap.peca.enums.StatusEstoque;
-import br.com.autocenterfiap.peca.enums.TipoPeca;
-import br.com.autocenterfiap.peca.enums.UnidadeMedida;
-import br.com.autocenterfiap.peca.exception.EstoqueInsuficienteException;
+import br.com.autocenterfiap.produto.dto.ProdutoRequestDTO;
+import br.com.autocenterfiap.produto.enums.StatusEstoque;
+import br.com.autocenterfiap.produto.enums.TipoProduto;
+import br.com.autocenterfiap.produto.enums.UnidadeMedida;
+import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,27 +29,27 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "pecas")
-@Schema(description = "Representa uma Peça ou Insumo do estoque da oficina")
-public class Peca implements Serializable {
+@Table(name = "produtos")
+@Schema(description = "Representa um Produto (Peça ou Insumo) do estoque da oficina")
+public class Produto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Identificador único da peça", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Identificador único do produto", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @Column(nullable = false)
-    @Schema(description = "Nome da peça", example = "Filtro de Óleo", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Nome do produto", example = "Filtro de Óleo", requiredMode = Schema.RequiredMode.REQUIRED)
     private String nome;
 
     @Column(nullable = false, unique = true)
-    @Schema(description = "Código interno único da peça", example = "FO-001", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Código interno único do produto", example = "FO-001", requiredMode = Schema.RequiredMode.REQUIRED)
     private String codigo;
 
-    @Schema(description = "Descrição da peça", example = "Filtro de óleo para motores 1.0 a 2.0")
+    @Schema(description = "Descrição do produto", example = "Filtro de óleo para motores 1.0 a 2.0")
     private String descricao;
 
     @Enumerated(EnumType.STRING)
@@ -58,7 +58,7 @@ public class Peca implements Serializable {
     private UnidadeMedida unidadeMedida;
 
     @Column(nullable = false, precision = 15, scale = 2)
-    @Schema(description = "Preço unitário da peça", example = "45.90", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Preço unitário do produto", example = "45.90", requiredMode = Schema.RequiredMode.REQUIRED)
     private BigDecimal precoUnitario;
 
     @Column(nullable = false)
@@ -70,16 +70,16 @@ public class Peca implements Serializable {
     private Integer estoqueMinimo;
 
     @Column(nullable = false)
-    @Schema(description = "Categoria da peça", example = "Motor")
+    @Schema(description = "Categoria do produto", example = "Motor")
     private String categoria;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    @Schema(description = "Tipo do item: PECAS ou INSUMOS", example = "PECAS", requiredMode = Schema.RequiredMode.REQUIRED)
-    private TipoPeca tipo;
+    @Schema(description = "Tipo do produto: PECAS ou INSUMOS", example = "PECAS", requiredMode = Schema.RequiredMode.REQUIRED)
+    private TipoProduto tipo;
 
     @Column(nullable = false)
-    @Schema(description = "Indica se a peça está ativa", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Indica se o produto está ativo", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
     private Boolean ativo;
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
@@ -90,16 +90,16 @@ public class Peca implements Serializable {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataUltimaAtualizacao;
 
-    public Peca(PecaRequestDTO dto) {
+    public Produto(ProdutoRequestDTO dto) {
         aplicarDados(dto);
         this.ativo = true;
     }
 
-    public void atualizarDados(PecaRequestDTO dto) {
+    public void atualizarDados(ProdutoRequestDTO dto) {
         aplicarDados(dto);
     }
 
-    private void aplicarDados(PecaRequestDTO dto) {
+    private void aplicarDados(ProdutoRequestDTO dto) {
         this.nome = dto.nome();
         this.codigo = dto.codigo();
         this.descricao = dto.descricao();
@@ -110,7 +110,6 @@ public class Peca implements Serializable {
         this.categoria = dto.categoria();
         this.tipo = dto.tipo();
     }
-
 
     public void decrementarEstoque(Integer quantidade) {
         if (quantidade > this.quantidadeEstoque) {

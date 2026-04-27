@@ -1,7 +1,7 @@
-package br.com.autocenterfiap.peca.dto;
+package br.com.autocenterfiap.produto.dto;
 
-import br.com.autocenterfiap.peca.enums.TipoPeca;
-import br.com.autocenterfiap.peca.enums.UnidadeMedida;
+import br.com.autocenterfiap.produto.enums.TipoProduto;
+import br.com.autocenterfiap.produto.enums.UnidadeMedida;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -10,18 +10,18 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-@Schema(description = "Dados para criação ou atualização de uma peça/insumo")
-public record PecaRequestDTO(
+@Schema(description = "Dados para criação ou atualização de um produto/insumo")
+public record ProdutoRequestDTO(
 
         @NotBlank(message = "Nome é obrigatório")
-        @Schema(description = "Nome da peça", example = "Filtro de Óleo")
+        @Schema(description = "Nome do produto", example = "Filtro de Óleo")
         String nome,
 
         @NotBlank(message = "Código é obrigatório")
-        @Schema(description = "Código interno único da peça", example = "FO-001")
+        @Schema(description = "Código interno único do produto", example = "FO-001")
         String codigo,
 
-        @Schema(description = "Descrição da peça", example = "Filtro de óleo para motores 1.0 a 2.0")
+        @Schema(description = "Descrição do produto", example = "Filtro de óleo para motores 1.0 a 2.0")
         String descricao,
 
         @NotNull(message = "Unidade de medida é obrigatória")
@@ -44,11 +44,11 @@ public record PecaRequestDTO(
         Integer estoqueMinimo,
 
         @NotBlank(message = "Categoria é obrigatória")
-        @Schema(description = "Categoria da peça", example = "Motor")
+        @Schema(description = "Categoria do produto", example = "Motor")
         String categoria,
 
         @NotNull(message = "Tipo é obrigatório")
-        @Schema(description = "Tipo do item: PECAS ou INSUMOS", example = "PECAS")
-        TipoPeca tipo
+        @Schema(description = "Tipo do produto: PECAS ou INSUMOS", example = "PECAS")
+        TipoProduto tipo
 ) {
 }

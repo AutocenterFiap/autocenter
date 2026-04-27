@@ -1,11 +1,11 @@
-package br.com.autocenterfiap.peca.handler;
+package br.com.autocenterfiap.produto.handler;
 
 import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.peca.exception.CodigoJaCadastradoException;
-import br.com.autocenterfiap.peca.exception.EstoqueInsuficienteException;
-import br.com.autocenterfiap.peca.exception.OSItemPecaNaoEncontradoException;
-import br.com.autocenterfiap.peca.exception.PecaInativaException;
-import br.com.autocenterfiap.peca.exception.PecaNaoEncontradaException;
+import br.com.autocenterfiap.produto.exception.CodigoJaCadastradoException;
+import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
+import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
+import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
+import br.com.autocenterfiap.produto.exception.ProdutoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 @Order(0)
-public class PecaExceptionHandler {
+public class ProdutoExceptionHandler {
 
-    @ExceptionHandler(PecaNaoEncontradaException.class)
-    public ResponseEntity<ErroResposta> handlePecaNaoEncontrada(
-            PecaNaoEncontradaException ex, HttpServletRequest request) {
+    @ExceptionHandler(ProdutoNaoEncontradoException.class)
+    public ResponseEntity<ErroResposta> handleProdutoNaoEncontrado(
+            ProdutoNaoEncontradoException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErroResposta(
                 HttpStatus.NOT_FOUND.value(),
@@ -29,9 +29,9 @@ public class PecaExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(OSItemPecaNaoEncontradoException.class)
-    public ResponseEntity<ErroResposta> handleOSItemNaoEncontrado(
-            OSItemPecaNaoEncontradoException ex, HttpServletRequest request) {
+    @ExceptionHandler(OSItemProdutoNaoEncontradoException.class)
+    public ResponseEntity<ErroResposta> handleOSItemProdutoNaoEncontrado(
+            OSItemProdutoNaoEncontradoException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErroResposta(
                 HttpStatus.NOT_FOUND.value(),
@@ -65,9 +65,9 @@ public class PecaExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(PecaInativaException.class)
-    public ResponseEntity<ErroResposta> handlePecaInativa(
-            PecaInativaException ex, HttpServletRequest request) {
+    @ExceptionHandler(ProdutoInativoException.class)
+    public ResponseEntity<ErroResposta> handleProdutoInativo(
+            ProdutoInativoException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErroResposta(
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),

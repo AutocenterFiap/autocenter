@@ -1,13 +1,13 @@
-package br.com.autocenterfiap.peca.controller;
+package br.com.autocenterfiap.produto.controller;
 
-import br.com.autocenterfiap.peca.dto.OSItemPecaRequestDTO;
-import br.com.autocenterfiap.peca.dto.PecaRequestDTO;
-import br.com.autocenterfiap.peca.enums.TipoPeca;
-import br.com.autocenterfiap.peca.enums.UnidadeMedida;
-import br.com.autocenterfiap.peca.model.OSItemPeca;
-import br.com.autocenterfiap.peca.model.Peca;
-import br.com.autocenterfiap.peca.repository.OSItemPecaRepository;
-import br.com.autocenterfiap.peca.repository.PecaRepository;
+import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.dto.ProdutoRequestDTO;
+import br.com.autocenterfiap.produto.enums.TipoProduto;
+import br.com.autocenterfiap.produto.enums.UnidadeMedida;
+import br.com.autocenterfiap.produto.model.OSItemProduto;
+import br.com.autocenterfiap.produto.model.Produto;
+import br.com.autocenterfiap.produto.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.produto.repository.ProdutoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,8 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("OSItemPecaController - Testes de Integração")
-class OSItemPecaControllerTest {
+@DisplayName("OSItemProdutoController - Testes de Integração")
+class OSItemProdutoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,34 +51,34 @@ class OSItemPecaControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private PecaRepository pecaRepository;
+    private ProdutoRepository produtoRepository;
 
     @Autowired
-    private OSItemPecaRepository osItemPecaRepository;
+    private OSItemProdutoRepository osItemProdutoRepository;
 
-    private Peca peca;
+    private Produto produto;
     private final Long osId = 10L;
 
     @BeforeEach
     void setUp() {
-        osItemPecaRepository.deleteAll();
-        pecaRepository.deleteAll();
+        osItemProdutoRepository.deleteAll();
+        produtoRepository.deleteAll();
 
-        PecaRequestDTO dto = new PecaRequestDTO(
+        ProdutoRequestDTO dto = new ProdutoRequestDTO(
                 "Filtro de Óleo", "FO-001", null,
                 UnidadeMedida.UNIT, new BigDecimal("45.90"),
-                50, 10, "Motor", TipoPeca.PECAS
+                50, 10, "Motor", TipoProduto.PECAS
         );
-        peca = pecaRepository.save(new Peca(dto));
+        produto = produtoRepository.save(new Produto(dto));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("POST /v1/ordem-servicos/{osId}/pecas deve adicionar peça e decrementar estoque")
-    void deveAdicionarPecaNaOS() throws Exception {
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 3);
+    @DisplayName("POST /v1/ordem-servicos/{osId}/produtos deve adicionar produto e decrementar estoque")
+    void deveAdicionarProdutoNaOS() throws Exception {
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 3);
 
-        mockMvc.perform(post("/v1/ordem-servicos/{osId}/pecas", osId)
+        mockMvc.perform(post("/v1/ordem-servicos/{osId}/produtos", osId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -87,17 +87,17 @@ class OSItemPecaControllerTest {
                 .andExpect(jsonPath("$.quantidade", is(3)))
                 .andExpect(jsonPath("$.subtotal", is(137.70)));
 
-        Peca pecaAtualizada = pecaRepository.findById(peca.getId()).orElseThrow();
-        org.junit.jupiter.api.Assertions.assertEquals(47, pecaAtualizada.getQuantidadeEstoque());
+        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(47, produtoAtualizado.getQuantidadeEstoque());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("POST /v1/ordem-servicos/{osId}/pecas deve retornar 422 para peça sem estoque")
+    @DisplayName("POST /v1/ordem-servicos/{osId}/produtos deve retornar 422 para produto sem estoque")
     void deveRetornar422PorEstoqueInsuficiente() throws Exception {
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 999);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 999);
 
-        mockMvc.perform(post("/v1/ordem-servicos/{osId}/pecas", osId)
+        mockMvc.perform(post("/v1/ordem-servicos/{osId}/produtos", osId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnprocessableEntity())
@@ -106,14 +106,14 @@ class OSItemPecaControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("POST /v1/ordem-servicos/{osId}/pecas deve retornar 422 para peça inativa")
-    void deveRetornar422ParaPecaInativa() throws Exception {
-        peca.desativar();
-        pecaRepository.save(peca);
+    @DisplayName("POST /v1/ordem-servicos/{osId}/produtos deve retornar 422 para produto inativo")
+    void deveRetornar422ParaProdutoInativo() throws Exception {
+        produto.desativar();
+        produtoRepository.save(produto);
 
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 1);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 1);
 
-        mockMvc.perform(post("/v1/ordem-servicos/{osId}/pecas", osId)
+        mockMvc.perform(post("/v1/ordem-servicos/{osId}/produtos", osId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnprocessableEntity());
@@ -121,118 +121,118 @@ class OSItemPecaControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("DELETE /v1/ordem-servicos/{osId}/pecas/{pecaId} deve remover e devolver estoque")
-    void deveRemoverPecaDaOSEDevolverEstoque() throws Exception {
-        OSItemPeca item = new OSItemPeca();
+    @DisplayName("DELETE /v1/ordem-servicos/{osId}/produtos/{produtoId} deve remover e devolver estoque")
+    void deveRemoverProdutoDaOSEDevolverEstoque() throws Exception {
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(5);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
-        peca.setQuantidadeEstoque(45); // simula estoque já decrementado
-        pecaRepository.save(peca);
+        produto.setQuantidadeEstoque(45); // simula estoque já decrementado
+        produtoRepository.save(produto);
 
-        mockMvc.perform(delete("/v1/ordem-servicos/{osId}/pecas/{pecaId}", osId, peca.getId()))
+        mockMvc.perform(delete("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId()))
                 .andExpect(status().isNoContent());
 
-        Peca pecaAtualizada = pecaRepository.findById(peca.getId()).orElseThrow();
-        org.junit.jupiter.api.Assertions.assertEquals(50, pecaAtualizada.getQuantidadeEstoque());
+        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(50, produtoAtualizado.getQuantidadeEstoque());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("GET /v1/ordem-servicos/{osId}/pecas deve listar peças da OS")
-    void deveListarPecasDaOS() throws Exception {
-        OSItemPeca item = new OSItemPeca();
+    @DisplayName("GET /v1/ordem-servicos/{osId}/produtos deve listar produtos da OS")
+    void deveListarProdutosDaOS() throws Exception {
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(2);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
-        mockMvc.perform(get("/v1/ordem-servicos/{osId}/pecas", osId))
+        mockMvc.perform(get("/v1/ordem-servicos/{osId}/produtos", osId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].codigoPeca", is("FO-001")));
+                .andExpect(jsonPath("$[0].codigoProduto", is("FO-001")));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("PUT /{pecaId} deve aumentar quantidade e decrementar diferença do estoque")
+    @DisplayName("PUT /{produtoId} deve aumentar quantidade e decrementar diferença do estoque")
     void deveAtualizarQuantidadeAumentando() throws Exception {
         // Prepara item com quantidade 3 (estoque = 50 - 3 = 47)
-        peca.setQuantidadeEstoque(47);
-        pecaRepository.save(peca);
+        produto.setQuantidadeEstoque(47);
+        produtoRepository.save(produto);
 
-        OSItemPeca item = new OSItemPeca();
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(3);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
         // Atualiza para quantidade 5 → deve decrementar mais 2 do estoque
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 5);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 5);
 
-        mockMvc.perform(put("/v1/ordem-servicos/{osId}/pecas/{pecaId}", osId, peca.getId())
+        mockMvc.perform(put("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantidade", is(5)))
                 .andExpect(jsonPath("$.subtotal", is(229.50)));
 
-        Peca pecaAtualizada = pecaRepository.findById(peca.getId()).orElseThrow();
-        assertEquals(45, pecaAtualizada.getQuantidadeEstoque()); // 47 - 2 = 45
+        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        assertEquals(45, produtoAtualizado.getQuantidadeEstoque()); // 47 - 2 = 45
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("PUT /{pecaId} deve reduzir quantidade e devolver diferença ao estoque")
+    @DisplayName("PUT /{produtoId} deve reduzir quantidade e devolver diferença ao estoque")
     void deveAtualizarQuantidadeReduzindo() throws Exception {
         // Prepara item com quantidade 5 (estoque = 50 - 5 = 45)
-        peca.setQuantidadeEstoque(45);
-        pecaRepository.save(peca);
+        produto.setQuantidadeEstoque(45);
+        produtoRepository.save(produto);
 
-        OSItemPeca item = new OSItemPeca();
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(5);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
         // Atualiza para quantidade 2 → deve devolver 3 ao estoque
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 2);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 2);
 
-        mockMvc.perform(put("/v1/ordem-servicos/{osId}/pecas/{pecaId}", osId, peca.getId())
+        mockMvc.perform(put("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantidade", is(2)))
                 .andExpect(jsonPath("$.subtotal", is(91.80)));
 
-        Peca pecaAtualizada = pecaRepository.findById(peca.getId()).orElseThrow();
-        assertEquals(48, pecaAtualizada.getQuantidadeEstoque()); // 45 + 3 = 48
+        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        assertEquals(48, produtoAtualizado.getQuantidadeEstoque()); // 45 + 3 = 48
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("PUT /{pecaId} deve retornar 422 quando aumento excede o estoque disponível")
+    @DisplayName("PUT /{produtoId} deve retornar 422 quando aumento excede o estoque disponível")
     void deveRetornar422AoAtualizarComEstoqueInsuficiente() throws Exception {
-        peca.setQuantidadeEstoque(2);
-        pecaRepository.save(peca);
+        produto.setQuantidadeEstoque(2);
+        produtoRepository.save(produto);
 
-        OSItemPeca item = new OSItemPeca();
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(3);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
         // Tenta aumentar para 100 → estoque tem só 2, insuficiente para mais 97
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 100);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 100);
 
-        mockMvc.perform(put("/v1/ordem-servicos/{osId}/pecas/{pecaId}", osId, peca.getId())
+        mockMvc.perform(put("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnprocessableEntity())
@@ -241,45 +241,45 @@ class OSItemPecaControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("POST deve preencher dataCriacao no OSItemPeca persistido")
+    @DisplayName("POST deve preencher dataCriacao no OSItemProduto persistido")
     void devePreencherDataCriacaoAoPersistir() throws Exception {
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 1);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 1);
 
-        mockMvc.perform(post("/v1/ordem-servicos/{osId}/pecas", osId)
+        mockMvc.perform(post("/v1/ordem-servicos/{osId}/produtos", osId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dataCriacao", notNullValue()));
 
-        OSItemPeca itemPersistido = osItemPecaRepository.findByOrdemServicoId(osId).get(0);
+        OSItemProduto itemPersistido = osItemProdutoRepository.findByOrdemServicoId(osId).get(0);
         assertNotNull(itemPersistido.getDataCriacao(), "dataCriacao deve ser preenchida pelo @PrePersist");
         assertNotNull(itemPersistido.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser preenchida pelo @PrePersist");
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("PUT deve atualizar dataUltimaAtualizacao no OSItemPeca após modificação")
+    @DisplayName("PUT deve atualizar dataUltimaAtualizacao no OSItemProduto após modificação")
     void deveAtualizarDataUltimaAtualizacaoAoModificar() throws Exception {
-        OSItemPeca item = new OSItemPeca();
+        OSItemProduto item = new OSItemProduto();
         item.setOrdemServicoId(osId);
-        item.setPeca(peca);
+        item.setProduto(produto);
         item.setQuantidade(2);
-        item.setPrecoUnitarioNoMomento(peca.getPrecoUnitario());
-        osItemPecaRepository.save(item);
+        item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+        osItemProdutoRepository.save(item);
 
         assertNotNull(item.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser preenchida pelo @PrePersist");
 
-        peca.setQuantidadeEstoque(48);
-        pecaRepository.save(peca);
+        produto.setQuantidadeEstoque(48);
+        produtoRepository.save(produto);
 
-        OSItemPecaRequestDTO dto = new OSItemPecaRequestDTO(peca.getId(), 4);
+        OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 4);
 
-        mockMvc.perform(put("/v1/ordem-servicos/{osId}/pecas/{pecaId}", osId, peca.getId())
+        mockMvc.perform(put("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
 
-        OSItemPeca itemAtualizado = osItemPecaRepository.findByOrdemServicoIdAndPecaId(osId, peca.getId()).orElseThrow();
+        OSItemProduto itemAtualizado = osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(osId, produto.getId()).orElseThrow();
         assertNotNull(itemAtualizado.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser atualizada pelo @PreUpdate");
     }
 }

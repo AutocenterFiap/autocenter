@@ -35,7 +35,7 @@ CREATE INDEX idx_os_item_produto_produto ON os_item_produto (produto_id);
 CREATE TABLE os_item_servico (
 id BIGINT AUTO_INCREMENT PRIMARY KEY,
 ordem_servico_id BIGINT NOT NULL,
---servico_id BIGINT NOT NULL,
+servico_id BIGINT NOT NULL,
 valor_item_servico NUMERIC(15,2) NOT NULL,
 status_servico VARCHAR(30) NOT NULL,
 data_hora_inicio TIMESTAMP NOT NULL,
@@ -43,7 +43,7 @@ data_hora_fim TIMESTAMP,
 data_criacao TIMESTAMP,
 data_ultima_atualizacao TIMESTAMP,
 CONSTRAINT fk_item_servico_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
---,CONSTRAINT fk_item_servico FOREIGN KEY (servico_id) REFERENCES servico(id)
+,CONSTRAINT fk_item_servico FOREIGN KEY (servico_id) REFERENCES servicos(id)
 );
 
 -- Tabela orcamento

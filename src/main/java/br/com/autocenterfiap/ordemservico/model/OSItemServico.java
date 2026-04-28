@@ -1,6 +1,7 @@
 package br.com.autocenterfiap.ordemservico.model;
 
 import br.com.autocenterfiap.ordemservico.enums.StatusServico;
+import br.com.autocenterfiap.servico.model.Servico;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,11 +49,9 @@ public class OSItemServico implements Serializable {
     @JoinColumn(name = "ordem_servico_id", nullable = false)
     private OrdemServico ordemServico;
 
-    //TODO: Mapear a classe Servico
-
-//    @ManyToOne
-//    @JoinColumn(name = "servico_id", nullable = false)
-//    private Servico servico;
+    @ManyToOne
+    @JoinColumn(name = "servico_id", nullable = false)
+    private Servico servico;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal valorItemServico;

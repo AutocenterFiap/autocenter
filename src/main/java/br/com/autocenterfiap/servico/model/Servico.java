@@ -34,7 +34,9 @@ public class Servico implements Serializable {
     @Schema(description = "Tipo do serviço", example = "Troca pastilhas de freio", requiredMode = Schema.RequiredMode.REQUIRED)
     private String descricao;
 
-    @NotBlank(message = "Status é obrigatório")
+    @NotNull(message = "Status é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     @Schema(description = "Status do serviço", example = "ATIVO", requiredMode = Schema.RequiredMode.REQUIRED)
     private StatusServico status;
 

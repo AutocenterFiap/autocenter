@@ -5,6 +5,7 @@ import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "orcamento")
+@EntityListeners(AuditingEntityListener.class)
 public class Orcamento implements Serializable {
 
     @Serial

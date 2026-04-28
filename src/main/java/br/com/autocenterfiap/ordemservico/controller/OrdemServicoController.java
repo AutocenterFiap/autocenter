@@ -68,26 +68,6 @@ public class OrdemServicoController {
     }
 
     // ========================================
-    // Endpoints de Produtos
-    // ========================================
-
-    @PostMapping("/{id}/produtos")
-    public ResponseEntity<OSItemProdutoResponseDTO> adicionarProduto(@PathVariable Long id, @RequestBody @Valid OSItemProdutoRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordemServicoService.adicionarProduto(id, dto));
-    }
-
-    @PutMapping("/{id}/produtos/{idItem}")
-    public ResponseEntity<OSItemProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @PathVariable Long idItem, @RequestBody @Valid OSItemProdutoRequestDTO dto) {
-        return ResponseEntity.ok(ordemServicoService.atualizarProduto(id, idItem, dto));
-    }
-
-    @DeleteMapping("/{id}/produtos/{idItem}")
-    public ResponseEntity<Void> removerProduto(@PathVariable Long id, @PathVariable Long idItem) {
-        ordemServicoService.removerProduto(id, idItem);
-        return ResponseEntity.noContent().build();
-    }
-
-    // ========================================
     // Endpoints de Serviços
     // ========================================
 

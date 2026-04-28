@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +39,7 @@ public class ServicoController {
             @ApiResponse(responseCode = "201", description = "Serviço criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
-    public ResponseEntity<ServicoResponseDTO> criar(@RequestBody ServicoDto servico) {
+    public ResponseEntity<ServicoResponseDTO> criar(@Valid @RequestBody ServicoDto servico) {
         return ResponseEntity
                 .status(CREATED)
                 .body(service.criar(servico));
@@ -79,7 +80,7 @@ public class ServicoController {
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
-    public ResponseEntity<ServicoResponseDTO> atualizar(@PathVariable Long id, @RequestBody ServicoDto servico) {
+    public ResponseEntity<ServicoResponseDTO> atualizar(@PathVariable Long id, @Valid @RequestBody ServicoDto servico) {
         return ResponseEntity.ok(service.atualizar(id, servico));
     }
 

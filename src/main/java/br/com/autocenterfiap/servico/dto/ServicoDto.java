@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public record ServicoDto(
     @NotBlank(message = "Descricao é obrigatório")
     String descricao,
-    @NotNull(,message = "Status é obrigatório")
+    @NotNull(message = "Status é obrigatório")
     StatusServico status,
     @NotBlank(message = "Status é obrigatório")
     BigDecimal valor

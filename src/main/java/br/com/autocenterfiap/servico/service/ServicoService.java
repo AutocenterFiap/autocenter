@@ -100,7 +100,5 @@ public class ServicoService {
         log.info("Deletando cliente: ID={}", servico.getId());
         repository.delete(servico);
         log.info("Cliente deletado com sucesso: ID={}", id);
-
-        repository.delete(servico);
     }
 }

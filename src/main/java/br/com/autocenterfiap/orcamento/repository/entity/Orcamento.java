@@ -55,7 +55,7 @@ public class Orcamento implements Serializable {
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_ultima_atualizacao ")
+    @Column(name = "data_ultima_atualizacao")
     private LocalDateTime dataUltimaAtualizacao;
 
     public boolean isAprovado(){

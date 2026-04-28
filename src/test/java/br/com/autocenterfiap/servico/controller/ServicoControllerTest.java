@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("ServicoController - Testes de Integração")
-class ServicoControllerITest {
+class ServicoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

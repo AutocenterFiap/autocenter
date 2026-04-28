@@ -91,11 +91,9 @@ public class OrdemServico implements Serializable {
     private LocalDateTime dataUltimaAtualizacao;
 
     public OrdemServico(OrdemServicoDTO dto,Veiculo veiculo,Cliente cliente) {
-        this.numeroOrdemServico = dto.numeroOrdemServico();
         this.cliente = cliente;
         this.veiculo = veiculo;
-        this.statusOS = StatusOS.RECEBIDA; // Status inicial padrão
-        this.valorTotal = dto.valorTotal();
+        this.statusOS = StatusOS.ABERTA;
     }
 
 

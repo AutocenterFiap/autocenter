@@ -2,9 +2,8 @@ package br.com.autocenterfiap.cliente.handler;
 
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoJaCadastradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
-import br.com.autocenterfiap.cliente.exception.EmailJaCadastradoException;
+import br.com.autocenterfiap.cliente.exception.InformacaoJaCadastradaException;
 import br.com.autocenterfiap.cliente.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -20,24 +19,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DocumentoJaCadastradoException.class)
-    public ResponseEntity<ErroResposta> handleDocumentoJaCadastrado(
-            DocumentoJaCadastradoException ex,
-            HttpServletRequest request) {
-
-        ErroResposta erro = new ErroResposta(
-                HttpStatus.CONFLICT.value(),
-                "Conflito de Dados",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
-    }
-
-    @ExceptionHandler(EmailJaCadastradoException.class)
-    public ResponseEntity<ErroResposta> handleEmailJaCadastrado(
-            EmailJaCadastradoException ex,
+    @ExceptionHandler(InformacaoJaCadastradaException.class)
+    public ResponseEntity<ErroResposta> handleInformacaoJaCadastrada(
+            InformacaoJaCadastradaException ex,
             HttpServletRequest request) {
 
         ErroResposta erro = new ErroResposta(

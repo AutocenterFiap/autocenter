@@ -3,8 +3,7 @@ package br.com.autocenterfiap.ordemservico.service;
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoResponseDTO;
+
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
@@ -14,6 +13,8 @@ import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaExc
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.validator.OrdemServicoValidator;
+import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
@@ -81,14 +82,14 @@ public class OrdemServicoService {
     // ========================================
 
     @Transactional
-    public OSItemProdutoResponseDTO adicionarProduto(Long ordemServicoId, OSItemProdutoDTO dto) {
+    public OSItemProdutoResponseDTO adicionarProduto(Long ordemServicoId, OSItemProdutoRequestDTO dto) {
         OrdemServico ordemServico = findById(ordemServicoId);
         // TODO: Mapear e adicionar OSItemProduto à OrdemServico
         return null;
     }
 
     @Transactional
-    public OSItemProdutoResponseDTO atualizarProduto(Long ordemServicoId, Long produtoItemId, OSItemProdutoDTO dto) {
+    public OSItemProdutoResponseDTO atualizarProduto(Long ordemServicoId, Long produtoItemId, OSItemProdutoRequestDTO dto) {
         OrdemServico ordemServico = findById(ordemServicoId);
         // TODO: Buscar o item, atualizar e salvar
         return null;

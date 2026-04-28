@@ -1,8 +1,8 @@
-package br.com.autocenterfiap.produto.controller;
+package br.com.autocenterfiap.ordemservico.controller;
 
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
-import br.com.autocenterfiap.produto.service.OSItemProdutoService;
+import br.com.autocenterfiap.ordemservico.service.OSItemProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

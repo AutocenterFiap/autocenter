@@ -1,14 +1,14 @@
 package br.com.autocenterfiap.ordemservico.controller;
 
 
-import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.service.OrdemServicoService;
 
+import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -72,12 +72,12 @@ public class OrdemServicoController {
     // ========================================
 
     @PostMapping("/{id}/produtos")
-    public ResponseEntity<OSItemProdutoResponseDTO> adicionarProduto(@PathVariable Long id, @RequestBody @Valid OSItemProdutoDTO dto) {
+    public ResponseEntity<OSItemProdutoResponseDTO> adicionarProduto(@PathVariable Long id, @RequestBody @Valid OSItemProdutoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ordemServicoService.adicionarProduto(id, dto));
     }
 
     @PutMapping("/{id}/produtos/{idItem}")
-    public ResponseEntity<OSItemProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @PathVariable Long idItem, @RequestBody @Valid OSItemProdutoDTO dto) {
+    public ResponseEntity<OSItemProdutoResponseDTO> atualizarProduto(@PathVariable Long id, @PathVariable Long idItem, @RequestBody @Valid OSItemProdutoRequestDTO dto) {
         return ResponseEntity.ok(ordemServicoService.atualizarProduto(id, idItem, dto));
     }
 

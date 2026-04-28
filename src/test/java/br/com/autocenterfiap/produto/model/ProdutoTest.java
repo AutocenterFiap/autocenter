@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.produto.model;
 
+import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.produto.enums.StatusEstoque;
 import br.com.autocenterfiap.produto.enums.UnidadeMedida;
 import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;

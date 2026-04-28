@@ -1,12 +1,15 @@
-package br.com.autocenterfiap.produto.service;
+package br.com.autocenterfiap.ordemservico.service;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
 import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
-import br.com.autocenterfiap.produto.model.OSItemProduto;
 import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.produto.service.ProdutoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,7 @@ import java.util.List;
 public class OSItemProdutoService {
 
     private final OSItemProdutoRepository osItemProdutoRepository;
+    private final OrdemServicoRepository ordemServicoRepository;
     private final ProdutoService produtoService;
 
     public List<OSItemProdutoResponseDTO> listarPorOS(Long ordemServicoId) {
@@ -38,8 +42,10 @@ public class OSItemProdutoService {
         // Decrementa o estoque imediatamente (reserva o produto)
         produto.decrementarEstoque(dto.quantidade());
 
+        OrdemServico ordemServico = ordemServicoRepository.getReferenceById(ordemServicoId);
+
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(ordemServicoId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(dto.quantidade());
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());

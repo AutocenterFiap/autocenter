@@ -105,8 +105,9 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarVeiculoPorIdComSucesso() throws Exception {
-        repository.save(veiculo);
-        mockMvc.perform(get("/v1/veiculos/{id}", 1L)
+        Veiculo saved = repository.save(veiculo);
+
+        mockMvc.perform(get("/v1/veiculos/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(veiculo.getId().intValue())))

@@ -56,7 +56,7 @@ public class OrcamentoService {
     public Orcamento findById(Long id){
         Orcamento orcamento = orcamentoRepository
                 .findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new OrcamentoNaoEncontradoException(id));
         orcamento.aprovar();
         return orcamentoRepository.save(orcamento);
     }

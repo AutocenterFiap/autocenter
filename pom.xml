@@ -196,8 +196,7 @@
 						<exclude>**/config/**</exclude>
 						<exclude>**/dto/**</exclude>
 						<exclude>**/enums/**</exclude>
-						<exclude>**/security/model/**</exclude>
-						<exclude>**/security/entity/**</exclude>
+						<exclude>**/repository/entity/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

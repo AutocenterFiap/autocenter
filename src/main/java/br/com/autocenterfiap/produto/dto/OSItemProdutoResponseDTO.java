@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.produto.dto;
 
-import br.com.autocenterfiap.produto.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -39,7 +39,7 @@ public record OSItemProdutoResponseDTO(
     public static OSItemProdutoResponseDTO from(OSItemProduto item) {
         return new OSItemProdutoResponseDTO(
                 item.getId(),
-                item.getOrdemServicoId(),
+                item.getOrdemServico().getId(),
                 item.getProduto().getId(),
                 item.getProduto().getCodigo(),
                 item.getProduto().getNome(),

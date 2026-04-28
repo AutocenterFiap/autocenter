@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.ordemservico.repository.entity;
 
+import br.com.autocenterfiap.produto.model.Produto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,13 +25,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+import static java.util.Objects.isNull;
+
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "os_item_produto")
+@Schema(description = "Representa um produto vinculado a uma Ordem de Serviço")
 public class OSItemProduto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -42,23 +47,34 @@ public class OSItemProduto implements Serializable {
     @JoinColumn(name = "ordem_servico_id", nullable = false)
     private OrdemServico ordemServico;
 
-    //TODO: Mapear a classe Produto
-
-//    @ManyToOne
-//    @JoinColumn(name = "produto_id", nullable = false)
-//    private Produto produto;
-
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal valorItemProduto;
+    @ManyToOne
+    @JoinColumn(name = "produto_id", nullable = false)
+    @Schema(description = "Produto vinculado")
+    private Produto produto;
 
     @Column(nullable = false)
-    private Long quantidadeItem;
+    @Schema(description = "Quantidade utilizada", example = "2")
+    private Integer quantidade;
 
-    @CreatedDate
+    @Column(nullable = false, precision = 15, scale = 2)
+    @Schema(description = "Preço unitário no momento da inclusão (snapshot)", example = "45.90")
+    private BigDecimal precoUnitarioNoMomento;
+
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataCriacao;
 
-    @LastModifiedDate
+    @Column(name = "data_ultima_atualizacao")
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataUltimaAtualizacao;
+
+    // ── Regra de domínio ──────────────────────────────────────────────────────
+
+    public BigDecimal calcularSubtotal() {
+        if (isNull(precoUnitarioNoMomento) || isNull(quantidade))
+            return BigDecimal.ZERO;
+        return this.precoUnitarioNoMomento.multiply(BigDecimal.valueOf(this.quantidade));
+    }
 
     @PrePersist
     public void prePersist() {
@@ -67,7 +83,7 @@ public class OSItemProduto implements Serializable {
     }
 
     @PreUpdate
-    public void preUpdate(){
+    public void preUpdate() {
         this.dataUltimaAtualizacao = LocalDateTime.now();
     }
 }

@@ -78,30 +78,6 @@ public class OrdemServicoService {
     }
 
     // ========================================
-    // Sub-recursos: Produtos
-    // ========================================
-
-    @Transactional
-    public OSItemProdutoResponseDTO adicionarProduto(Long ordemServicoId, OSItemProdutoRequestDTO dto) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Mapear e adicionar OSItemProduto à OrdemServico
-        return null;
-    }
-
-    @Transactional
-    public OSItemProdutoResponseDTO atualizarProduto(Long ordemServicoId, Long produtoItemId, OSItemProdutoRequestDTO dto) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Buscar o item, atualizar e salvar
-        return null;
-    }
-
-    @Transactional
-    public void removerProduto(Long ordemServicoId, Long produtoItemId) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Remover o item da lista e salvar
-    }
-
-    // ========================================
     // Sub-recursos: Serviços
     // ========================================
 

@@ -17,19 +17,17 @@ CONSTRAINT fk_ordem_servico_veiculo FOREIGN KEY (veiculo_id) REFERENCES veiculos
 CONSTRAINT fk_ordem_servico_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id)
 );
 
-CREATE TABLE os_item_produto
-(
-    id                        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    ordem_servico_id          BIGINT         NOT NULL,
-    produto_id                BIGINT         NOT NULL,
-    quantidade                INT            NOT NULL,
-    preco_unitario_no_momento NUMERIC(15, 2) NOT NULL,
-    data_criacao              TIMESTAMP,
-    data_ultima_atualizacao   TIMESTAMP,
-    CONSTRAINT fk_os_item_produto_produto FOREIGN KEY (produto_id) REFERENCES produtos (id)
+CREATE TABLE os_item_produto (
+id                        BIGINT AUTO_INCREMENT PRIMARY KEY,
+ordem_servico_id          BIGINT         NOT NULL,
+produto_id                BIGINT         NOT NULL,
+quantidade                INT            NOT NULL,
+preco_unitario_no_momento NUMERIC(15, 2) NOT NULL,
+data_criacao              TIMESTAMP,
+data_ultima_atualizacao   TIMESTAMP,
+CONSTRAINT fk_os_item_produto_produto FOREIGN KEY (produto_id) REFERENCES produtos (id),
+CONSTRAINT fk_item_produto_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_os_item_produto_os      ON os_item_produto (ordem_servico_id);
-CREATE INDEX idx_os_item_produto_produto ON os_item_produto (produto_id);
 
 -- Tabela os_item_servico
 CREATE TABLE os_item_servico (
@@ -56,20 +54,3 @@ data_criacao TIMESTAMP NOT NULL,
 data_ultima_atualizacao TIMESTAMP,
 CONSTRAINT fk_orcamento_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
 );
-
-insert into ordem_servico (
-numero_ordem_servico,
-status_os,
-valor_total,
-veiculo_id,
-cliente_id,
-data_criacao,
-data_ultima_atualizacao)
-values
-    (1,
-     'AGUARDANDO_APROVACAO',
-     100.55,
-     1,
-     1,
-     CURRENT_TIMESTAMP,
-     CURRENT_TIMESTAMP);

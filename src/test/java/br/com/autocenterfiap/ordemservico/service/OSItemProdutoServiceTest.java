@@ -1,14 +1,17 @@
-package br.com.autocenterfiap.produto.service;
+package br.com.autocenterfiap.ordemservico.service;
 
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.enums.UnidadeMedida;
 import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
 import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
 import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
-import br.com.autocenterfiap.produto.model.OSItemProduto;
 import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.produto.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,10 +43,14 @@ class OSItemProdutoServiceTest {
     @Mock
     private ProdutoService produtoService;
 
+    @Mock
+    private OrdemServicoRepository ordemServicoRepository;
+
     @InjectMocks
     private OSItemProdutoService osItemProdutoService;
 
     private Produto produto;
+    private OrdemServico os;
     private OSItemProduto osItem;
 
     @BeforeEach
@@ -59,12 +66,14 @@ class OSItemProdutoServiceTest {
         produto.setCategoria("Motor");
         produto.setAtivo(true);
 
+        os = new OrdemServico();
+        os.setId(10L);
+
         osItem = new OSItemProduto();
         osItem.setId(1L);
-        osItem.setOrdemServicoId(10L);
+        osItem.setOrdemServico(os);
         osItem.setProduto(produto);
         osItem.setQuantidade(2);
-        osItem.setPrecoUnitarioNoMomento(new BigDecimal("45.90"));
     }
 
     @Test

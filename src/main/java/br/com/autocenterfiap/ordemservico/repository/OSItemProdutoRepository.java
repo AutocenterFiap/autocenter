@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.produto.repository;
+package br.com.autocenterfiap.ordemservico.repository;
 
-import br.com.autocenterfiap.produto.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +20,7 @@ public interface OSItemProdutoRepository extends JpaRepository<OSItemProduto, Lo
     @Query("""
             SELECT COALESCE(SUM(i.precoUnitarioNoMomento * i.quantidade), 0)
             FROM OSItemProduto i
-            WHERE i.ordemServicoId = :ordemServicoId
+            WHERE i.ordemServico.id = :ordemServicoId
             """)
     BigDecimal calcularTotalProdutosPorOS(@Param("ordemServicoId") Long ordemServicoId);
 }

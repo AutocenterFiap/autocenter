@@ -1,14 +1,17 @@
-package br.com.autocenterfiap.produto.controller;
+package br.com.autocenterfiap.ordemservico.controller;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.ProdutoRequestDTO;
 import br.com.autocenterfiap.produto.enums.TipoProduto;
 import br.com.autocenterfiap.produto.enums.UnidadeMedida;
-import br.com.autocenterfiap.produto.model.OSItemProduto;
 import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.produto.repository.ProdutoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,15 +57,20 @@ class OSItemProdutoControllerTest {
     private ProdutoRepository produtoRepository;
 
     @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
+
+    @Autowired
     private OSItemProdutoRepository osItemProdutoRepository;
 
     private Produto produto;
-    private final Long osId = 10L;
+    private Long osId;
+    private OrdemServico ordemServico;
 
     @BeforeEach
     void setUp() {
         osItemProdutoRepository.deleteAll();
         produtoRepository.deleteAll();
+        ordemServicoRepository.deleteAll();
 
         ProdutoRequestDTO dto = new ProdutoRequestDTO(
                 "Filtro de Óleo", "FO-001", null,
@@ -70,6 +78,9 @@ class OSItemProdutoControllerTest {
                 50, 10, "Motor", TipoProduto.PECAS
         );
         produto = produtoRepository.save(new Produto(dto));
+
+        ordemServico = ordemServicoRepository.save(new OrdemServico());
+        osId = ordemServico.getId(); 
     }
 
     @Test
@@ -124,7 +135,7 @@ class OSItemProdutoControllerTest {
     @DisplayName("DELETE /v1/ordem-servicos/{osId}/produtos/{produtoId} deve remover e devolver estoque")
     void deveRemoverProdutoDaOSEDevolverEstoque() throws Exception {
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(5);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
@@ -145,7 +156,7 @@ class OSItemProdutoControllerTest {
     @DisplayName("GET /v1/ordem-servicos/{osId}/produtos deve listar produtos da OS")
     void deveListarProdutosDaOS() throws Exception {
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(2);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
@@ -166,7 +177,7 @@ class OSItemProdutoControllerTest {
         produtoRepository.save(produto);
 
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(3);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
@@ -195,7 +206,7 @@ class OSItemProdutoControllerTest {
         produtoRepository.save(produto);
 
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(5);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
@@ -223,7 +234,7 @@ class OSItemProdutoControllerTest {
         produtoRepository.save(produto);
 
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(3);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
@@ -261,7 +272,7 @@ class OSItemProdutoControllerTest {
     @DisplayName("PUT deve atualizar dataUltimaAtualizacao no OSItemProduto após modificação")
     void deveAtualizarDataUltimaAtualizacaoAoModificar() throws Exception {
         OSItemProduto item = new OSItemProduto();
-        item.setOrdemServicoId(osId);
+        item.setOrdemServico(ordemServico);
         item.setProduto(produto);
         item.setQuantidade(2);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());

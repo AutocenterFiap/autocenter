@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>br.com</groupId>
 	<artifactId>auto-center-fiap</artifactId>
@@ -38,7 +38,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- Segurança -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -76,7 +75,10 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 		</dependency>
-		<!-- Cache -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
@@ -85,8 +87,11 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 		</dependency>
-
-
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
@@ -128,7 +133,6 @@
 							<artifactId>mapstruct-processor</artifactId>
 							<version>1.5.5.Final</version>
 						</path>
-						<!-- Se usar Lombok, ele deve vir ANTES do MapStruct -->
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
@@ -142,22 +146,17 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-
-			<!-- JaCoCo Plugin para Cobertura de Testes -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.11</version>
 				<executions>
-					<!-- Preparar o agente JaCoCo antes dos testes -->
 					<execution>
 						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
-
-					<!-- Gerar relatório após os testes -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>
@@ -165,8 +164,6 @@
 							<goal>report</goal>
 						</goals>
 					</execution>
-
-					<!-- Verificação de cobertura mínima (opcional) -->
 					<execution>
 						<id>jacoco-check</id>
 						<phase>verify</phase>
@@ -181,7 +178,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.60</minimum>
+											<minimum>0.80</minimum>
 										</limit>
 									</limits>
 								</rule>
@@ -190,7 +187,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- Exclusões de classes que não precisam de cobertura -->
 					<excludes>
 						<exclude>**/StartApplication.class</exclude>
 						<exclude>**/config/**</exclude>

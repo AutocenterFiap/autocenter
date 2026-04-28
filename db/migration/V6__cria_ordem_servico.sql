@@ -18,30 +18,30 @@ CONSTRAINT fk_ordem_servico_cliente FOREIGN KEY (cliente_id) REFERENCES clientes
 );
 
 CREATE TABLE os_item_produto (
-id BIGINT AUTO_INCREMENT PRIMARY KEY,
-ordem_servico_id BIGINT NOT NULL,
---produto_id BIGINT NOT NULL,
-valor_item_produto NUMERIC(15,2) NOT NULL,
-quantidade_item BIGINT NOT NULL,
-data_criacao TIMESTAMP,
-data_ultima_atualizacao TIMESTAMP,
-CONSTRAINT fk_item_produto_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
---,CONSTRAINT fk_item_produto FOREIGN KEY (produto_id) REFERENCES produto(id)
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ordem_servico_id BIGINT NOT NULL,
+    -- produto_id BIGINT NOT NULL, (comentado temporariamente)
+    valor_item_produto NUMERIC(15,2) NOT NULL,
+    quantidade_item BIGINT NOT NULL,
+    data_criacao TIMESTAMP,
+    data_ultima_atualizacao TIMESTAMP,
+    CONSTRAINT fk_item_produto_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
+    -- CONSTRAINT fk_item_produto FOREIGN KEY (produto_id) REFERENCES produto(id) (comentado temporariamente)
 );
 
 -- Tabela os_item_servico
 CREATE TABLE os_item_servico (
-id BIGINT AUTO_INCREMENT PRIMARY KEY,
-ordem_servico_id BIGINT NOT NULL,
---servico_id BIGINT NOT NULL,
-valor_item_servico NUMERIC(15,2) NOT NULL,
-status_servico VARCHAR(30) NOT NULL,
-data_hora_inicio TIMESTAMP NOT NULL,
-data_hora_fim TIMESTAMP,
-data_criacao TIMESTAMP,
-data_ultima_atualizacao TIMESTAMP,
-CONSTRAINT fk_item_servico_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
---,CONSTRAINT fk_item_servico FOREIGN KEY (servico_id) REFERENCES servico(id)
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ordem_servico_id BIGINT NOT NULL,
+    -- servico_id BIGINT NOT NULL, (comentado temporariamente)
+    valor_item_servico NUMERIC(15,2) NOT NULL,
+    status_servico VARCHAR(30) NOT NULL,
+    data_hora_inicio TIMESTAMP NOT NULL,
+    data_hora_fim TIMESTAMP,
+    data_criacao TIMESTAMP,
+    data_ultima_atualizacao TIMESTAMP,
+    CONSTRAINT fk_item_servico_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE
+    -- CONSTRAINT fk_item_servico FOREIGN KEY (servico_id) REFERENCES servico(id) (comentado temporariamente)
 );
 
 -- Tabela orcamento

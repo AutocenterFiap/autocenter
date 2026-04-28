@@ -71,6 +71,20 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.PUT, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
                             req.requestMatchers(HttpMethod.DELETE, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
 
+                            req.requestMatchers(HttpMethod.GET, "/v1/produtos").hasAnyRole("ADMIN", "READ", "WRITE");
+                            req.requestMatchers(HttpMethod.GET, "/v1/produtos/{id}").hasAnyRole("ADMIN", "READ", "WRITE");
+                            req.requestMatchers(HttpMethod.GET, "/v1/produtos/estoque/alertas").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.POST, "/v1/produtos").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PUT, "/v1/produtos/{id}").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.DELETE, "/v1/produtos/{id}").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PATCH, "/v1/produtos/{id}/estoque/adicionar").hasAnyRole("ADMIN");
+                            req.requestMatchers(HttpMethod.PATCH, "/v1/produtos/{id}/estoque/remover").hasAnyRole("ADMIN");
+
+                            req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/{osId}/produtos").hasAnyRole("ADMIN", "READ", "WRITE");
+                            req.requestMatchers(HttpMethod.POST, "/v1/ordem-servicos/{osId}/produtos").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PUT, "/v1/ordem-servicos/{osId}/produtos/{produtoId}").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.DELETE, "/v1/ordem-servicos/{osId}/produtos/{produtoId}").hasAnyRole("ADMIN", "WRITE");
+
                             // Swagger - público para documentação
                             req.requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll();
                             req.requestMatchers("/v3/api-docs/**", "/api-docs/**").permitAll();

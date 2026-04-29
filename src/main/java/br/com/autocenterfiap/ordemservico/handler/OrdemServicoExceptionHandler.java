@@ -3,6 +3,7 @@ package br.com.autocenterfiap.ordemservico.handler;
 import br.com.autocenterfiap.cliente.model.ErroResposta;
 import br.com.autocenterfiap.ordemservico.exception.OrdemServicoJaAbertaParaVeiculoException;
 import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaException;
+import br.com.autocenterfiap.ordemservico.exception.StatusOSInvalidoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -34,5 +35,16 @@ public class OrdemServicoExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    @ExceptionHandler(StatusOSInvalidoException.class)
+    public ResponseEntity<ErroResposta> handleValidacaoDeDados(StatusOSInvalidoException ex, HttpServletRequest request){
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de Validação",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 }

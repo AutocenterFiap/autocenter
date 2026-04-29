@@ -8,6 +8,7 @@ import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
+import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaException;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
@@ -66,9 +67,13 @@ public class OrdemServicoService {
     }
 
     @Transactional
-    public OrdemServicoResponseDTO atualizar(Long id, OrdemServicoDTO dto) {
-        // Implementar
-        return null;
+    public OrdemServicoResponseDTO atualizar(Long id, OrdemServicoUpdateDTO dto) {
+        OrdemServico ordemServico = findById(id);
+        StatusOS novoStatus = dto.statusOS();
+        ordemServico.getStatusOS().podeMudarPara(novoStatus);
+        ordemServico.setStatusOS(novoStatus);
+
+        return new OrdemServicoResponseDTO(ordemServico);
     }
 
     @Transactional

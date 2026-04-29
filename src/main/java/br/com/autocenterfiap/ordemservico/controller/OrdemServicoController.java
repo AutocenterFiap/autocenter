@@ -5,6 +5,7 @@ import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
+import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
 import br.com.autocenterfiap.ordemservico.service.OrdemServicoService;
 
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
@@ -57,7 +58,7 @@ public class OrdemServicoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrdemServicoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid OrdemServicoDTO dto) {
+    public ResponseEntity<OrdemServicoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid OrdemServicoUpdateDTO dto) {
         return ResponseEntity.ok(ordemServicoService.atualizar(id, dto));
     }
 

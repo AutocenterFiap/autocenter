@@ -19,10 +19,12 @@ public class OrdemServicoDuplicadaValidator implements OrdemServicoValidator{
     @Override
     public void validate(OrdemServicoDTO dto) {
         List<StatusOS> statusNotAllowed = List.of(
+                StatusOS.ABERTA,
                 StatusOS.RECEBIDA,
                 StatusOS.EM_DIAGNOSTICO,
-                StatusOS.EM_EXECUCAO,
-                StatusOS.AGUARDANDO_APROVACAO);
+                StatusOS.AGUARDANDO_APROVACAO,
+                StatusOS.APROVADA,
+                StatusOS.EM_EXECUCAO);
         if(ordemServicoRepository.existsByVeiculoIdAndStatusOSIn(dto.veiculoId(),statusNotAllowed)){
             throw new OrdemServicoJaAbertaParaVeiculoException("Já existe uma ordem de serviço em andamento para este veículo!");
         }

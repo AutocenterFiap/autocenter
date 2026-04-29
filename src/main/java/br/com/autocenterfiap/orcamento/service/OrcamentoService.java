@@ -4,12 +4,15 @@ import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static br.com.autocenterfiap.orcamento.enums.StatusOrcamento.AGUARDANDO_APROVACAO;
@@ -47,7 +50,7 @@ public class OrcamentoService {
         Orcamento orcamento = Orcamento.builder()
                 .ordemServico(os)
                 .statusOrcamento(AGUARDANDO_APROVACAO)
-                .valorTotal(os.getValorTotal())
+                .valorTotal(Util.calcularValorTotal(os))
                 .build();
         return orcamentoRepository.save(orcamento);
     }

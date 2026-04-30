@@ -10,8 +10,8 @@ CREATE TABLE servicos (
     descricao VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL,
     valor DECIMAL(10, 2) NOT NULL,
-    data_criacao TIMESTAMP NOT NULL,
-    data_ultima_atualizacao TIMESTAMP NULL
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_descricao ON servicos(descricao);

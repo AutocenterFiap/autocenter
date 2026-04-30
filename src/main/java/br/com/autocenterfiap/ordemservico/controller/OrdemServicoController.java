@@ -1,15 +1,10 @@
 package br.com.autocenterfiap.ordemservico.controller;
 
-
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
 import br.com.autocenterfiap.ordemservico.service.OrdemServicoService;
 
-import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -21,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,26 +60,6 @@ public class OrdemServicoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         ordemServicoService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // ========================================
-    // Endpoints de Serviços
-    // ========================================
-
-    @PostMapping("/{id}/servicos")
-    public ResponseEntity<OSItemServicoResponseDTO> adicionarServico(@PathVariable Long id, @RequestBody @Valid OSItemServicoDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordemServicoService.adicionarServico(id, dto));
-    }
-
-    @PutMapping("/{id}/servicos/{idItem}")
-    public ResponseEntity<OSItemServicoResponseDTO> atualizarServico(@PathVariable Long id, @PathVariable Long idItem, @RequestBody @Valid OSItemServicoDTO dto) {
-        return ResponseEntity.ok(ordemServicoService.atualizarServico(id, idItem, dto));
-    }
-
-    @DeleteMapping("/{id}/servicos/{idItem}")
-    public ResponseEntity<Void> removerServico(@PathVariable Long id, @PathVariable Long idItem) {
-        ordemServicoService.removerServico(id, idItem);
         return ResponseEntity.noContent().build();
     }
 }

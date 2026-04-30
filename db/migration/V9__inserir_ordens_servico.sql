@@ -28,3 +28,11 @@ INSERT INTO ordem_servico (
 ) VALUES (
     1003, 'FINALIZADA', 850.75, 3, 4, NOW(), NOW()
 );
+
+-- OS 4: Tech Solutions LTDA (Cliente 4) com a Ford Ranger (Veiculo 3)
+INSERT INTO ordem_servico (
+    numero_ordem_servico, status_os, valor_total, veiculo_id, cliente_id,
+    data_criacao, data_ultima_atualizacao
+) VALUES (
+    1004, 'EM_DIAGNOSTICO', 0.0, 3, 4, NOW(), NOW()
+);

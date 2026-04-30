@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.ordemservico.model;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusServico;
+import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
 import br.com.autocenterfiap.servico.model.Servico;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -58,7 +58,7 @@ public class OSItemServico implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusServico statusServico;
+    private StatusItemServico statusServico;
 
     @Column(nullable = false)
     private LocalDateTime dataHoraInicio;
@@ -74,7 +74,7 @@ public class OSItemServico implements Serializable {
     @PrePersist
     public void prePersist() {
         if (this.statusServico == null) {
-            this.statusServico = StatusServico.AGUARDANDO_INICIO;
+            this.statusServico = StatusItemServico.AGUARDANDO_INICIO;
         }
         this.dataCriacao = LocalDateTime.now();
         this.dataUltimaAtualizacao = LocalDateTime.now();

@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.ordemservico.dto;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusServico;
+import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
@@ -12,7 +12,7 @@ public record OSItemServicoDTO(
     @PositiveOrZero(message = "O valor do serviço não pode ser negativo")
     BigDecimal valorItemServico,
 
-    StatusServico statusServico,
+    StatusItemServico statusItemServico,
 
     @NotNull(message = "Data de início é obrigatória")
     LocalDateTime dataHoraInicio,

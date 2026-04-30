@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.ordemservico.enums;
 
-
-public enum StatusServico {
+public enum StatusItemServico {
     FINALIZADO,
     EXECUTANDO,
     AGUARDANDO_INICIO;

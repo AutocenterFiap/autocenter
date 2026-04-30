@@ -4,8 +4,6 @@ import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
 
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
@@ -14,8 +12,6 @@ import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaExc
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.validator.OrdemServicoValidator;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
@@ -82,32 +78,6 @@ public class OrdemServicoService {
         ordemServicoRepository.delete(ordemServico);
     }
 
-    // ========================================
-    // Sub-recursos: Serviços
-    // ========================================
-
-    @Transactional
-    public OSItemServicoResponseDTO adicionarServico(Long ordemServicoId, OSItemServicoDTO dto) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Mapear e adicionar OSItemServico à OrdemServico
-        return null;
-    }
-
-    @Transactional
-    public OSItemServicoResponseDTO atualizarServico(Long ordemServicoId, Long servicoItemId, OSItemServicoDTO dto) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Buscar o item, atualizar e salvar
-        return null;
-    }
-
-    @Transactional
-    public void removerServico(Long ordemServicoId, Long servicoItemId) {
-        OrdemServico ordemServico = findById(ordemServicoId);
-        // TODO: Remover o item da lista e salvar
-    }
-
-    // Funções auxiliares para buscar entidades relacionadas e validar a existência de OS
-
     private OrdemServico findById(Long id) {
         return ordemServicoRepository.findById(id)
                 .orElseThrow(() -> new OrdemServicoNaoEncontradaException("Ordem de Serviço não encontrada com ID: " + id));
@@ -127,6 +97,5 @@ public class OrdemServicoService {
         return clienteRepositoryl.findById(clienteId)
                 .orElseThrow(() -> new ClienteNaoEncontradoException("Cliente não encontrado com ID: " + clienteId));
     }
-
 
 }

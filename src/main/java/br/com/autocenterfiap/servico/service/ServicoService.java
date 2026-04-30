@@ -57,7 +57,7 @@ public class ServicoService {
         return repository.findById(id)
                 .orElseThrow(() -> {
                     final String message = "Servico não encontrado de ID " + id;
-                    log.info(message);
+                    log.error(message);
                     return new ServicoNaoEncontradoException(message);
                 });
     }
@@ -100,5 +100,7 @@ public class ServicoService {
         log.info("Deletando cliente: ID={}", servico.getId());
         repository.delete(servico);
         log.info("Cliente deletado com sucesso: ID={}", id);
+
+        repository.delete(servico);
     }
 }

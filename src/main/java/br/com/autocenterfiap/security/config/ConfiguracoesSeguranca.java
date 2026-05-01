@@ -39,6 +39,11 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.POST, "/v1/usuarios").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PATCH, "/v1/usuarios/senha/alteracao").hasAnyRole("ADMIN", "WRITE");
 
+                            req.requestMatchers(HttpMethod.GET, "/v1/orcamentos/{id}").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.POST, "/v1/orcamentos/{id}/enviar-cliente").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PATCH, "/v1/orcamentos/{id}}/aprovar").hasAnyRole("ADMIN", "WRITE");
+                            req.requestMatchers(HttpMethod.PATCH, "/v1/orcamentos/{id}}/reprovar").hasAnyRole("ADMIN", "WRITE");
+
 
                             req.requestMatchers(HttpMethod.GET, "/v1/api/clientes/**").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.POST, "/v1/api/clientes").hasAnyRole("ADMIN", "READ");
@@ -64,6 +69,7 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.POST, "/v1/ordem-servicos").hasAnyRole("ADMIN", "READ", "WRITE");
                             req.requestMatchers(HttpMethod.PUT, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "READ", "WRITE");
                             req.requestMatchers(HttpMethod.DELETE, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "READ", "WRITE");
+                            req.requestMatchers(HttpMethod.GET, "/v1/api/ordem-servico/metricas/servicos").hasAnyRole("ADMIN", "READ");
 
                             req.requestMatchers(HttpMethod.GET, "/v1/produtos").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.GET, "/v1/produtos/{id}").hasAnyRole("ADMIN", "READ");

@@ -2,6 +2,7 @@ package br.com.autocenterfiap.orcamento.controller;
 
 import br.com.autocenterfiap.cliente.dto.ClienteDTO;
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
+import br.com.autocenterfiap.orcamento.dto.EnvioRequest;
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.service.OrcamentoService;
@@ -16,11 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.service.annotation.PatchExchange;
 
 @RestController
@@ -85,5 +82,35 @@ public class OrcamentoController {
     ) {
         Orcamento orcamento = orcamentoService.reprovar(id);
         return ResponseEntity.ok(Orcamento.paraOrcamentoResponse(orcamento));
+    }
+
+    @Operation(
+            summary = "Enviar orcamento",
+            description = "Envia o orcamento para o cliente"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Orcamento enviado com sucesso",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Orcamento não encontrado"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos fornecidos"
+            )
+    })
+    @PostMapping("/{id}/enviar-cliente")
+    public ResponseEntity<String> enviarOrcamento(
+            @PathVariable Long id,
+            @RequestBody EnvioRequest envioRequest) {
+
+        String mensagem = String.format("Orçamento %d enviado via %s com sucesso!",
+                id, envioRequest.tipo().name());
+
+        return ResponseEntity.ok(mensagem);
     }
 }

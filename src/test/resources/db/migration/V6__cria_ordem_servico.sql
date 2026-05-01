@@ -26,6 +26,7 @@ CREATE TABLE os_item_produto
     preco_unitario_no_momento NUMERIC(15, 2) NOT NULL,
     data_criacao              TIMESTAMP,
     data_ultima_atualizacao   TIMESTAMP,
+    CONSTRAINT fk_item_produto_ordem FOREIGN KEY (ordem_servico_id) REFERENCES ordem_servico(id) ON DELETE CASCADE,
     CONSTRAINT fk_os_item_produto_produto FOREIGN KEY (produto_id) REFERENCES produtos (id)
 );
 CREATE INDEX idx_os_item_produto_os      ON os_item_produto (ordem_servico_id);

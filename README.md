@@ -18,34 +18,37 @@ Flyway (migração de banco de dados)
 
 H2 (dev) / MySQL (prod)
 
-📂 Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 O projeto segue uma arquitetura em camadas, organizada nos pacotes:
 
+```
 br.com.autocenterfiap.domain
- ├── controller
- ├── dto
- ├── enums
- ├── exception
- ├── handler
- ├── mapper
- ├── model
- ├── repository
- ├── service
- └── validator
+┌─ controller
+├─ dto
+├─ enums
+├─ exception
+├─ handler
+├─ mapper
+├─ model
+├─ repository
+├─ service
+└─ validator
+```
 
-⚙️ Configuração e Execução
+---
 
-Pré-requisitos
+## ⚙️ Configuração e Execução
 
-JDK 21
+### Pré-requisitos
 
-Maven ou Gradle
+* JDK 21
+* Maven ou Gradle
+* Banco de dados configurado (H2 para dev, MySQL para prod)
 
-Banco de dados configurado (H2 para dev, MySQL para prod)
+### Executando localmente
 
-Executando localmente
-
+```bash
 # Clonar repositório
 git clone https://github.com/seuusuario/autocenter-fiap.git
 
@@ -54,45 +57,58 @@ cd autocenter-fiap
 
 # Rodar com Maven
 ./mvnw spring-boot:run
+```
 
-🔑 Perfis (Profiles)
+---
 
-dev: usa H2 em memória e migrações em db/migration/dev
+## 🔑 Perfis (Profiles)
 
-prod: usa MySQL e migrações em db/migration/prod
+* **dev**: usa H2 em memória e migrações em `db/migration/dev`
+* **prod**: usa MySQL e migrações em `db/migration/prod`
 
 Ativar perfil:
 
+```bash
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
 
-📖 Documentação da API
+---
+
+## 📖 Documentação da API
 
 Após subir a aplicação:
 
-Swagger UI: http://localhost:8097/swagger-ui/index.html
+* Swagger UI: http://localhost:8097/swagger-ui/index.html
+* OpenAPI JSON: http://localhost:8097/v3/api-docs
 
-OpenAPI JSON: http://localhost:8097/v3/api-docs
+---
 
-🔐 Autenticação
+## 🗑️ Autenticação
 
 A API utiliza OAuth2 com JWT.
 
-Obtenha token em /v1/oauth/token.
+* Obtenha token em `/v1/oauth/token`.
 
-Use o botão Authorize no Swagger UI ou envie o header:
+* Use o botão **Authorize** no Swagger UI ou envie o header:
 
-Authorization: Bearer <seu_token>
+  ```
+  Authorization: Bearer <seu_token>
+  ```
 
-🧪 Testes
+---
+
+## 🥢 Testes
 
 Rodar testes:
 
+```bash
 ./mvnw test
+```
 
-📌 Próximos Passos
+---
 
-Configurar CI/CD
+## 📌 Próximos Passos
 
-Adicionar monitoramento
-
-Melhorar documentação de endpoints
+* Configurar CI/CD
+* Adicionar monitoramento
+* Melhorar documentação de endpoints

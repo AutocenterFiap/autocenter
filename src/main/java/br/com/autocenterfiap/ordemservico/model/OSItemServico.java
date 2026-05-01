@@ -1,9 +1,11 @@
-package br.com.autocenterfiap.ordemservico.repository.entity;
+package br.com.autocenterfiap.ordemservico.model;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusServico;
+import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
+import br.com.autocenterfiap.servico.model.Servico;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -32,6 +35,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "os_item_servico")
+@EntityListeners(AuditingEntityListener.class)
 public class OSItemServico implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -45,18 +49,16 @@ public class OSItemServico implements Serializable {
     @JoinColumn(name = "ordem_servico_id", nullable = false)
     private OrdemServico ordemServico;
 
-    //TODO: Mapear a classe Servico
-
-//    @ManyToOne
-//    @JoinColumn(name = "servico_id", nullable = false)
-//    private Servico servico;
+    @ManyToOne
+    @JoinColumn(name = "servico_id", nullable = false)
+    private Servico servico;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal valorItemServico;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusServico statusServico;
+    private StatusItemServico statusServico;
 
     @Column(nullable = false)
     private LocalDateTime dataHoraInicio;
@@ -72,7 +74,7 @@ public class OSItemServico implements Serializable {
     @PrePersist
     public void prePersist() {
         if (this.statusServico == null) {
-            this.statusServico = StatusServico.AGUARDANDO_INICIO;
+            this.statusServico = StatusItemServico.AGUARDANDO_INICIO;
         }
         this.dataCriacao = LocalDateTime.now();
         this.dataUltimaAtualizacao = LocalDateTime.now();

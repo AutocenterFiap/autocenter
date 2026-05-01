@@ -4,7 +4,7 @@ import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

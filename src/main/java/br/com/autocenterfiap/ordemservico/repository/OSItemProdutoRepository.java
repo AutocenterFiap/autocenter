@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.ordemservico.repository;
 
-import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

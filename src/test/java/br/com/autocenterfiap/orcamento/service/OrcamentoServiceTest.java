@@ -5,7 +5,7 @@ import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

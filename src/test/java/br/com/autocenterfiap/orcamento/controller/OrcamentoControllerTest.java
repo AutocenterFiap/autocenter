@@ -3,7 +3,7 @@ package br.com.autocenterfiap.orcamento.controller;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.service.OrcamentoService;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;
 import br.com.autocenterfiap.security.service.TokenService;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(OrcamentoController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@MockBean(JpaMetamodelMappingContext.class)
 class OrcamentoControllerTest {
 
     @Autowired

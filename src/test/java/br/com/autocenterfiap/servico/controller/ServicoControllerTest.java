@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.servico.controller;
 
+import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
 import br.com.autocenterfiap.servico.dto.ServicoDto;
 import br.com.autocenterfiap.servico.enums.StatusServico;
 import br.com.autocenterfiap.servico.model.Servico;
@@ -41,12 +42,16 @@ class ServicoControllerTest {
     @Autowired
     private ServicoRepository servicoRepository;
 
+    @Autowired
+    private OSItemServicoRepository osItemServicoRepository;
+
     private Servico servico;
 
     private ServicoDto servicoDto;
 
     @BeforeEach
     void setUp() {
+        osItemServicoRepository.deleteAll();
         servicoRepository.deleteAll();
         servico = new Servico();
         servico.setDescricao("Troca de óleo");

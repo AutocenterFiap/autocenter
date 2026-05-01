@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: autocenter-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Aut0c3nt3rfiap
+      MYSQL_DATABASE: autocenterdb
+      MYSQL_USER: autocenter
+      MYSQL_PASSWORD: autocenter123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - autocenter-network
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  autocenterfiap:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: autocenter-app
+    ports:
+      - "8097:8097"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/autocenterdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo
+      SPRING_DATASOURCE_USERNAME: autocenter
+      SPRING_DATASOURCE_PASSWORD: autocenter123
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - autocenter-network
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  autocenter-network:
+    driver: bridge

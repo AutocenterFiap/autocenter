@@ -30,6 +30,7 @@ INSERT INTO perfil (nome) VALUES ('WRITE');
 
 INSERT INTO usuario (nome, senha) VALUES ('ADMIN', '$2a$10$JLzN0RAohZTkZZpK1YH8g.zBrZTrN2Q5QbNK2b210gK1wlkg/DJA2');
 
-INSERT INTO R_usuario_perfil (usuario_id, perfil_id)
-VALUES (select id from usuario where nome = 'ADMIN',
-           select id from perfil where nome = 'ADMIN');
+INSERT INTO r_usuario_perfil (usuario_id, perfil_id)
+SELECT
+    (SELECT id FROM usuario WHERE nome = 'ADMIN'),
+    (SELECT id FROM perfil WHERE nome = 'ADMIN');

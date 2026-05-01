@@ -83,6 +83,7 @@ class OSItemProdutoServiceTest {
 
         when(produtoService.buscarOuLancarExcecao(1L)).thenReturn(produto);
         when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
+        when(ordemServicoRepository.getReferenceById(10L)).thenReturn(os);
 
         OSItemProdutoResponseDTO result = osItemProdutoService.adicionarProdutoNaOS(10L, dto);
 
@@ -117,13 +118,16 @@ class OSItemProdutoServiceTest {
     @Test
     @DisplayName("Deve remover produto da OS e devolver ao estoque")
     void deveRemoverProdutoDaOSEDevolverEstoque() {
+        os.getOsItensProdutos().add(osItem);
+        
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
 
         osItemProdutoService.removerProdutoDaOS(10L, 1L);
 
+        // Valida se o estoque voltou e se o item sumiu da lista da OS
         assertEquals(52, produto.getQuantidadeEstoque()); // 50 + 2 = 52
-        verify(osItemProdutoRepository, times(1)).delete(osItem);
+        assertEquals(0, os.getOsItensProdutos().size(), "O item deveria ter sido removido da lista");
     }
 
     @Test
@@ -154,7 +158,6 @@ class OSItemProdutoServiceTest {
 
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
-        when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);
 
@@ -168,7 +171,6 @@ class OSItemProdutoServiceTest {
 
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
-        when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);
 

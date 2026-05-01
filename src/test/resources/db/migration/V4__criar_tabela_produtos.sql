@@ -1,5 +1,5 @@
 -- ========================================
--- Migration: V6__criar_tabela_produtos
+-- Migration: V4__criar_tabela_produtos
 -- Descrição: Cria tabelas de produtos/insumos e itens de produto na OS
 -- Data: 2026-04-25
 -- Autor: Auto Center FIAP Team

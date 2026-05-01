@@ -1,9 +1,10 @@
-package br.com.autocenterfiap.ordemservico.repository.entity;
+package br.com.autocenterfiap.ordemservico.model;
 
 import br.com.autocenterfiap.produto.model.Produto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -32,6 +34,7 @@ import static java.util.Objects.isNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "os_item_produto")
+@EntityListeners(AuditingEntityListener.class)
 @Schema(description = "Representa um produto vinculado a uma Ordem de Serviço")
 public class OSItemProduto implements Serializable {
 

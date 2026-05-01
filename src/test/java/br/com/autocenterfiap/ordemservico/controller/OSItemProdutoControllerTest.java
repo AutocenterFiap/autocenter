@@ -1,8 +1,8 @@
 package br.com.autocenterfiap.ordemservico.controller;
 
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.entity.OSItemProduto;
-import br.com.autocenterfiap.ordemservico.repository.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.ProdutoRequestDTO;
 import br.com.autocenterfiap.produto.enums.TipoProduto;

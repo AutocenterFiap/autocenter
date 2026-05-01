@@ -19,6 +19,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AutenticacaoController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@MockBean(JpaMetamodelMappingContext.class)
 class AutenticacaoControllerTest {
 
     @Autowired

@@ -42,6 +42,8 @@ class ServicoControllerTest {
 
     private Servico servico;
 
+    private ServicoDto servicoDto;
+
     @BeforeEach
     void setUp() {
         servicoRepository.deleteAll();
@@ -49,13 +51,18 @@ class ServicoControllerTest {
         servico.setDescricao("Troca de óleo");
         servico.setStatus(StatusServico.ATIVO);
         servico.setValor(BigDecimal.valueOf(100));
+
+        servicoDto = new ServicoDto(
+                "Troca de óleo",
+                StatusServico.ATIVO,
+                BigDecimal.valueOf(100));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveListarTodosOsServicos() throws Exception {
         servicoRepository.save(servico);
-        mockMvc.perform(get("/v1/api/servicos")
+        mockMvc.perform(get("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
@@ -152,7 +159,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoDeletarServicoInexistente() throws Exception {
-        mockMvc.perform(delete("/v1/api/servicos/{id}", 999L)
+        mockMvc.perform(delete("/v1/servicos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

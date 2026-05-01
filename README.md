@@ -18,6 +18,8 @@ Flyway (migração de banco de dados)
 
 H2 (dev) / MySQL (prod)
 
+“Optamos pelo MySQL porque é mais simples de configurar e tem suporte nativo em diversas ferramentas que utilizamos no curso. Isso nos permitiu focar na implementação da arquitetura em camadas, segurança com OAuth2/JWT e documentação com Swagger, sem gastar tempo excessivo em ajustes de banco. Além disso, o MySQL é amplamente usado em ambientes acadêmicos e corporativos, o que facilita encontrar suporte e exemplos.”
+
 ## 📂 Estrutura do Projeto
 
 O projeto segue uma arquitetura em camadas, organizada nos pacotes:

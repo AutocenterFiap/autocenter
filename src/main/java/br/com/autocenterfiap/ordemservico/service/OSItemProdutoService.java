@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.ordemservico.service;
 
+import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaException;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
@@ -10,6 +11,7 @@ import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
 import br.com.autocenterfiap.produto.model.Produto;
 import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.produto.service.ProdutoService;
+import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,10 @@ public class OSItemProdutoService {
         item.setQuantidade(dto.quantidade());
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
 
+        // Recalcula o valor total da OS após adicionar o produto
+        ordemServico.getOsItensProdutos().add(item);
+        ordemServico.setValorTotal(Util.calcularValorTotal(ordemServico));
+
         return OSItemProdutoResponseDTO.from(osItemProdutoRepository.save(item));
     }
 
@@ -57,6 +63,7 @@ public class OSItemProdutoService {
     public OSItemProdutoResponseDTO atualizarQuantidade(Long ordemServicoId, Long produtoId, OSItemProdutoRequestDTO dto) {
         OSItemProduto item = osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(ordemServicoId, produtoId)
                 .orElseThrow(() -> new OSItemProdutoNaoEncontradoException(ordemServicoId, produtoId));
+        
 
         Produto produto = item.getProduto();
         int diferencaQuantidade = dto.quantidade() - item.getQuantidade();
@@ -70,7 +77,12 @@ public class OSItemProdutoService {
         }
 
         item.setQuantidade(dto.quantidade());
-        return OSItemProdutoResponseDTO.from(osItemProdutoRepository.save(item));
+
+        // Recalcula o valor total da OS após atualizar a quantidade
+        OrdemServico os = item.getOrdemServico();
+        os.setValorTotal(Util.calcularValorTotal(os));
+
+        return OSItemProdutoResponseDTO.from(item);
     }
 
     @Transactional
@@ -81,6 +93,11 @@ public class OSItemProdutoService {
         // Devolve a quantidade ao estoque
         item.getProduto().incrementarEstoque(item.getQuantidade());
 
-        osItemProdutoRepository.delete(item);
+        OrdemServico os = item.getOrdemServico();
+        os.getOsItensProdutos().remove(item);
+
+        // Recalcula o valor total da OS
+        os.setValorTotal(Util.calcularValorTotal(os));
     }
+
 }

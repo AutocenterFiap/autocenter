@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.servico.controller;
 
+import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
 import br.com.autocenterfiap.servico.enums.StatusServico;
 import br.com.autocenterfiap.servico.model.Servico;
 import br.com.autocenterfiap.servico.repository.ServicoRepository;
@@ -12,10 +13,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("ServicoController - Testes de Integração")
 class ServicoControllerTest {
 
@@ -40,11 +39,17 @@ class ServicoControllerTest {
     @Autowired
     private ServicoRepository servicoRepository;
 
+    @Autowired
+    private OSItemServicoRepository osItemServicoRepository;
+
     private Servico servico;
 
     @BeforeEach
     void setUp() {
+        osItemServicoRepository.deleteAll();
+        osItemServicoRepository.flush();
         servicoRepository.deleteAll();
+        servicoRepository.flush();
         servico = new Servico();
         servico.setDescricao("Troca de óleo");
         servico.setStatus(StatusServico.ATIVO);

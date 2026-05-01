@@ -3,18 +3,22 @@ package br.com.autocenterfiap.ordemservico.repository;
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
+import br.com.autocenterfiap.cliente.repository.ClienteRepository;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
+import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("OrdemServicoRepository - Testes de Integração")
 class OrdemServicoRepositoryTest {
 
@@ -37,6 +42,12 @@ class OrdemServicoRepositoryTest {
     @Autowired
     private OrdemServicoRepository repository;
 
+    @Autowired
+    private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+
     private Cliente cliente;
     private Veiculo veiculo;
     private OrdemServico ordemServico;
@@ -45,6 +56,12 @@ class OrdemServicoRepositoryTest {
     @BeforeEach
     void setUp() {
         repository.deleteAll();
+        repository.flush();
+        veiculoRepository.deleteAll();
+        veiculoRepository.flush();
+        clienteRepository.deleteAll();
+        clienteRepository.flush();
+        entityManager.flush();
 
         cliente = new Cliente();
         cliente.setNome("João da Silva");

@@ -15,10 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("ProdutoController - Testes de Integração")
 class ProdutoControllerTest {
 
@@ -56,6 +54,7 @@ class ProdutoControllerTest {
     @BeforeEach
     void setUp() {
         produtoRepository.deleteAll();
+        produtoRepository.flush();
 
         requestDTO = new ProdutoRequestDTO(
                 "Filtro de Óleo",

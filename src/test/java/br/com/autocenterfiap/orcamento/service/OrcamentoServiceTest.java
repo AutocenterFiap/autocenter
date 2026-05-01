@@ -12,10 +12,12 @@ import br.com.autocenterfiap.produto.model.Produto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import static br.com.autocenterfiap.orcamento.enums.StatusOrcamento.REPROVADO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class OrcamentoServiceTest {
 
     @Mock
@@ -44,7 +47,6 @@ class OrcamentoServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
 
         Produto produto = new Produto();
         produto.setPrecoUnitario(new BigDecimal("200.00"));
@@ -52,6 +54,7 @@ class OrcamentoServiceTest {
         OSItemProduto itemProduto = new OSItemProduto();
         itemProduto.setProduto(produto);
         itemProduto.setQuantidade(1);
+        itemProduto.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
 
         OSItemServico itemServico = new OSItemServico();
         itemServico.setValorItemServico(new BigDecimal("300.00"));

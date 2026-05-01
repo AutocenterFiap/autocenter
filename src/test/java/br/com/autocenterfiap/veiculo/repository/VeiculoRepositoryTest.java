@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.veiculo.repository;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
@@ -9,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("VeiculoRepository - Testes de Integração")
 class VeiculoRepositoryTest {
     @Autowired
@@ -29,12 +33,18 @@ class VeiculoRepositoryTest {
     @Autowired
     private VeiculoRepository repository;
 
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
+
     private Veiculo veiculo;
     private Veiculo veiculoSegundo;
 
     @BeforeEach
     void setUp() {
+        ordemServicoRepository.deleteAll();
+        ordemServicoRepository.flush();
         repository.deleteAll();
+        repository.flush();
 
         veiculo = new Veiculo();
         veiculo.setPlaca("ABC1D23");

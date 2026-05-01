@@ -12,7 +12,7 @@ public class Util {
 
         BigDecimal valorTotalPecas = os.getOsItensProdutos()
                 .stream().map(osItemProduto ->
-                        osItemProduto.getProduto().getPrecoUnitario()
+                        osItemProduto.getPrecoUnitarioNoMomento()
                                 .multiply(BigDecimal.valueOf(osItemProduto.getQuantidade()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal valorTotalServico = os.getOsItensServicos()

@@ -30,14 +30,14 @@ class OrdemServicoDuplicadaValidatorTest {
 
     @Test
     public void devePassarQuandoNaoExistirOrdemServicoAbertaParaVeiculo(){
-        OrdemServicoDTO dto = new OrdemServicoDTO(1L, 1L, StatusOS.RECEBIDA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(1L, 1L);
         doReturn(false).when(ordemServicoRepository).existsByVeiculoIdAndStatusOSIn(eq(1L), anyList());
         assertDoesNotThrow(() -> ordemServicoDuplicadaValidator.validate(dto));
     }
 
     @Test
     public void deveLancarExceptionQuandoExistirOrdemServicoAbertaParaVeiculo(){
-        OrdemServicoDTO dto = new OrdemServicoDTO(1L, 1L, StatusOS.RECEBIDA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(1L, 1L);
         doReturn(true).when(ordemServicoRepository).existsByVeiculoIdAndStatusOSIn(eq(1L), anyList());
         assertThrows(OrdemServicoJaAbertaParaVeiculoException.class,() -> ordemServicoDuplicadaValidator.validate(dto));
     }

@@ -58,12 +58,6 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.PUT, "/v1/servicos/{idServico}").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.DELETE, "/v1/servicos/{idServico}").hasAnyRole("ADMIN", "WRITE");
 
-                            req.requestMatchers(HttpMethod.GET, "/v1/produtos").permitAll();
-                            req.requestMatchers(HttpMethod.GET, "/v1/produtos/{idProduto}").permitAll();
-                            req.requestMatchers(HttpMethod.POST, "/v1/produtos").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.PUT, "/v1/produtos/{idProduto}").hasAnyRole("ADMIN", "WRITE");
-                            req.requestMatchers(HttpMethod.DELETE, "/v1/produtos/{idProduto}").hasAnyRole("ADMIN", "WRITE");
-
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/{idOrdemServico}").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/numero/{numeroOrdemServico}").permitAll();

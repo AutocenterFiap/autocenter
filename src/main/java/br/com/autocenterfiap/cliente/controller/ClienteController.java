@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/api/clientes")
+@RequestMapping("/v1/clientes")
 @Tag(name = "Clientes", description = "API para gerenciamento de clientes da oficina")
 public class ClienteController {
 

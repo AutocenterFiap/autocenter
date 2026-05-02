@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.PatchExchange;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class OrcamentoController {
                     description = "Dados inválidos fornecidos"
             )
     })
-    @PatchExchange("/{id}/aprovar")
+    @PatchMapping("/{id}/aprovar")
     public ResponseEntity<OrcamentoResponse> aprovar(
             @Parameter(description = "ID do orcamento a ser aprovado", required = true)
             @PathVariable Long id
@@ -75,7 +75,7 @@ public class OrcamentoController {
                     description = "Dados inválidos fornecidos"
             )
     })
-    @PatchExchange("/{id}/reprovar")
+    @PatchMapping("/{id}/reprovar")
     public ResponseEntity<OrcamentoResponse> reprovar(
             @Parameter(description = "ID do orcamento a ser reprovado", required = true)
             @PathVariable Long id

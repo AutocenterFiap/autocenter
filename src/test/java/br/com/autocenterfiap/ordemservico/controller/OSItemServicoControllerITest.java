@@ -92,7 +92,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("GET - 200 deve listar todos os serviços de uma OS")
     void deveListarServicosComSucesso() throws Exception {
-        mockMvc.perform(get("/v1/api/ordem-servico/{id}/servicos", osEmExecucao.getId())
+        mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osEmExecucao.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -106,7 +106,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("GET - 200 deve retornar lista vazia quando OS não tem serviços")
     void deveRetornarListaVaziaQuandoOsNaoTemServicos() throws Exception {
-        mockMvc.perform(get("/v1/api/ordem-servico/{id}/servicos", osFinalizada.getId())
+        mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osFinalizada.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -119,7 +119,7 @@ class OSItemServicoControllerITest {
     void deveAdicionarServicoNaOSComSucesso() throws Exception {
         OSItemServicoRequestDTO request = new OSItemServicoRequestDTO(servicoAtivo.getId());
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -136,7 +136,7 @@ class OSItemServicoControllerITest {
     void deveRetornar400QuandoServicoIdNulo() throws Exception {
         OSItemServicoRequestDTO requestInvalido = new OSItemServicoRequestDTO(null);
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestInvalido)))
                 .andExpect(status().isBadRequest());
@@ -148,7 +148,7 @@ class OSItemServicoControllerITest {
     void deveRetornar400QuandoServicoInativo() throws Exception {
         OSItemServicoRequestDTO request = new OSItemServicoRequestDTO(servicoInativo.getId());
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -160,7 +160,7 @@ class OSItemServicoControllerITest {
     void deveRetornar400QuandoOsNaoEstaEmDiagnostico() throws Exception {
         OSItemServicoRequestDTO request = new OSItemServicoRequestDTO(servicoAtivo.getId());
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", osEmExecucao.getId())
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", osEmExecucao.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -172,7 +172,7 @@ class OSItemServicoControllerITest {
     void deveRetornar404QuandoServicoNaoExiste() throws Exception {
         OSItemServicoRequestDTO request = new OSItemServicoRequestDTO(999L);
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -184,7 +184,7 @@ class OSItemServicoControllerITest {
     void deveRetornar404QuandoOrdemServicoNaoExiste() throws Exception {
         OSItemServicoRequestDTO request = new OSItemServicoRequestDTO(servicoAtivo.getId());
 
-        mockMvc.perform(post("/v1/api/ordem-servico/{id}/servicos", 999L)
+        mockMvc.perform(post("/v1/ordem-servico/{id}/servicos", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -200,7 +200,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
                         osEmExecucao.getId(), itemAguardando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -218,7 +218,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
                         osEmDiagnostico.getId(), itemDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -234,7 +234,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
                         osEmExecucao.getId(), itemExecutando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -244,7 +244,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /iniciar - 404 quando item não existe")
     void deveRetornar404AoIniciarServicoNaoExistente() throws Exception {
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/iniciar",
                         osEmExecucao.getId(), 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -260,7 +260,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
                         osEmExecucao.getId(), itemExecutando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -279,7 +279,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
                         osEmExecucao.getId(), itemAguardando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -289,7 +289,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /finalizar - 404 quando item não existe")
     void deveRetornar404AoFinalizarServicoNaoExistente() throws Exception {
-        mockMvc.perform(patch("/v1/api/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
+        mockMvc.perform(patch("/v1/ordem-servico/{osId}/servicos/{servicoId}/finalizar",
                         osEmExecucao.getId(), 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -304,12 +304,12 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(delete("/v1/api/ordem-servico/{osId}/servicos/{servicoId}",
+        mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         osEmDiagnostico.getId(), itemAguardando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/v1/api/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
+        mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
@@ -324,7 +324,7 @@ class OSItemServicoControllerITest {
                 .findFirst()
                 .orElseThrow();
 
-        mockMvc.perform(delete("/v1/api/ordem-servico/{osId}/servicos/{servicoId}",
+        mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         osEmExecucao.getId(), itemExecutando.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -342,7 +342,7 @@ class OSItemServicoControllerITest {
         itemDiagnostico.setStatusServico(StatusItemServico.EXECUTANDO);
         osItemServicoRepository.save(itemDiagnostico);
 
-        mockMvc.perform(delete("/v1/api/ordem-servico/{osId}/servicos/{servicoId}",
+        mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         osEmDiagnostico.getId(), itemDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -352,7 +352,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE - 404 quando item não existe")
     void deveRetornar404AoRemoverServicoNaoExistente() throws Exception {
-        mockMvc.perform(delete("/v1/api/ordem-servico/{osId}/servicos/{servicoId}",
+        mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         osEmDiagnostico.getId(), 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -362,7 +362,7 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE - 404 quando OS não existe")
     void deveRetornar404AoRemoverServicoDeOsNaoExistente() throws Exception {
-        mockMvc.perform(delete("/v1/api/ordem-servico/{osId}/servicos/{servicoId}",
+        mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         999L, 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());

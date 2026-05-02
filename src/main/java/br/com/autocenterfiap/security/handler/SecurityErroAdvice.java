@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
-public class TratamentoErroAdvice {
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.security")
+public class SecurityErroAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> tratarErro400(MethodArgumentNotValidException ex) {
@@ -68,11 +68,6 @@ public class TratamentoErroAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> tratarErro500(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: " +ex.getLocalizedMessage());
     }
 
     private record DadosErroValidacao(String campo, String mensagem) {

@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.orcamento.service;
 
+import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException;
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
@@ -9,6 +10,8 @@ import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.util.Util;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,5 +67,13 @@ public class OrcamentoService {
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(id));
         orcamento.aprovar();
         return orcamentoRepository.save(orcamento);
+    }
+
+    public Page<Orcamento> listarTodos(StatusOrcamento statusOrcamento, Pageable pageable) {
+        Page<Orcamento> orcamentos = orcamentoRepository.findByStatusOrcamento(statusOrcamento, pageable);
+        if (orcamentos.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return orcamentos;
     }
 }

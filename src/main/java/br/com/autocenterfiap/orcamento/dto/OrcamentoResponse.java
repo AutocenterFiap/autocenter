@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.orcamento.controller;
+package br.com.autocenterfiap.orcamento.dto;
 
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import lombok.Builder;

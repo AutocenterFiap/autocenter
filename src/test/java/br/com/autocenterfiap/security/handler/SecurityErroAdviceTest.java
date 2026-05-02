@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.security.handler;
 
+import br.com.autocenterfiap.handler.GlobalExceptionHandler;
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,14 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class TratamentoErroTest {
-
-    private TratamentoErroAdvice tratamentoErro;
+class SecurityErroAdviceTest {
+    private GlobalExceptionHandler globalExceptionHandler;
+    private SecurityErroAdvice tratamentoErro;
     private HttpServletRequest request;
 
     @BeforeEach
     void setUp() {
-        tratamentoErro = new TratamentoErroAdvice();
+        tratamentoErro = new SecurityErroAdvice();
         request = Mockito.mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/api/teste");
     }
@@ -90,10 +91,10 @@ class TratamentoErroTest {
     void deveTratarErro500() {
         Exception ex = new Exception("Falha inesperada");
 
-        ResponseEntity<String> resposta = tratamentoErro.tratarErro500(ex);
+        ResponseEntity<br.com.autocenterfiap.handler.ErroResposta> resposta = globalExceptionHandler.handleGenericException(ex, request);
 
         assertEquals(500, resposta.getStatusCodeValue());
-        assertTrue(resposta.getBody().contains("Falha inesperada"));
+        assertTrue(resposta.getBody().getErro().contains("Falha inesperada"));
     }
 
     @Test

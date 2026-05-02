@@ -10,8 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.servico")
 public class ServicoExceptionHandler {
 
     @ExceptionHandler(ServicoNaoEncontradoException.class)

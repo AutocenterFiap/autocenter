@@ -36,7 +36,7 @@ public class ServicoService {
         return mapper.toServicoResponseDto(servico);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<ServicoResponseDTO> listarTodos(Pageable pageable) {
         log.info("Listando servicos com paginação - Página: {}, Tamanho: {}",
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -51,13 +51,13 @@ public class ServicoService {
         return servicos.map(mapper::toServicoResponseDto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Servico buscarPorId(Long id) {
         log.info("Iniciando busca de servico por id: {}", id);
         return repository.findById(id)
                 .orElseThrow(() -> {
                     final String message = "Servico não encontrado de ID " + id;
-                    log.info(message);
+                    log.error(message);
                     return new ServicoNaoEncontradoException(message);
                 });
     }

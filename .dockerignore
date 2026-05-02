@@ -1,0 +1,55 @@
+# ========================================
+# .dockerignore
+# Define arquivos/pastas que NÃO devem ser copiados para o container
+# Reduz o tamanho da imagem e acelera o build
+# ========================================
+
+# Diretório target do Maven (builds anteriores)
+target/
+
+# Arquivos de configuração do IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+
+# Arquivos do Git
+.git/
+.gitignore
+.gitattributes
+
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+*~
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Documentação
+README.md
+*.md
+docs/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Node modules (se houver frontend)
+node_modules/
+
+# Arquivos de teste
+*.test
+test-results/
+coverage/

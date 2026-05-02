@@ -1,6 +1,7 @@
 package br.com.autocenterfiap.servico.controller;
 
 import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
+import br.com.autocenterfiap.servico.dto.ServicoDto;
 import br.com.autocenterfiap.servico.enums.StatusServico;
 import br.com.autocenterfiap.servico.model.Servico;
 import br.com.autocenterfiap.servico.repository.ServicoRepository;
@@ -44,6 +45,8 @@ class ServicoControllerTest {
 
     private Servico servico;
 
+    private ServicoDto servicoDto;
+
     @BeforeEach
     void setUp() {
         osItemServicoRepository.deleteAll();
@@ -54,13 +57,18 @@ class ServicoControllerTest {
         servico.setDescricao("Troca de óleo");
         servico.setStatus(StatusServico.ATIVO);
         servico.setValor(BigDecimal.valueOf(100));
+
+        servicoDto = new ServicoDto(
+                "Troca de óleo",
+                StatusServico.ATIVO,
+                BigDecimal.valueOf(100));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveListarTodosOsServicos() throws Exception {
         servicoRepository.save(servico);
-        mockMvc.perform(get("/v1/api/servicos")
+        mockMvc.perform(get("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
@@ -71,7 +79,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornarListaVaziaQuandoNaoHouverServicos() throws Exception {
-        mockMvc.perform(get("/v1/api/servicos")
+        mockMvc.perform(get("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)))
@@ -82,7 +90,7 @@ class ServicoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarServicoPorIdComSucesso() throws Exception {
         Servico servicoSalvo = servicoRepository.save(servico);
-        mockMvc.perform(get("/v1/api/servicos/{id}", servicoSalvo.getId())
+        mockMvc.perform(get("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(servicoSalvo.getId().intValue())))
@@ -92,7 +100,8 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarServicoInexistentePorId() throws Exception {
-        mockMvc.perform(get("/v1/api/servicos/{id}", 999L)
+
+        mockMvc.perform(get("/v1/servicos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -100,9 +109,9 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarServicoComSucesso() throws Exception {
-        mockMvc.perform(post("/v1/api/servicos")
+        mockMvc.perform(post("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(servico)))
+                        .content(objectMapper.writeValueAsString(servicoDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.descricao", is("Troca de óleo")))
@@ -115,7 +124,7 @@ class ServicoControllerTest {
     void deveRetornar400AoCriarServicoComDadosInvalidos() throws Exception {
         Servico servicoInvalido = new Servico();
         servicoInvalido.setDescricao(""); // descrição vazia
-        mockMvc.perform(post("/v1/api/servicos")
+        mockMvc.perform(post("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(servicoInvalido)))
                 .andExpect(status().isBadRequest());
@@ -126,7 +135,7 @@ class ServicoControllerTest {
     void deveAtualizarServicoComSucesso() throws Exception {
         Servico servicoSalvo = servicoRepository.save(servico);
         servicoSalvo.setDescricao("Troca de filtro");
-        mockMvc.perform(put("/v1/api/servicos/{id}", servicoSalvo.getId())
+        mockMvc.perform(put("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(servicoSalvo)))
                 .andExpect(status().isOk())
@@ -136,9 +145,9 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoAtualizarServicoInexistente() throws Exception {
-        mockMvc.perform(put("/v1/api/servicos/{id}", 999L)
+        mockMvc.perform(put("/v1/servicos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(servico)))
+                        .content(objectMapper.writeValueAsString(servicoDto)))
                 .andExpect(status().isNotFound());
     }
 
@@ -146,10 +155,11 @@ class ServicoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveDeletarServicoComSucesso() throws Exception {
         Servico servicoSalvo = servicoRepository.save(servico);
-        mockMvc.perform(delete("/v1/api/servicos/{id}", servicoSalvo.getId())
+        mockMvc.perform(delete("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        mockMvc.perform(get("/v1/api/servicos/{id}", servicoSalvo.getId())
+
+        mockMvc.perform(get("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -157,7 +167,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoDeletarServicoInexistente() throws Exception {
-        mockMvc.perform(delete("/v1/api/servicos/{id}", 999L)
+        mockMvc.perform(delete("/v1/servicos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

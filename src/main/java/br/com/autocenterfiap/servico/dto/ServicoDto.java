@@ -11,6 +11,6 @@ public record ServicoDto(
     String descricao,
     @NotNull(message = "Status é obrigatório")
     StatusServico status,
-    @NotBlank(message = "Status é obrigatório")
+    @NotNull(message = "Valor é obrigatório")
     BigDecimal valor
 ) {}

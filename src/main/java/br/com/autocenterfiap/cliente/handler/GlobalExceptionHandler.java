@@ -6,6 +6,7 @@ import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoExcept
 import br.com.autocenterfiap.cliente.exception.InformacaoJaCadastradaException;
 import br.com.autocenterfiap.cliente.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
+
 @RestControllerAdvice
+@Order(LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(InformacaoJaCadastradaException.class)

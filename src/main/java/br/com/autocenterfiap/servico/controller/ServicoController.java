@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/v1/api/servicos")
+@RequestMapping("/v1/servicos")
 @Tag(name = "Serviços", description = "API para gerenciamento de serviços da oficina")
 public class ServicoController {
 

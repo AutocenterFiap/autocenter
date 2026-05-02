@@ -29,7 +29,7 @@ class VeiculoValidatorTest {
     public void devePassarSemExcecaoQuandoVeiculoExistir() {
         Long veiculoIdExistente = 1L;
         when(veiculoRepository.existsById(veiculoIdExistente)).thenReturn(true);
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdExistente,2L, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdExistente,2L);
         Assertions.assertDoesNotThrow(() -> veiculoValidator.validate(dto));
     }
 
@@ -37,7 +37,7 @@ class VeiculoValidatorTest {
     public void deveRetornarExcecaoQuandoVeiculoNaoExistir() {
         Long veiculoIdInexistente = 999L;
         when(veiculoRepository.existsById(veiculoIdInexistente)).thenReturn(false);
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdInexistente,1L, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdInexistente,1L);
         assertThrows(VeiculoNaoEncontradoException.class, () -> {
             veiculoValidator.validate(dto);
         });

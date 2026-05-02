@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -264,15 +265,16 @@ class OSItemServicoServiceTest {
     @DisplayName("Deve remover serviço da OS com sucesso")
     void deveRemoverServicoDaOS() {
         ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        ordemServico.getOsItensServicos().add(osItemServico);
+
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
         when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
-        doNothing().when(osItemServicoRepository).delete(osItemServico);
 
         osItemServicoService.removerServicoDaOS(1L, 5L);
 
         verify(ordemServicoRepository).findById(1L);
         verify(osItemServicoRepository).findById(5L);
-        verify(osItemServicoRepository).delete(osItemServico);
+        assertEquals(0, ordemServico.getOsItensServicos().size(), "O item deveria ter sido removido da lista");
     }
 
     @Test

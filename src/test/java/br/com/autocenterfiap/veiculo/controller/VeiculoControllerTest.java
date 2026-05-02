@@ -1,12 +1,12 @@
 package br.com.autocenterfiap.veiculo.controller;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +15,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -33,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("VeiculoController - Testes de Integração")
 class VeiculoControllerTest {
 
@@ -46,12 +46,18 @@ class VeiculoControllerTest {
     @Autowired
     private VeiculoRepository repository;
 
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
+
     private Veiculo veiculo;
     private Veiculo veiculoSegundo;
 
     @BeforeEach
     void setUp() {
+        ordemServicoRepository.deleteAll();
+        ordemServicoRepository.flush();
         repository.deleteAll();
+        repository.flush();
 
         veiculo = new Veiculo();
         veiculo.setPlaca("ABC1D23");

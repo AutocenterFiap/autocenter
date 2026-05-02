@@ -17,6 +17,7 @@ import br.com.autocenterfiap.servico.enums.StatusServico;
 import br.com.autocenterfiap.servico.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.model.Servico;
 import br.com.autocenterfiap.servico.service.ServicoService;
+import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,10 @@ public class OSItemServicoService {
         item.setValorItemServico(servico.getValor());
         item.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
         item.setDataHoraInicio(LocalDateTime.now());
+
+        // Recalcula o valor total da OS após adicionar o serviço
+        ordemServico.getOsItensServicos().add(item);
+        ordemServico.setValorTotal(Util.calcularValorTotal(ordemServico));
 
         OSItemServico itemSalvo = osItemServicoRepository.save(item);
 
@@ -159,7 +164,9 @@ public class OSItemServicoService {
             throw new StatusOSItemInvalidoException("Só é possível remover um serviço que esteja no status 'AGUARDANDO_INICIO'");
         }
 
-        osItemServicoRepository.delete(item);
+        // Recalcula o valor total da OS após remover o serviço
+        ordemServico.getOsItensServicos().remove(item);
+        ordemServico.setValorTotal(Util.calcularValorTotal(ordemServico));
 
         log.info("Serviço removido da OS com sucesso: Item ID={}, Serviço={}",
                 item.getId(), item.getServico().getDescricao());

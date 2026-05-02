@@ -10,8 +10,6 @@ public record OrdemServicoDTO(
     Long veiculoId,
     
     @NotNull(message = "O ID do cliente é obrigatório")
-    Long clienteId,
-    
-    StatusOS statusOS
+    Long clienteId
 ) {
 }

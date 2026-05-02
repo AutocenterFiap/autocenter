@@ -4,6 +4,7 @@ import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("ClienteController - Testes de Integração")
 class ClienteControllerITest {
 
@@ -47,13 +46,19 @@ class ClienteControllerITest {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
+
     private Cliente clientePF;
     private Cliente clientePJ;
     private Endereco endereco;
 
     @BeforeEach
     void setUp() {
+        ordemServicoRepository.deleteAll();
+        ordemServicoRepository.flush();
         clienteRepository.deleteAll();
+        clienteRepository.flush();
 
         // Setup Endereço
         endereco = new Endereco(

@@ -31,7 +31,7 @@ class ClienteValidatorTest {
     public void devePassarSemExcecaoQuandoClienteExistir() {
         Long clienteIdExistente = 1L;
         when(clienteRepository.existsById(clienteIdExistente)).thenReturn(true);
-        OrdemServicoDTO dto = new OrdemServicoDTO(1L,clienteIdExistente, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(1L,clienteIdExistente);
         Assertions.assertDoesNotThrow(() -> clienteValidator.validate(dto));
     }
 
@@ -39,7 +39,7 @@ class ClienteValidatorTest {
     public void deveRetornarExcecaoQuandoClienteNaoExistir() {
         Long clienteIdInexistente = 999L;
         when(clienteRepository.existsById(clienteIdInexistente)).thenReturn(false);
-        OrdemServicoDTO dto = new OrdemServicoDTO(1L,clienteIdInexistente, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(1L,clienteIdInexistente);
         assertThrows(ClienteNaoEncontradoException.class, () -> {
             clienteValidator.validate(dto);
         });

@@ -4,16 +4,23 @@ import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.produto.model.Produto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +30,7 @@ import static br.com.autocenterfiap.orcamento.enums.StatusOrcamento.REPROVADO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class OrcamentoServiceTest {
 
     @Mock
@@ -39,12 +47,24 @@ class OrcamentoServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+
+        Produto produto = new Produto();
+        produto.setPrecoUnitario(new BigDecimal("200.00"));
+
+        OSItemProduto itemProduto = new OSItemProduto();
+        itemProduto.setProduto(produto);
+        itemProduto.setQuantidade(1);
+        itemProduto.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
+
+        OSItemServico itemServico = new OSItemServico();
+        itemServico.setValorItemServico(new BigDecimal("300.00"));
 
         ordemServico = OrdemServico.builder()
                 .id(1L)
                 .valorTotal(BigDecimal.valueOf(500))
                 .statusOS(StatusOS.AGUARDANDO_APROVACAO)
+                .osItensProdutos(new ArrayList<>(List.of(itemProduto)))
+                .osItensServicos(new ArrayList<>(List.of(itemServico)))
                 .build();
 
         orcamento = Orcamento.builder()
@@ -88,7 +108,7 @@ class OrcamentoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve gerar orçamento para OS aguardando aprovação")
+    @DisplayName("Deve gerar orçamento para OS aguardando aprovação com valor calculado")
     void deveGerarOrcamentoParaOS() {
         when(ordemServicoRepository.findByStatus(StatusOS.AGUARDANDO_APROVACAO))
                 .thenReturn(List.of(ordemServico));
@@ -98,7 +118,11 @@ class OrcamentoServiceTest {
 
         orcamentoService.gerarOrcamento();
 
-        verify(orcamentoRepository).save(any(Orcamento.class));
+        ArgumentCaptor<Orcamento> captor = ArgumentCaptor.forClass(Orcamento.class);
+        verify(orcamentoRepository).save(captor.capture());
+        // produto: R$ 200,00 x 1 + serviço: R$ 300,00 = R$ 500,00
+        assertEquals(new BigDecimal("500.00"), captor.getValue().getValorTotal());
+        assertEquals(AGUARDANDO_APROVACAO, captor.getValue().getStatusOrcamento());
     }
 
     @Test

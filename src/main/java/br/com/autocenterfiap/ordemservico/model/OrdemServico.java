@@ -96,6 +96,7 @@ public class OrdemServico implements Serializable {
         this.cliente = cliente;
         this.veiculo = veiculo;
         this.statusOS = StatusOS.ABERTA;
+        this.valorTotal = BigDecimal.ZERO;
     }
 
 

@@ -20,10 +20,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -43,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("OSItemProdutoController - Testes de Integração")
 class OSItemProdutoControllerTest {
 
@@ -68,9 +66,12 @@ class OSItemProdutoControllerTest {
 
     @BeforeEach
     void setUp() {
-        osItemProdutoRepository.deleteAll();
-        produtoRepository.deleteAll();
         ordemServicoRepository.deleteAll();
+        ordemServicoRepository.flush();
+        osItemProdutoRepository.deleteAll();
+        osItemProdutoRepository.flush();
+        produtoRepository.deleteAll();
+        produtoRepository.flush();
 
         ProdutoRequestDTO dto = new ProdutoRequestDTO(
                 "Filtro de Óleo", "FO-001", null,

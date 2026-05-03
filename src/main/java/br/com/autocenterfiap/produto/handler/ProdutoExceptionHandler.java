@@ -1,12 +1,9 @@
 package br.com.autocenterfiap.produto.handler;
 
-import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.produto.exception.CodigoJaCadastradoException;
-import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
-import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
-import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
-import br.com.autocenterfiap.produto.exception.ProdutoNaoEncontradoException;
+import br.com.autocenterfiap.comum.model.ErroResposta;
+import br.com.autocenterfiap.produto.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(basePackages = "br.com.autocenterfiap.produto")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ProdutoExceptionHandler {
 
     @ExceptionHandler(ProdutoNaoEncontradoException.class)

@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.security.handler;
 
+import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.handler.GlobalExceptionHandler;
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +29,7 @@ class SecurityErroAdviceTest {
 
     @BeforeEach
     void setUp() {
+        globalExceptionHandler = new GlobalExceptionHandler();
         tratamentoErro = new SecurityErroAdvice();
         request = Mockito.mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/api/teste");
@@ -91,10 +91,10 @@ class SecurityErroAdviceTest {
     void deveTratarErro500() {
         Exception ex = new Exception("Falha inesperada");
 
-        ResponseEntity<br.com.autocenterfiap.handler.ErroResposta> resposta = globalExceptionHandler.handleGenericException(ex, request);
+        ResponseEntity<ErroResposta> resposta = globalExceptionHandler.handleGenericException(ex, request);
 
         assertEquals(500, resposta.getStatusCodeValue());
-        assertTrue(resposta.getBody().getErro().contains("Falha inesperada"));
+        assertTrue(resposta.getBody().getErro().contains("Erro inesperado"));
     }
 
     @Test

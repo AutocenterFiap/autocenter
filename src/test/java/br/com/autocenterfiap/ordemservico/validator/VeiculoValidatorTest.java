@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.ordemservico.validator;
 
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.junit.jupiter.api.Assertions;

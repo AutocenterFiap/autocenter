@@ -4,18 +4,17 @@ import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
 import br.com.autocenterfiap.cliente.exception.InformacaoJaCadastradaException;
-import br.com.autocenterfiap.cliente.model.ErroResposta;
+import br.com.autocenterfiap.comum.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
-
-@RestControllerAdvice
-@Order(LOWEST_PRECEDENCE)
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.cliente")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ClienteExceptionHandler {
 
     @ExceptionHandler(InformacaoJaCadastradaException.class)

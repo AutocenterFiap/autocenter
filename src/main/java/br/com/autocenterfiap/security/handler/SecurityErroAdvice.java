@@ -1,7 +1,10 @@
 package br.com.autocenterfiap.security.handler;
 
+import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice(basePackages = "br.com.autocenterfiap.security")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class SecurityErroAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -26,7 +30,7 @@ public class SecurityErroAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErroResposta> tratarErro400(HttpMessageNotReadableException ex,
-        HttpServletRequest request) {
+                                                      HttpServletRequest request) {
             Map<String, String> error = new HashMap<>();
 
             String message = null;

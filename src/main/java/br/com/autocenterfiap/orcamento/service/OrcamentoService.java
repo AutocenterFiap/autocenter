@@ -5,8 +5,8 @@ import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.util.Util;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

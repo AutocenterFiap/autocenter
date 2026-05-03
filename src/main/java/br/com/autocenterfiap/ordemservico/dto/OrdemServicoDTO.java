@@ -1,9 +1,6 @@
 package br.com.autocenterfiap.ordemservico.dto;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
 
 public record OrdemServicoDTO(
     @NotNull(message = "O ID do veículo é obrigatório")

@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.ordemservico.service;
 
-import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.enums.UnidadeMedida;
@@ -24,14 +24,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OSItemProdutoService - Testes Unitários")

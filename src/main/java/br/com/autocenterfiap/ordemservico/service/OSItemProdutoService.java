@@ -1,15 +1,14 @@
 package br.com.autocenterfiap.ordemservico.service;
 
-import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaException;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
 import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
 import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.produto.service.ProdutoService;
 import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;

@@ -4,12 +4,7 @@ import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.dto.VeiculoResponseDTO;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
-import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
-import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.exception.*;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import br.com.autocenterfiap.veiculo.validator.ChassiValidator;
@@ -31,17 +26,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("VeiculoService - Testes Unitários")

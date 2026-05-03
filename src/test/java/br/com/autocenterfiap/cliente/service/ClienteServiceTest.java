@@ -4,11 +4,7 @@ import br.com.autocenterfiap.cliente.dto.ClienteDTO;
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.cliente.dto.EnderecoDTO;
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoJaCadastradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
-import br.com.autocenterfiap.cliente.exception.EmailJaCadastradoException;
+import br.com.autocenterfiap.cliente.exception.*;
 import br.com.autocenterfiap.cliente.mapper.ClienteMapper;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
@@ -31,18 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ClienteService - Testes Unitários")

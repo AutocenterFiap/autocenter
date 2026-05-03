@@ -2,11 +2,7 @@ package br.com.autocenterfiap.cliente.service;
 
 import br.com.autocenterfiap.cliente.dto.ClienteDTO;
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
-import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoJaCadastradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
-import br.com.autocenterfiap.cliente.exception.EmailJaCadastradoException;
+import br.com.autocenterfiap.cliente.exception.*;
 import br.com.autocenterfiap.cliente.mapper.ClienteMapper;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;

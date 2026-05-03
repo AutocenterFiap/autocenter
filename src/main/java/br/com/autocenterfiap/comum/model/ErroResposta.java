@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.servico.model;
+package br.com.autocenterfiap.comum.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

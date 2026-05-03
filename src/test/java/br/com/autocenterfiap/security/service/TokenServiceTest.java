@@ -14,9 +14,7 @@ import java.util.List;
 
 import static br.com.autocenterfiap.util.PerfilMockUtil.createPerfisMock;
 import static br.com.autocenterfiap.util.UsuarioMockUtil.createUsuarioMock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

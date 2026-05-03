@@ -38,6 +38,8 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.POST, "/v1/usuarios").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PATCH, "/v1/usuarios/senha/alteracao").hasAnyRole("ADMIN", "WRITE");
 
+                            req.requestMatchers(HttpMethod.GET, "/v1/orcamentos").hasAnyRole("ADMIN", "READ");
+                            req.requestMatchers(HttpMethod.GET, "/v1/orcamentos/{id}").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.POST, "/v1/orcamentos/{id}/enviar-cliente").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PATCH, "/v1/orcamentos/{id}/aprovar").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PATCH, "/v1/orcamentos/{id}/reprovar").hasAnyRole("ADMIN", "WRITE");

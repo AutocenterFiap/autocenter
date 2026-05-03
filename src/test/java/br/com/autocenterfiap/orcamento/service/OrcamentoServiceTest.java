@@ -119,7 +119,7 @@ class OrcamentoServiceTest {
         ArgumentCaptor<Orcamento> captor = ArgumentCaptor.forClass(Orcamento.class);
         verify(orcamentoRepository).save(captor.capture());
         // produto: R$ 200,00 x 1 + serviço: R$ 300,00 = R$ 500,00
-        assertEquals(new BigDecimal("500.00"), captor.getValue().getValorTotal());
+        assertEquals(0, new BigDecimal("500.00").compareTo(captor.getValue().getValorTotal()));
         assertEquals(AGUARDANDO_APROVACAO, captor.getValue().getStatusOrcamento());
     }
 

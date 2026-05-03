@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.cliente.handler;
 
+import br.com.autocenterfiap.cliente.exception.ClienteEmUsoException;
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
 import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
@@ -20,6 +21,21 @@ public class ClienteExceptionHandler {
     @ExceptionHandler(InformacaoJaCadastradaException.class)
     public ResponseEntity<ErroResposta> handleInformacaoJaCadastrada(
             InformacaoJaCadastradaException ex,
+            HttpServletRequest request) {
+
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.CONFLICT.value(),
+                "Conflito de Dados",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
+    @ExceptionHandler(ClienteEmUsoException.class)
+    public ResponseEntity<ErroResposta> handleClienteEmUso(
+            ClienteEmUsoException ex,
             HttpServletRequest request) {
 
         ErroResposta erro = new ErroResposta(

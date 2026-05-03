@@ -29,6 +29,21 @@ public class VeiculoExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 
+    @ExceptionHandler(VeiculoEmUsoException.class)
+    public ResponseEntity<ErroResposta> handleVeiculoEmUso(
+            VeiculoEmUsoException ex,
+            HttpServletRequest request) {
+
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.CONFLICT.value(),
+                "Conflito de Dados",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
     @ExceptionHandler({
             ChassiInvalidoException.class,
             RenavamInvalidoException.class

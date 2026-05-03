@@ -8,6 +8,7 @@ import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
 import br.com.autocenterfiap.cliente.validator.DocumentoValidator;
 import br.com.autocenterfiap.cliente.validator.DocumentoValidatorFactory;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,9 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
 
     @Autowired
     private ClienteMapper clienteMapper;
@@ -198,6 +202,12 @@ public class ClienteService {
                     log.warn("Tentativa de deletar cliente inexistente: ID={}", id);
                     return new ClienteNaoEncontradoException(id);
                 });
+
+        boolean clienteEmUso = ordemServicoRepository.existsByClienteId(id);
+        if (clienteEmUso) {
+            log.warn("Tentativa de deletar cliente em uso: ID={}", id);
+            throw new ClienteEmUsoException("Não é possível deletar o cliente, pois ele está associado a uma ordem de serviço ativa.");
+        }
 
         log.info("Deletando cliente: ID={}, Nome={}, Documento={}",
             cliente.getId(), cliente.getNome(), cliente.getDocumento());

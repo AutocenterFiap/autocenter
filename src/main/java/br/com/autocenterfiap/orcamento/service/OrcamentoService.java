@@ -48,15 +48,15 @@ public class OrcamentoService {
 
         ordens.forEach(os ->
                 orcamentoRepository.buscarOrcamentoAguardandoAprovacaoPorOS(os)
-                        .orElseGet(() -> salvarOrcamento(os))
+                        .orElseGet(() -> createOrcamento(os))
         );
     }
 
-    private Orcamento salvarOrcamento(OrdemServico os) {
+    private Orcamento createOrcamento(OrdemServico os) {
         Orcamento orcamento = Orcamento.builder()
                 .ordemServico(os)
                 .statusOrcamento(AGUARDANDO_APROVACAO)
-                .valorTotal(Util.calcularValorTotal(os))
+                .valorTotal(os.getValorTotal())
                 .build();
         return orcamentoRepository.save(orcamento);
     }

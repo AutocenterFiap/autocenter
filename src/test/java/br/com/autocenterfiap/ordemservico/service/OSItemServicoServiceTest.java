@@ -159,14 +159,14 @@ class OSItemServicoServiceTest {
     void deveIniciarServico() {
         ordemServico.setStatusOS(StatusOS.EM_EXECUCAO);
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
         when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.iniciarServico(1L, 5L);
 
         assertThat(resultado).isNotNull();
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository).save(any(OSItemServico.class));
     }
 
@@ -175,13 +175,13 @@ class OSItemServicoServiceTest {
     void deveLancarExcecaoAoIniciarServicoNaoEncontrado() {
         ordemServico.setStatusOS(StatusOS.EM_EXECUCAO);
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.empty());
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> osItemServicoService.iniciarServico(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -207,14 +207,14 @@ class OSItemServicoServiceTest {
         osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
 
         assertThatThrownBy(() -> osItemServicoService.iniciarServico(1L, 5L))
                 .isInstanceOf(StatusOSItemInvalidoException.class)
                 .hasMessageContaining("AGUARDANDO_INICIO");
 
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -222,25 +222,24 @@ class OSItemServicoServiceTest {
     @DisplayName("Deve finalizar serviço com sucesso")
     void deveFinalizarServico() {
         osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
         when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.finalizarServico(1L, 5L);
 
         assertThat(resultado).isNotNull();
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository).save(any(OSItemServico.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao finalizar serviço não encontrado")
     void deveLancarExcecaoAoFinalizarServicoNaoEncontrado() {
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.empty());
-
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> osItemServicoService.finalizarServico(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -248,13 +247,12 @@ class OSItemServicoServiceTest {
     @DisplayName("Deve lançar exceção ao finalizar serviço que não está em EXECUTANDO")
     void deveLancarExcecaoAoFinalizarServicoComStatusInvalido() {
         osItemServico.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
-
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
         assertThatThrownBy(() -> osItemServicoService.finalizarServico(1L, 5L))
                 .isInstanceOf(StatusOSInvalidoException.class)
                 .hasMessageContaining("EXECUTANDO");
 
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -265,12 +263,12 @@ class OSItemServicoServiceTest {
         ordemServico.getOsItensServicos().add(osItemServico);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
 
         osItemServicoService.removerServicoDaOS(1L, 5L);
 
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         assertEquals(0, ordemServico.getOsItensServicos().size(), "O item deveria ter sido removido da lista");
     }
 
@@ -279,13 +277,12 @@ class OSItemServicoServiceTest {
     void deveLancarExcecaoAoRemoverServicoNaoEncontrado() {
         ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.empty());
-
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> osItemServicoService.removerServicoDaOS(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).delete(any());
     }
 
@@ -311,14 +308,14 @@ class OSItemServicoServiceTest {
         osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findById(5L)).thenReturn(Optional.of(osItemServico));
+        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
 
         assertThatThrownBy(() -> osItemServicoService.removerServicoDaOS(1L, 5L))
                 .isInstanceOf(StatusOSItemInvalidoException.class)
                 .hasMessageContaining("AGUARDANDO_INICIO");
 
         verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findById(5L);
+        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).delete(any());
     }
 }

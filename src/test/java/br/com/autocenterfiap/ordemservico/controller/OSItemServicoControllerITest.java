@@ -299,7 +299,7 @@ class OSItemServicoControllerITest {
                 .orElseThrow();
 
         mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
-                        osEmDiagnostico.getId(), itemAguardando.getId())
+                        osEmDiagnostico.getId(), itemAguardando.getServico().getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -337,7 +337,7 @@ class OSItemServicoControllerITest {
         osItemServicoRepository.save(itemDiagnostico);
 
         mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
-                        osEmDiagnostico.getId(), itemDiagnostico.getId())
+                        osEmDiagnostico.getId(), itemDiagnostico.getServico().getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

@@ -178,7 +178,7 @@ public class OSItemServicoService {
     }
 
     private OSItemServico findOsItemServico(Long ordemServicoId, Long servicoId) {
-        return osItemServicoRepository.findById(servicoId)
+        return osItemServicoRepository.findByServicoIdAndOrdemServicoId(servicoId, ordemServicoId)
                 .orElseThrow(() -> new OSItemServicoNaoEncontradoException(ordemServicoId, servicoId));
     }
 

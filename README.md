@@ -22,6 +22,7 @@ A aplicação foi construída com foco em boas práticas, utilizando **Java 21**
 - **Persistência:** Spring Data JPA, Flyway (Migrações)
 - **Banco de Dados:** H2 Database (Desenvolvimento) / MySQL (Produção)
 - **Segurança:** Spring Security (OAuth2 + JWT)
+- **Cache:** Caffeine
 - **Documentação:** Springdoc OpenAPI (Swagger)
 
 > *"Optamos pelo MySQL porque é mais simples de configurar e tem suporte nativo em diversas ferramentas que utilizamos no curso. Isso nos permitiu focar na implementação da arquitetura em camadas, segurança com OAuth2/JWT e documentação com Swagger, sem gastar tempo excessivo em ajustes de banco. Além disso, o MySQL é amplamente usado em ambientes acadêmicos e corporativos, o que facilita encontrar suporte e exemplos."*
@@ -120,6 +121,11 @@ mvnw.cmd test
 # No Linux/Mac
 ./mvnw test
 ```
+## 📖 Diagramas DDD
+
+Você pode acessar todos os diagramas de DDD pelo navegador:
+
+- **Plataforma miro:** [https://miro.com/app/board/uXjVGxJbbQU=/](http://localhost:8097/swagger-ui/index.html)
 
 ## 📌 Próximos Passos
 

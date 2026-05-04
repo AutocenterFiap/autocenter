@@ -82,5 +82,18 @@ public class OrdemServico implements Serializable {
         this.valorTotal = BigDecimal.ZERO;
     }
 
+    public void aprovar(){
+        this.statusOS = StatusOS.APROVADA;
+    }
 
+    public void cancelar(){
+        this.statusOS = StatusOS.CANCELADA;
+    }
+
+    @PostPersist
+    public void postPersist() {
+        if (this.numeroOrdemServico == null) {
+            this.numeroOrdemServico = this.id;
+        }
+    }
 }

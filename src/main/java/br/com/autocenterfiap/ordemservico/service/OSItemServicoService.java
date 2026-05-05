@@ -76,7 +76,6 @@ public class OSItemServicoService {
         item.setServico(servico);
         item.setValorItemServico(servico.getValor());
         item.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
-        item.setDataHoraInicio(LocalDateTime.now());
 
         // Recalcula o valor total da OS após adicionar o serviço
         ordemServico.getOsItensServicos().add(item);

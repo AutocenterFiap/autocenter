@@ -137,18 +137,6 @@ class OrcamentoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve encontrar orçamento por ID e aprovar")
-    void deveEncontrarOrcamentoPorIdEAprovar() {
-        when(orcamentoRepository.findById(1L)).thenReturn(Optional.of(orcamento));
-        when(orcamentoRepository.save(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        Orcamento resultado = orcamentoService.findById(1L);
-
-        assertEquals(APROVADO, resultado.getStatusOrcamento());
-        verify(orcamentoRepository).save(resultado);
-    }
-
-    @Test
     @DisplayName("Deve lançar exceção ao buscar orçamento inexistente")
     void deveLancarExcecaoAoBuscarOrcamentoInexistente() {
         when(orcamentoRepository.findById(99L)).thenReturn(Optional.empty());

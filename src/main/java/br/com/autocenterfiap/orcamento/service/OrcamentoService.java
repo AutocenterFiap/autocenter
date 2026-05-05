@@ -29,7 +29,7 @@ public class OrcamentoService {
         Orcamento orcamento = orcamentoRepository.findById(orcamentoId)
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(orcamentoId));
         orcamento.aprovar();
-        orcamento.getOrdemServico().setStatusOS(StatusOS.APROVADA);
+        orcamento.getOrdemServico().aprovar();
         return orcamentoRepository.save(orcamento);
     }
 
@@ -38,7 +38,7 @@ public class OrcamentoService {
         Orcamento orcamento = orcamentoRepository.findById(orcamentoId)
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(orcamentoId));
         orcamento.reprovar();
-        orcamento.getOrdemServico().setStatusOS(StatusOS.CANCELADA);
+        orcamento.getOrdemServico().cancelar();
         return orcamentoRepository.save(orcamento);
     }
 
@@ -62,11 +62,9 @@ public class OrcamentoService {
     }
 
     public Orcamento findById(Long id){
-        Orcamento orcamento = orcamentoRepository
+        return orcamentoRepository
                 .findById(id)
                 .orElseThrow(() -> new OrcamentoNaoEncontradoException(id));
-        orcamento.aprovar();
-        return orcamentoRepository.save(orcamento);
     }
 
     public Page<Orcamento> listarTodos(StatusOrcamento statusOrcamento, Pageable pageable) {

@@ -18,5 +18,6 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
 
     boolean existsByVeiculoIdAndStatusOSIn(Long veiculoId, List<StatusOS> statusList);
 
-
+    boolean existsByVeiculoId(Long veiculoId);
+    boolean existsByClienteId(Long clienteId);
 }

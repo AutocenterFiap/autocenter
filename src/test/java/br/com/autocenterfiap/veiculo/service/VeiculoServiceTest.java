@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.veiculo.service;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.dto.VeiculoResponseDTO;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
@@ -38,6 +39,9 @@ class VeiculoServiceTest {
     private VeiculoRepository veiculoRepository;
 
     @Mock
+    private OrdemServicoRepository ordemServicoRepository;
+
+    @Mock
     private ChassiValidator chassiValidator;
     @Mock
     private RenavamValidator renavamValidator;
@@ -50,7 +54,7 @@ class VeiculoServiceTest {
 
     @BeforeEach
     public void setUp(){
-        veiculoService = new VeiculoService(veiculoRepository, List.of(chassiValidator, renavamValidator,placaValidator));
+        veiculoService = new VeiculoService(veiculoRepository,ordemServicoRepository, List.of(chassiValidator, renavamValidator,placaValidator));
         veiculo = new Veiculo();
         veiculo.setId(1L);
         veiculo.setPlaca("ABC1D23");
@@ -282,12 +286,26 @@ class VeiculoServiceTest {
     @Test
     public void deveDeletarVeiculoComSucesso(){
         when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculo));
+        when(ordemServicoRepository.existsByVeiculoId(1L)).thenReturn(false);
         doNothing().when(veiculoRepository).delete(any(Veiculo.class));
 
         veiculoService.deletar(1L);
 
         verify(veiculoRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByVeiculoId(1L);
         verify(veiculoRepository, times(1)).delete(any(Veiculo.class));
+    }
+
+    @Test
+    public void deveLancarExcecaoAoDeletarVeiculoEmUso(){
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculo));
+        when(ordemServicoRepository.existsByVeiculoId(1L)).thenReturn(true);
+
+        assertThrows(VeiculoEmUsoException.class, () -> veiculoService.deletar(1L));
+
+        verify(veiculoRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByVeiculoId(1L);
+        verify(veiculoRepository, never()).delete(any(Veiculo.class));
     }
 
     @Test

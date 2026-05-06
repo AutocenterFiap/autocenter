@@ -89,6 +89,52 @@ class ServicoServiceTest {
     }
 
     @Test
+    void listaServicosPorStatus_DeveRetornarListaQuandoExistiremServicosComStatus() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Servico outro = new Servico();
+        outro.setId(2L);
+        outro.setDescricao("Alinhamento");
+        outro.setStatus(StatusServico.ATIVO);
+        outro.setValor(BigDecimal.valueOf(120));
+
+        List<Servico> lista = List.of(servico, outro);
+        Page<Servico> page = new PageImpl<>(lista, pageable, lista.size());
+
+        when(repository.findAllByStatus(StatusServico.ATIVO, pageable)).thenReturn(page);
+        when(mapper.toServicoResponseDto(servico)).thenReturn(servicoResponseDTO);
+        ServicoResponseDTO outroResponse = ServicoResponseDTO.builder()
+                .id(2L)
+                .descricao("Alinhamento")
+                .status(StatusServico.ATIVO)
+                .valor(BigDecimal.valueOf(120))
+                .build();
+        when(mapper.toServicoResponseDto(outro)).thenReturn(outroResponse);
+
+        Page<ServicoResponseDTO> resultado = service.listaServicosPorStatus(StatusServico.ATIVO, pageable);
+
+        assertNotNull(resultado);
+        assertEquals(2, resultado.getTotalElements());
+        assertEquals("Troca de óleo", resultado.getContent().get(0).descricao());
+        assertEquals("Alinhamento", resultado.getContent().get(1).descricao());
+        verify(repository, times(1)).findAllByStatus(StatusServico.ATIVO, pageable);
+    }
+
+    @Test
+    void listaServicosPorStatus_DeveRetornarPaginaVaziaQuandoNenhumServicoComStatus() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Servico> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+        when(repository.findAllByStatus(StatusServico.INATIVO, pageable)).thenReturn(emptyPage);
+
+        Page<ServicoResponseDTO> resultado = service.listaServicosPorStatus(StatusServico.INATIVO, pageable);
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+        assertEquals(0, resultado.getTotalElements());
+        verify(repository, times(1)).findAllByStatus(StatusServico.INATIVO, pageable);
+    }
+
+    @Test
     void buscarPorId_Existente_DeveRetornarServico() {
         when(repository.findById(1L)).thenReturn(Optional.of(servico));
         Servico encontrado = service.buscarEntidadePorId(1L);

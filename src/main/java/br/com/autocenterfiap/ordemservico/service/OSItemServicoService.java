@@ -63,7 +63,7 @@ public class OSItemServicoService {
             throw new StatusOSInvalidoException("Só é possível adicionar serviços em ordens de serviço que estejam no status 'EM_DIAGNOSTICO'");
         }
 
-        Servico servico = servicoService.buscarPorId(dto.servicoId());
+        Servico servico = servicoService.buscarEntidadePorId(dto.servicoId());
 
         if (servico.getStatus() == StatusServico.INATIVO) {
             log.warn("Tentativa de adicionar serviço inativo: ID={}, Descrição={}",

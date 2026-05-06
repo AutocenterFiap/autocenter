@@ -52,14 +52,10 @@ public class ServicoService {
     }
 
     @Transactional
-    public Servico buscarPorId(Long id) {
+    public ServicoResponseDTO buscarPorId(Long id) {
         log.info("Iniciando busca de servico por id: {}", id);
-        return repository.findById(id)
-                .orElseThrow(() -> {
-                    final String message = "Servico não encontrado de ID " + id;
-                    log.error(message);
-                    return new ServicoNaoEncontradoException(message);
-                });
+        Servico servico = buscarEntidadePorId(id);
+        return mapper.toServicoResponseDto(servico);
     }
 
     @Transactional
@@ -82,7 +78,7 @@ public class ServicoService {
     public ServicoResponseDTO atualizar(Long id, ServicoDto servicoAtualizadoDTO) {
         log.info("Iniciando atualização do servico por id: {}", id);
 
-        Servico servicoExistente = buscarPorId(id);
+        Servico servicoExistente = buscarEntidadePorId(id);
         mapper.updateEntityFromDto(servicoAtualizadoDTO, servicoExistente);
 
         Servico servicoSalvo = repository.save(servicoExistente);
@@ -95,10 +91,21 @@ public class ServicoService {
     @Transactional
     public void deletar(Long id) {
         log.info("Iniciando exclusão do servico por id: {}", id);
-        Servico servico = buscarPorId(id);
+        Servico servico = buscarEntidadePorId(id);
 
         log.info("Deletando cliente: ID={}", servico.getId());
         repository.delete(servico);
         log.info("Cliente deletado com sucesso: ID={}", id);
+    }
+
+
+    public Servico buscarEntidadePorId(Long id) {
+        log.info("Iniciando busca de entidade de servico por id: {}", id);
+        return repository.findById(id)
+                .orElseThrow(() -> {
+                    final String message = "Servico não encontrado de ID " + id;
+                    log.error(message);
+                    return new ServicoNaoEncontradoException(message);
+                });
     }
 }

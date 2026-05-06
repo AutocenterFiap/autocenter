@@ -107,7 +107,7 @@ class OSItemServicoServiceTest {
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(servicoService.buscarPorId(5L)).thenReturn(servico);
+        when(servicoService.buscarEntidadePorId(5L)).thenReturn(servico);
         when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.adicionarServicoNaOS(1L, dto);
@@ -116,7 +116,7 @@ class OSItemServicoServiceTest {
         assertThat(resultado.id()).isEqualTo(10L);
         assertThat(resultado.valorItemServico()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
         verify(ordemServicoRepository).findById(1L);
-        verify(servicoService).buscarPorId(5L);
+        verify(servicoService).buscarEntidadePorId(5L);
         verify(osItemServicoRepository).save(any(OSItemServico.class));
     }
 
@@ -128,14 +128,14 @@ class OSItemServicoServiceTest {
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(servicoService.buscarPorId(5L)).thenReturn(servico);
+        when(servicoService.buscarEntidadePorId(5L)).thenReturn(servico);
 
         assertThatThrownBy(() -> osItemServicoService.adicionarServicoNaOS(1L, dto))
                 .isInstanceOf(ServicoInativoException.class)
                 .hasMessageContaining("Troca de óleo");
 
         verify(ordemServicoRepository).findById(1L);
-        verify(servicoService).buscarPorId(5L);
+        verify(servicoService).buscarEntidadePorId(5L);
         verify(osItemServicoRepository, never()).save(any());
     }
 

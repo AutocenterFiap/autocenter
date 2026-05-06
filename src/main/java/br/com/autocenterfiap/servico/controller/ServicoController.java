@@ -53,7 +53,7 @@ public class ServicoController {
             @ApiResponse(responseCode = "200", description = "Serviço encontrado"),
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado")
     })
-    public ResponseEntity<Servico> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ServicoResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 

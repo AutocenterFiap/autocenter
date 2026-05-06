@@ -109,6 +109,37 @@ class ServicoControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void deveListarServicosPorStatusQuandoExistirem() throws Exception {
+        Servico outro = new Servico();
+        outro.setDescricao("Alinhamento");
+        outro.setStatus(StatusServico.INATIVO);
+        outro.setValor(BigDecimal.valueOf(120));
+
+        servicoRepository.save(servico);
+        servicoRepository.save(outro);
+
+        mockMvc.perform(get("/v1/servicos/status/{status}", StatusServico.ATIVO)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].descricao", is("Troca de óleo")))
+                .andExpect(jsonPath("$.totalElements", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void deveRetornarListaVaziaAoListarPorStatusQuandoNaoHouver() throws Exception {
+        servicoRepository.save(servico);
+
+        mockMvc.perform(get("/v1/servicos/status/{status}", StatusServico.INATIVO)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements", is(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarServicoComSucesso() throws Exception {
         mockMvc.perform(post("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -129,8 +129,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornarListaVaziaAoListarPorStatusQuandoNaoHouver() throws Exception {
-        // nenhum servico com status INATIVO salvo
-        servicoRepository.save(servico); // ATIVO
+        servicoRepository.save(servico);
 
         mockMvc.perform(get("/v1/servicos/status/{status}", StatusServico.INATIVO)
                         .contentType(MediaType.APPLICATION_JSON))

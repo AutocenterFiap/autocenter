@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +119,26 @@ class ServicoServiceTest {
 
         assertDoesNotThrow(() -> service.deletar(1L));
         verify(repository, times(1)).delete(servico);
+    }
+
+    @Test
+    void deveListarServicosPorStatus() {
+        PageRequest pageable = PageRequest.of(0, 10);
+        Page<Servico> pageServicos = new PageImpl<>(List.of(servico));
+
+        when(repository.findAllByStatus(StatusServico.ATIVO, pageable))
+                .thenReturn(pageServicos);
+        when(mapper.toServicoResponseDto(servico)).thenReturn(servicoResponseDTO);
+
+        Page<ServicoResponseDTO> resultado =
+                service.listaServicosPorStatus(StatusServico.ATIVO, pageable);
+
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals("Troca de óleo", resultado.getContent().get(0).descricao());
+        assertEquals(StatusServico.ATIVO, resultado.getContent().get(0).status());
+
+        verify(repository, times(1))
+                .findAllByStatus(StatusServico.ATIVO, pageable);
+        verify(mapper, times(1)).toServicoResponseDto(servico);
     }
 }

@@ -44,20 +44,6 @@ public class ClienteMapper {
                 .build();
     }
 
-    public void updateEntityFromDTO(ClienteDTO dto, Cliente clienteExistente) {
-        if (dto == null || clienteExistente == null) {
-            return;
-        }
-
-        clienteExistente.setNome(dto.getNome());
-        clienteExistente.setTipoCliente(dto.getTipoCliente());
-        // Documento não pode ser alterado - mantém o original
-        clienteExistente.setEmail(dto.getEmail());
-        clienteExistente.setTelefone(dto.getTelefone());
-        clienteExistente.setEndereco(toEnderecoEntity(dto.getEndereco()));
-        clienteExistente.setDataNascimento(dto.getDataNascimento());
-    }
-
     private Endereco toEnderecoEntity(EnderecoDTO dto) {
         if (dto == null) {
             return null;

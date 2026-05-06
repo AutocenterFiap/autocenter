@@ -4,15 +4,12 @@ import br.com.autocenterfiap.cliente.dto.ClienteDTO;
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.cliente.dto.EnderecoDTO;
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoInvalidoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoJaCadastradoException;
-import br.com.autocenterfiap.cliente.exception.DocumentoNaoPodeSerAlteradoException;
-import br.com.autocenterfiap.cliente.exception.EmailJaCadastradoException;
+import br.com.autocenterfiap.cliente.exception.*;
 import br.com.autocenterfiap.cliente.mapper.ClienteMapper;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,18 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ClienteService - Testes Unitários")
@@ -50,6 +39,9 @@ class ClienteServiceTest {
 
     @Mock
     private ClienteRepository clienteRepository;
+
+    @Mock
+    private OrdemServicoRepository ordemServicoRepository;
 
     @Mock
     private ClienteMapper clienteMapper;
@@ -572,12 +564,26 @@ class ClienteServiceTest {
     @Test
     void deveDeletarClienteComSucesso() {
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(clientePF));
+        when(ordemServicoRepository.existsByClienteId(1L)).thenReturn(false);
         doNothing().when(clienteRepository).delete(any(Cliente.class));
 
         assertDoesNotThrow(() -> clienteService.deletar(1L));
 
         verify(clienteRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByClienteId(1L);
         verify(clienteRepository, times(1)).delete(clientePF);
+    }
+
+    @Test
+    void deveLancarExcecaoAoDeletarClienteEmUso() {
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clientePF));
+        when(ordemServicoRepository.existsByClienteId(1L)).thenReturn(true);
+
+        assertThrows(ClienteEmUsoException.class, () -> clienteService.deletar(1L));
+
+        verify(clienteRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByClienteId(1L);
+        verify(clienteRepository, never()).delete(any(Cliente.class));
     }
 
     @Test

@@ -1,116 +1,134 @@
-📘 Projeto: API AutoCenter FIAP
+<h1 align="center">
+  🚗 API AutoCenter FIAP
+</h1>
 
-🚀 Visão Geral
+<p align="center">
+  <img alt="Java" src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java">
+  <img alt="Spring Boot" src="https://img.shields.io/badge/Spring_Boot-3.3.4-brightgreen?style=for-the-badge&logo=spring-boot">
+  <img alt="MySQL" src="https://img.shields.io/badge/MySQL-Blue?style=for-the-badge&logo=mysql">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
+</p>
 
-API REST para gerenciamento de clientes, veículos, serviços e produtos de uma oficina mecânica. Desenvolvida em Java 21 com Spring Boot 3.3.4, utilizando segurança OAuth2 com JWT e documentação via OpenAPI/Swagger.
+## 🚀 Visão Geral
 
-🛠️ Tecnologias Utilizadas
+A **API AutoCenter FIAP** é um sistema RESTful desenvolvido para o gerenciamento completo de uma oficina mecânica. Ela permite controlar clientes, veículos, serviços e produtos, provendo uma base sólida para as operações diárias de um Auto Center. 
 
-Java 21
+A aplicação foi construída com foco em boas práticas, utilizando **Java 21**, **Spring Boot 3.3.4**, e garantindo segurança através de **OAuth2 com JWT**. Toda a API possui documentação interativa via **OpenAPI/Swagger**.
 
-Spring Boot 3.3.4
+## 🛠️ Tecnologias Utilizadas
 
-Spring Data JPA
+- **Linguagem:** Java 21
+- **Framework:** Spring Boot 3.3.4
+- **Persistência:** Spring Data JPA, Flyway (Migrações)
+- **Banco de Dados:** H2 Database (Desenvolvimento) / MySQL (Produção)
+- **Segurança:** Spring Security (OAuth2 + JWT)
+- **Cache:** Caffeine
+- **Documentação:** Springdoc OpenAPI (Swagger)
 
-Spring Security (OAuth2 + JWT)
-
-Flyway (migração de banco de dados)
-
-H2 (dev) / MySQL (prod)
-
-“Optamos pelo MySQL porque é mais simples de configurar e tem suporte nativo em diversas ferramentas que utilizamos no curso. Isso nos permitiu focar na implementação da arquitetura em camadas, segurança com OAuth2/JWT e documentação com Swagger, sem gastar tempo excessivo em ajustes de banco. Além disso, o MySQL é amplamente usado em ambientes acadêmicos e corporativos, o que facilita encontrar suporte e exemplos.”
+> *"Optamos pelo MySQL porque é mais simples de configurar e tem suporte nativo em diversas ferramentas que utilizamos no curso. Isso nos permitiu focar na implementação da arquitetura em camadas, segurança com OAuth2/JWT e documentação com Swagger, sem gastar tempo excessivo em ajustes de banco. Além disso, o MySQL é amplamente usado em ambientes acadêmicos e corporativos, o que facilita encontrar suporte e exemplos."*
 
 ## 📂 Estrutura do Projeto
 
-O projeto segue uma arquitetura em camadas, organizada nos pacotes:
+O projeto segue uma arquitetura baseada em camadas, organizada da seguinte forma:
 
-```
+```text
 br.com.autocenterfiap.domain
-┌─ controller
-├─ dto
-├─ enums
-├─ exception
-├─ handler
-├─ mapper
-├─ model
-├─ repository
-├─ service
-└─ validator
+┌─ controller  # Endpoints REST
+├─ dto         # Objetos de Transferência de Dados
+├─ enums       # Enumerações
+├─ exception   # Tratamento global de erros
+├─ handler     # Manipuladores de exceção
+├─ mapper      # Conversão entre DTOs e Models
+├─ model       # Entidades JPA
+├─ repository  # Interfaces de acesso a dados
+├─ service     # Lógica de negócio
+└─ validator   # Validações customizadas
 ```
 
----
+## ⚙️ Como Rodar Localmente
 
-## ⚙️ Configuração e Execução
+É muito simples rodar o projeto na sua máquina. Siga os passos abaixo:
 
 ### Pré-requisitos
+- JDK 21 instalado
+- Git
+- (Opcional) Docker e Docker Compose para rodar com banco MySQL local
 
-* JDK 21
-* Maven ou Gradle
-* Banco de dados configurado (H2 para dev, MySQL para prod)
+### Passo a Passo (H2 Database - Memória)
 
-### Executando localmente
+A forma mais rápida de rodar é utilizando o perfil de desenvolvimento (`dev`), que sobe um banco H2 em memória automaticamente.
+
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/liamfer/autocenter-fiap.git
+   cd autocenter-fiap
+   ```
+
+2. **Execute a aplicação usando o Maven Wrapper:**
+   ```bash
+   # No Windows
+   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+
+   # No Linux/Mac
+   ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+   ```
+
+3. Pronto! A API estará rodando em `http://localhost:8097`.
+
+### Rodando com Docker (MySQL)
+Se quiser rodar a aplicação simulando o ambiente de produção com MySQL utilizando os contêineres já configurados:
 
 ```bash
-# Clonar repositório
-git clone https://github.com/seuusuario/autocenter-fiap.git
-
-# Entrar na pasta
-cd autocenter-fiap
-
-# Rodar com Maven
-./mvnw spring-boot:run
+cd docker
+docker-compose up -d
 ```
 
----
+## 🔑 Autenticação e Login de Admin
 
-## 🔑 Perfis (Profiles)
+A API é protegida utilizando o padrão OAuth2 com JWT. Para testar os endpoints restritos, você precisará gerar um token de acesso usando as credenciais de administrador padrão.
 
-* **dev**: usa H2 em memória e migrações em `db/migration/dev`
-* **prod**: usa MySQL e migrações em `db/migration/prod`
-
-Ativar perfil:
-
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+**Credenciais de Acesso (Admin):**
+```json
+{
+  "nome": "ADMIN",
+  "senha": "ADMIN"
+}
 ```
 
----
+**Como Autenticar:**
+1. Faça uma requisição `POST` para o endpoint de login (`/v1/oauth/token`) enviando um JSON com as credenciais acima.
+2. Copie o token JWT retornado na resposta.
+3. Se estiver usando o Swagger UI, clique no botão **Authorize** e insira o token, ou adicione o seguinte Header nas suas requisições:
+   ```text
+   Authorization: Bearer <seu_token_jwt>
+   ```
 
 ## 📖 Documentação da API
 
-Após subir a aplicação:
+Com a aplicação rodando localmente, você pode acessar a documentação interativa e testar os endpoints diretamente pelo navegador:
 
-* Swagger UI: http://localhost:8097/swagger-ui/index.html
-* OpenAPI JSON: http://localhost:8097/v3/api-docs
-
----
-
-## 🗑️ Autenticação
-
-A API utiliza OAuth2 com JWT.
-
-* Obtenha token em `/v1/oauth/token`.
-
-* Use o botão **Authorize** no Swagger UI ou envie o header:
-
-  ```
-  Authorization: Bearer <seu_token>
-  ```
-
----
+- **Swagger UI:** [http://localhost:8097/swagger-ui/index.html](http://localhost:8097/swagger-ui/index.html)
+- **OpenAPI JSON:** [http://localhost:8097/api-docs](http://localhost:8097/v3/api-docs)
 
 ## 🥢 Testes
 
-Rodar testes:
+A aplicação conta com uma robusta suíte de testes unitários e de integração. Para executá-los:
 
 ```bash
+# No Windows
+mvnw.cmd test
+
+# No Linux/Mac
 ./mvnw test
 ```
+## 📖 Diagramas DDD
 
----
+Você pode acessar todos os diagramas de DDD pelo navegador:
+
+- **Plataforma miro:** [https://miro.com/app/board/uXjVGxJbbQU=/](http://localhost:8097/swagger-ui/index.html)
 
 ## 📌 Próximos Passos
 
-* Configurar CI/CD
-* Adicionar monitoramento
-* Melhorar documentação de endpoints
+- [ ] Configurar CI/CD (GitHub Actions)
+- [ ] Adicionar monitoramento (Actuator + Prometheus + Grafana)
+- [ ] Melhorar ainda mais a cobertura de testes (JaCoCo)

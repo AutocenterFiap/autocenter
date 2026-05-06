@@ -1,21 +1,9 @@
 package br.com.autocenterfiap.orcamento.repository.entity;
 
-import br.com.autocenterfiap.orcamento.controller.OrcamentoResponse;
+import br.com.autocenterfiap.orcamento.dto.OrcamentoResponse;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -92,14 +80,14 @@ public class Orcamento implements Serializable {
         this.dataUltimaAtualizacao = LocalDateTime.now();
     }
 
-    public static OrcamentoResponse paraOrcamentoResponse(Orcamento orcamento) {
+    public OrcamentoResponse paraOrcamentoResponse() {
         return OrcamentoResponse.builder()
-                .id(orcamento.getId())
-                .ordemServicoId(orcamento.getOrdemServico().getId())
-                .valorTotal(orcamento.getValorTotal())
-                .statusOrcamento(orcamento.getStatusOrcamento())
-                .dataCriacao(orcamento.getDataCriacao())
-                .dataUltimaAtualizacao(orcamento.getDataUltimaAtualizacao())
+                .id(this.getId())
+                .ordemServicoId(this.getOrdemServico().getId())
+                .valorTotal(this.getValorTotal())
+                .statusOrcamento(this.getStatusOrcamento())
+                .dataCriacao(this.getDataCriacao())
+                .dataUltimaAtualizacao(this.getDataUltimaAtualizacao())
                 .build();
     }
 }

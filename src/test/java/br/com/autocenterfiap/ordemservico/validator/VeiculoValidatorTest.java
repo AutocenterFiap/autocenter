@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.ordemservico.validator;
 
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +28,7 @@ class VeiculoValidatorTest {
     public void devePassarSemExcecaoQuandoVeiculoExistir() {
         Long veiculoIdExistente = 1L;
         when(veiculoRepository.existsById(veiculoIdExistente)).thenReturn(true);
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdExistente,2L, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdExistente,2L);
         Assertions.assertDoesNotThrow(() -> veiculoValidator.validate(dto));
     }
 
@@ -37,7 +36,7 @@ class VeiculoValidatorTest {
     public void deveRetornarExcecaoQuandoVeiculoNaoExistir() {
         Long veiculoIdInexistente = 999L;
         when(veiculoRepository.existsById(veiculoIdInexistente)).thenReturn(false);
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdInexistente,1L, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculoIdInexistente,1L);
         assertThrows(VeiculoNaoEncontradoException.class, () -> {
             veiculoValidator.validate(dto);
         });

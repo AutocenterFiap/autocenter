@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.ordemservico.service;
 
-import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.enums.UnidadeMedida;
@@ -24,14 +24,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OSItemProdutoService - Testes Unitários")
@@ -83,6 +78,7 @@ class OSItemProdutoServiceTest {
 
         when(produtoService.buscarOuLancarExcecao(1L)).thenReturn(produto);
         when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
+        when(ordemServicoRepository.getReferenceById(10L)).thenReturn(os);
 
         OSItemProdutoResponseDTO result = osItemProdutoService.adicionarProdutoNaOS(10L, dto);
 
@@ -117,13 +113,16 @@ class OSItemProdutoServiceTest {
     @Test
     @DisplayName("Deve remover produto da OS e devolver ao estoque")
     void deveRemoverProdutoDaOSEDevolverEstoque() {
+        os.getOsItensProdutos().add(osItem);
+        
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
 
         osItemProdutoService.removerProdutoDaOS(10L, 1L);
 
+        // Valida se o estoque voltou e se o item sumiu da lista da OS
         assertEquals(52, produto.getQuantidadeEstoque()); // 50 + 2 = 52
-        verify(osItemProdutoRepository, times(1)).delete(osItem);
+        assertEquals(0, os.getOsItensProdutos().size(), "O item deveria ter sido removido da lista");
     }
 
     @Test
@@ -154,7 +153,6 @@ class OSItemProdutoServiceTest {
 
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
-        when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);
 
@@ -168,7 +166,6 @@ class OSItemProdutoServiceTest {
 
         when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
-        when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);
 

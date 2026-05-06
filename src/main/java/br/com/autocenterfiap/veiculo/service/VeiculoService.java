@@ -1,8 +1,10 @@
 package br.com.autocenterfiap.veiculo.service;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.dto.VeiculoResponseDTO;
 import br.com.autocenterfiap.veiculo.enums.TipoOperacao;
+import br.com.autocenterfiap.veiculo.exception.VeiculoEmUsoException;
 import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
@@ -18,10 +20,12 @@ import java.util.List;
 @Service
 public class VeiculoService {
     private final VeiculoRepository veiculoRepository;
+    private final OrdemServicoRepository ordemServicoRepository;
     private final List<VeiculoValidator> validators;
 
-    public VeiculoService(VeiculoRepository veiculoRepository, List<VeiculoValidator> validators) {
+    public VeiculoService(VeiculoRepository veiculoRepository, OrdemServicoRepository ordemServicoRepository, List<VeiculoValidator> validators) {
         this.veiculoRepository = veiculoRepository;
+        this.ordemServicoRepository = ordemServicoRepository;
         this.validators = validators;
     }
 
@@ -64,6 +68,10 @@ public class VeiculoService {
     @Transactional
     public void deletar(Long id){
         Veiculo veiculo = this.findById(id);
+
+        boolean veiculoEmUso = ordemServicoRepository.existsByVeiculoId(id);
+        if(veiculoEmUso) throw new VeiculoEmUsoException("Não é possível deletar o veículo, pois ele está associado a uma ordem de serviço ativa.");
+
         veiculoRepository.delete(veiculo);
     }
 

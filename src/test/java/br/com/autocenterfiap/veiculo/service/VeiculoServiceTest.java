@@ -1,15 +1,11 @@
 package br.com.autocenterfiap.veiculo.service;
 
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
 import br.com.autocenterfiap.veiculo.dto.VeiculoResponseDTO;
 import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
-import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
-import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.exception.*;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import br.com.autocenterfiap.veiculo.validator.ChassiValidator;
@@ -31,17 +27,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("VeiculoService - Testes Unitários")
@@ -50,6 +37,9 @@ class VeiculoServiceTest {
 
     @Mock
     private VeiculoRepository veiculoRepository;
+
+    @Mock
+    private OrdemServicoRepository ordemServicoRepository;
 
     @Mock
     private ChassiValidator chassiValidator;
@@ -64,7 +54,7 @@ class VeiculoServiceTest {
 
     @BeforeEach
     public void setUp(){
-        veiculoService = new VeiculoService(veiculoRepository, List.of(chassiValidator, renavamValidator,placaValidator));
+        veiculoService = new VeiculoService(veiculoRepository,ordemServicoRepository, List.of(chassiValidator, renavamValidator,placaValidator));
         veiculo = new Veiculo();
         veiculo.setId(1L);
         veiculo.setPlaca("ABC1D23");
@@ -296,12 +286,26 @@ class VeiculoServiceTest {
     @Test
     public void deveDeletarVeiculoComSucesso(){
         when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculo));
+        when(ordemServicoRepository.existsByVeiculoId(1L)).thenReturn(false);
         doNothing().when(veiculoRepository).delete(any(Veiculo.class));
 
         veiculoService.deletar(1L);
 
         verify(veiculoRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByVeiculoId(1L);
         verify(veiculoRepository, times(1)).delete(any(Veiculo.class));
+    }
+
+    @Test
+    public void deveLancarExcecaoAoDeletarVeiculoEmUso(){
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculo));
+        when(ordemServicoRepository.existsByVeiculoId(1L)).thenReturn(true);
+
+        assertThrows(VeiculoEmUsoException.class, () -> veiculoService.deletar(1L));
+
+        verify(veiculoRepository, times(1)).findById(1L);
+        verify(ordemServicoRepository, times(1)).existsByVeiculoId(1L);
+        verify(veiculoRepository, never()).delete(any(Veiculo.class));
     }
 
     @Test

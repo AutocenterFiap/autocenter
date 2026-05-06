@@ -3,11 +3,12 @@ package br.com.autocenterfiap.orcamento.repository;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@Transactional
 class OrcamentoRepositoryTest {
 
     @Autowired

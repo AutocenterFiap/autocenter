@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/api/ordem-servico/metricas")
+@RequestMapping("/v1/ordem-servico/metricas")
 @RequiredArgsConstructor
 @Tag(name = "Metricas de OS/Serviços/Produtos", description = "Endpoints para consulta de metricas em geral")
 public class MetricasController {

@@ -3,6 +3,7 @@ package br.com.autocenterfiap.cliente.repository;
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,19 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("ClienteRepository - Testes de Integração")
 class ClienteRepositoryTest {
 
@@ -32,12 +31,21 @@ class ClienteRepositoryTest {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
+
     private Cliente clientePF;
     private Cliente clientePJ;
     private Endereco endereco;
 
     @BeforeEach
     void setUp() {
+        ordemServicoRepository.deleteAll();
+        ordemServicoRepository.flush();
+        clienteRepository.deleteAll();
+        clienteRepository.flush();
+        entityManager.flush();
+
         // Setup Endereço
         endereco = new Endereco(
                 "01310100",

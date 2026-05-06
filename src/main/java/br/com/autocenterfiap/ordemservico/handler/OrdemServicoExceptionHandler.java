@@ -1,22 +1,19 @@
 package br.com.autocenterfiap.ordemservico.handler;
 
-import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.ordemservico.exception.OrdemServicoJaAbertaParaVeiculoException;
-import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaException;
-import br.com.autocenterfiap.ordemservico.exception.OSItemServicoNaoEncontradoException;
-import br.com.autocenterfiap.ordemservico.exception.StatusOSInvalidoException;
-import br.com.autocenterfiap.ordemservico.exception.StatusOSItemInvalidoException;
+import br.com.autocenterfiap.comum.model.ErroResposta;
+import br.com.autocenterfiap.ordemservico.exception.*;
 import br.com.autocenterfiap.servico.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.exception.ServicoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
-@Order(1)
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.ordemservico")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class OrdemServicoExceptionHandler {
 
     @ExceptionHandler(OrdemServicoJaAbertaParaVeiculoException.class)

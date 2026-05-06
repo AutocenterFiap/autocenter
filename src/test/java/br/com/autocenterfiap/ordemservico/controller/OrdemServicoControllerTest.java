@@ -14,7 +14,6 @@ import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.model.Veiculo;
 import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,20 +22,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("OrdemServicoController - Testes de Integração")
 class OrdemServicoControllerTest {
 
@@ -70,8 +63,11 @@ class OrdemServicoControllerTest {
     @BeforeEach
     void setUp() {
         repository.deleteAll();
+        repository.flush();
         veiculoRepository.deleteAll();
+        veiculoRepository.flush();
         clienteRepository.deleteAll();
+        clienteRepository.flush();
 
         cliente = new Cliente();
         cliente.setNome("João da Silva");
@@ -177,7 +173,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarOrdemServicoComSucesso() throws Exception {
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculo.getId(), cliente.getId(), StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculo.getId(), cliente.getId());
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/v1/ordem-servicos")
@@ -193,7 +189,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarOrdemServicoComDadosInvalidos() throws Exception {
-        OrdemServicoDTO dto = new OrdemServicoDTO(null, null, StatusOS.ABERTA);
+        OrdemServicoDTO dto = new OrdemServicoDTO(null, null);
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/v1/ordem-servicos")

@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.servico.handler;
 
+import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.servico.exception.ServicoNaoEncontradoException;
-import br.com.autocenterfiap.servico.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.servico")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ServicoExceptionHandler {
 

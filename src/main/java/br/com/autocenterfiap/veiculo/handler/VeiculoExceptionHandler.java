@@ -1,21 +1,17 @@
 package br.com.autocenterfiap.veiculo.handler;
 
-import br.com.autocenterfiap.cliente.model.ErroResposta;
-import br.com.autocenterfiap.veiculo.exception.ChassiInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.ChassiJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.PlacaJaCadastradaException;
-import br.com.autocenterfiap.veiculo.exception.RenavamInvalidoException;
-import br.com.autocenterfiap.veiculo.exception.RenavamJaCadastradoException;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.comum.model.ErroResposta;
+import br.com.autocenterfiap.veiculo.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
-@Order(0)
+@RestControllerAdvice(basePackages = "br.com.autocenterfiap.veiculo")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class VeiculoExceptionHandler {
 
     @ExceptionHandler({
@@ -30,6 +26,21 @@ public class VeiculoExceptionHandler {
                 ex.getMessage(),
                 request.getRequestURI()
         );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
+    @ExceptionHandler(VeiculoEmUsoException.class)
+    public ResponseEntity<ErroResposta> handleVeiculoEmUso(
+            VeiculoEmUsoException ex,
+            HttpServletRequest request) {
+
+        ErroResposta erro = new ErroResposta(
+                HttpStatus.CONFLICT.value(),
+                "Conflito de Dados",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 

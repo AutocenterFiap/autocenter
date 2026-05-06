@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.orcamento.controller;
 
-import br.com.autocenterfiap.cliente.dto.ClienteDTO;
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.orcamento.dto.EnvioRequest;
-import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
+import br.com.autocenterfiap.orcamento.dto.OrcamentoResponse;
+import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.service.OrcamentoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,12 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.PatchExchange;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -47,13 +47,13 @@ public class OrcamentoController {
                     description = "Dados inválidos fornecidos"
             )
     })
-    @PatchExchange("/{id}/aprovar")
+    @PatchMapping("/{id}/aprovar")
     public ResponseEntity<OrcamentoResponse> aprovar(
             @Parameter(description = "ID do orcamento a ser aprovado", required = true)
             @PathVariable Long id
     ) {
         Orcamento orcamento = orcamentoService.aprovar(id);
-        return ResponseEntity.ok(Orcamento.paraOrcamentoResponse(orcamento));
+        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
     }
 
     @Operation(
@@ -75,13 +75,13 @@ public class OrcamentoController {
                     description = "Dados inválidos fornecidos"
             )
     })
-    @PatchExchange("/{id}/reprovar")
+    @PatchMapping("/{id}/reprovar")
     public ResponseEntity<OrcamentoResponse> reprovar(
             @Parameter(description = "ID do orcamento a ser reprovado", required = true)
             @PathVariable Long id
     ) {
         Orcamento orcamento = orcamentoService.reprovar(id);
-        return ResponseEntity.ok(Orcamento.paraOrcamentoResponse(orcamento));
+        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
     }
 
     @Operation(
@@ -112,5 +112,48 @@ public class OrcamentoController {
                 id, envioRequest.tipo().name());
 
         return ResponseEntity.ok(mensagem);
+    }
+
+    @Operation(
+            summary = "Listar todos os orcamentos",
+            description = "Retorna uma lista paginada com todos os orcamentos por status. " +
+                    "Por padrão retorna 20 orcamentos por página, ordenados por ID de forma crescente."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Lista de orcamentos retornada com sucesso"
+    )
+    @GetMapping
+    public ResponseEntity<Page<OrcamentoResponse>> listarTodos(
+            @RequestParam(required = true) StatusOrcamento status,
+            Pageable pageable) {
+        Page<Orcamento> orcamentos = orcamentoService.listarTodos(status, pageable);
+        Page<OrcamentoResponse> orcamentoResponses = orcamentos.map(Orcamento::paraOrcamentoResponse);
+
+        return ResponseEntity.ok(orcamentoResponses);
+    }
+
+    @Operation(
+            summary = "Buscar orcamento por ID",
+            description = "Retorna um orcamento específico pelo seu identificador único"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "orcamento encontrado",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "orcamento não encontrado"
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<OrcamentoResponse> buscarPorId(
+            @Parameter(description = "ID do orcamento a ser buscado", required = true)
+            @PathVariable Long id) {
+        Orcamento orcamento = orcamentoService.findById(id);
+
+        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
     }
 }

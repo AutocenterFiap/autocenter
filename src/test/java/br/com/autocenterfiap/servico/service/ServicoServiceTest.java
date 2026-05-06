@@ -21,12 +21,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -89,7 +91,7 @@ class ServicoServiceTest {
     @Test
     void buscarPorId_Existente_DeveRetornarServico() {
         when(repository.findById(1L)).thenReturn(Optional.of(servico));
-        Servico encontrado = service.buscarPorId(1L);
+        Servico encontrado = service.buscarEntidadePorId(1L);
         assertNotNull(encontrado);
         assertEquals(1L, encontrado.getId());
         verify(repository, times(1)).findById(1L);

@@ -28,6 +28,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import br.com.autocenterfiap.ordemservico.dto.MetricaTempoGastoServicoDTO;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -317,5 +319,275 @@ class OSItemServicoServiceTest {
         verify(ordemServicoRepository).findById(1L);
         verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
         verify(osItemServicoRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não há serviços finalizados")
+    void getMetricaTempoGastoServico_deveRetornarListaVaziaQuandoSemServicosFinalizados() {
+        osItemServico.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).isEmpty();
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não há itens no repositório")
+    void getMetricaTempoGastoServico_deveRetornarListaVaziaQuandoRepositorioVazio() {
+        when(osItemServicoRepository.findAll()).thenReturn(List.of());
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).isEmpty();
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve retornar métricas de tempo quando há serviços finalizados")
+    void getMetricaTempoGastoServico_deveRetornarMetricasQuandoHaServicosFinalizados() {
+        LocalDateTime inicio = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+        LocalDateTime fim = LocalDateTime.of(2026, 1, 1, 9, 0, 0);
+
+        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServico.setDataHoraInicio(inicio);
+        osItemServico.setDataHoraFim(fim);
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("01:00:00");
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve agrupar e calcular média de tempo para o mesmo serviço com múltiplas execuções")
+    void getMetricaTempoGastoServico_deveCalcularMediaParaMesmoServico() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        OSItemServico item1 = new OSItemServico();
+        item1.setServico(servico);
+        item1.setStatusServico(StatusItemServico.FINALIZADO);
+        item1.setDataHoraInicio(base);
+        item1.setDataHoraFim(base.plusHours(1));
+
+        OSItemServico item2 = new OSItemServico();
+        item2.setServico(servico);
+        item2.setStatusServico(StatusItemServico.FINALIZADO);
+        item2.setDataHoraInicio(base);
+        item2.setDataHoraFim(base.plusHours(3));
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(item1, item2));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:00:00");
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve agrupar métricas por serviços diferentes")
+    void getMetricaTempoGastoServico_deveAgruparPorServicoDiferente() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        Servico servico2 = new Servico();
+        servico2.setId(6L);
+        servico2.setDescricao("Alinhamento");
+        servico2.setValor(BigDecimal.valueOf(80.00));
+        servico2.setStatus(br.com.autocenterfiap.servico.enums.StatusServico.ATIVO);
+
+        OSItemServico itemTrocaOleo = new OSItemServico();
+        itemTrocaOleo.setServico(servico);
+        itemTrocaOleo.setStatusServico(StatusItemServico.FINALIZADO);
+        itemTrocaOleo.setDataHoraInicio(base);
+        itemTrocaOleo.setDataHoraFim(base.plusHours(1));
+
+        OSItemServico itemAlinhamento = new OSItemServico();
+        itemAlinhamento.setServico(servico2);
+        itemAlinhamento.setStatusServico(StatusItemServico.FINALIZADO);
+        itemAlinhamento.setDataHoraInicio(base);
+        itemAlinhamento.setDataHoraFim(base.plusMinutes(30));
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemTrocaOleo, itemAlinhamento));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(2);
+
+        MetricaTempoGastoServicoDTO metricaTrocaOleo = resultado.stream()
+                .filter(m -> m.nomeServico().equals("Troca de óleo"))
+                .findFirst()
+                .orElseThrow();
+
+        MetricaTempoGastoServicoDTO metricaAlinhamento = resultado.stream()
+                .filter(m -> m.nomeServico().equals("Alinhamento"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(metricaTrocaOleo.tempoGastoMinutos()).isEqualTo("01:00:00");
+        assertThat(metricaAlinhamento.tempoGastoMinutos()).isEqualTo("00:30:00");
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve ignorar serviços que não estão com status FINALIZADO no cálculo de métricas")
+    void getMetricaTempoGastoServico_deveIgnorarServicosNaoFinalizados() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        OSItemServico itemFinalizado = new OSItemServico();
+        itemFinalizado.setServico(servico);
+        itemFinalizado.setStatusServico(StatusItemServico.FINALIZADO);
+        itemFinalizado.setDataHoraInicio(base);
+        itemFinalizado.setDataHoraFim(base.plusHours(2));
+
+        OSItemServico itemExecutando = new OSItemServico();
+        itemExecutando.setServico(servico);
+        itemExecutando.setStatusServico(StatusItemServico.EXECUTANDO);
+        itemExecutando.setDataHoraInicio(base);
+
+        OSItemServico itemAguardando = new OSItemServico();
+        itemAguardando.setServico(servico);
+        itemAguardando.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        itemAguardando.setDataHoraInicio(base);
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando, itemAguardando));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:00:00");
+        verify(osItemServicoRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Deve formatar tempo com 0 segundos corretamente")
+    void getMetricaTempoGastoServico_deveFormatarTempoZeroCorretamente() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServico.setDataHoraInicio(base);
+        osItemServico.setDataHoraFim(base);
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("00:00:00");
+    }
+
+    @Test
+    @DisplayName("Deve formatar tempo com apenas segundos corretamente")
+    void getMetricaTempoGastoServico_deveFormatarApenasSegundosCorretamente() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServico.setDataHoraInicio(base);
+        osItemServico.setDataHoraFim(base.plusSeconds(45));
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("00:00:45");
+    }
+
+    @Test
+    @DisplayName("Deve formatar tempo com horas, minutos e segundos corretamente")
+    void getMetricaTempoGastoServico_deveFormatarTempoCompletoCorretamente() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServico.setDataHoraInicio(base);
+        osItemServico.setDataHoraFim(base.plusHours(2).plusMinutes(30).plusSeconds(15)); // 2h30m15s
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:30:15");
+    }
+
+    @Test
+    @DisplayName("Deve calcular média correta para múltiplas execuções do mesmo serviço")
+    void calculaMediaServicos_deveCalcularMediaCorretaParaMultiplasExecucoes() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        OSItemServico item1 = new OSItemServico();
+        item1.setServico(servico);
+        item1.setStatusServico(StatusItemServico.FINALIZADO);
+        item1.setDataHoraInicio(base);
+        item1.setDataHoraFim(base.plusMinutes(30));
+
+        OSItemServico item2 = new OSItemServico();
+        item2.setServico(servico);
+        item2.setStatusServico(StatusItemServico.FINALIZADO);
+        item2.setDataHoraInicio(base);
+        item2.setDataHoraFim(base.plusMinutes(60));
+
+        OSItemServico item3 = new OSItemServico();
+        item3.setServico(servico);
+        item3.setStatusServico(StatusItemServico.FINALIZADO);
+        item3.setDataHoraInicio(base);
+        item3.setDataHoraFim(base.plusMinutes(90));
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(item1, item2, item3));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("01:00:00");
+    }
+
+    @Test
+    @DisplayName("Deve excluir itens com status diferente de FINALIZADO do cálculo da média")
+    void calculaMediaServicos_deveExcluirItensNaoFinalizados() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        OSItemServico itemFinalizado = new OSItemServico();
+        itemFinalizado.setServico(servico);
+        itemFinalizado.setStatusServico(StatusItemServico.FINALIZADO);
+        itemFinalizado.setDataHoraInicio(base);
+        itemFinalizado.setDataHoraFim(base.plusHours(2));
+
+        OSItemServico itemExecutando = new OSItemServico();
+        itemExecutando.setServico(servico);
+        itemExecutando.setStatusServico(StatusItemServico.EXECUTANDO);
+        itemExecutando.setDataHoraInicio(base);
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:00:00");
+    }
+
+    @Test
+    @DisplayName("Deve retornar nomeServico correto para cada serviço na métrica")
+    void getMetricaTempoGastoServico_deveRetornarNomeServicoCorreto() {
+        LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
+
+        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServico.setDataHoraInicio(base);
+        osItemServico.setDataHoraFim(base.plusHours(1));
+
+        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+
+        List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
+
+        assertThat(resultado.getFirst().nomeServico())
+                .isEqualTo(servico.getDescricao())
+                .isEqualTo("Troca de óleo");
     }
 }

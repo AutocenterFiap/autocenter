@@ -48,7 +48,7 @@ public class OSItemServico implements Serializable {
     @Column(nullable = false, length = 20)
     private StatusItemServico statusServico;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime dataHoraInicio;
 
     private LocalDateTime dataHoraFim;

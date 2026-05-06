@@ -120,7 +120,7 @@ class OSItemServicoControllerITest {
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.valorItemServico", is(servicoAtivo.getValor().doubleValue())))
                 .andExpect(jsonPath("$.statusItemServico", is("AGUARDANDO_INICIO")))
-                .andExpect(jsonPath("$.dataHoraInicio", notNullValue()))
+                .andExpect(jsonPath("$.dataHoraInicio", nullValue()))
                 .andExpect(jsonPath("$.dataHoraFim", nullValue()));
     }
 

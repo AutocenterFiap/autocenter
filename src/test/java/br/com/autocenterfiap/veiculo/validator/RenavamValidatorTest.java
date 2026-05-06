@@ -117,4 +117,107 @@ class RenavamValidatorTest {
         when(veiculoRepository.existsByRenavamAndIdNot(veiculoDTO.renavam(),1L)).thenReturn(true);
         assertThrows(RenavamJaCadastradoException.class,() -> renavamValidator.validate(context));
     }
+
+    @Test
+    @DisplayName("Deve retornar quando renavam for null")
+    public void deveRetornarQuandoRenavamForNull(){
+        VeiculoDTO dtoComRenavamNull = new VeiculoDTO(
+                "ABC1D23",
+                "9BWZZZ377VT004251",
+                null,
+                "Ford",
+                "Bronco",
+                2020,
+                2021,
+                "Preto",
+                45000L,
+                TipoCombustivel.DIESEL,
+                CategoriaVeiculo.CARRO
+        );
+        context = new VeiculoValidationContext(dtoComRenavamNull, TipoOperacao.CREATE);
+        assertDoesNotThrow(() -> renavamValidator.validate(context));
+    }
+
+    @Test
+    @DisplayName("Deve retornar quando renavam for blank")
+    public void deveRetornarQuandoRenavamForBlank(){
+        VeiculoDTO dtoComRenavamBlank = new VeiculoDTO(
+                "ABC1D23",
+                "9BWZZZ377VT004251",
+                "   ",
+                "Ford",
+                "Bronco",
+                2020,
+                2021,
+                "Preto",
+                45000L,
+                TipoCombustivel.DIESEL,
+                CategoriaVeiculo.CARRO
+        );
+        context = new VeiculoValidationContext(dtoComRenavamBlank, TipoOperacao.CREATE);
+        assertDoesNotThrow(() -> renavamValidator.validate(context));
+    }
+
+    @Test
+    @DisplayName("Deve calcular digito como 0 quando resto for 0")
+    public void deveCalcularDigitoZeroQuandoRestoForZero(){
+        VeiculoDTO dtoComRenavamResto0 = new VeiculoDTO(
+                "ABC1D23",
+                "9BWZZZ377VT004251",
+                "00000000000",
+                "Ford",
+                "Bronco",
+                2020,
+                2021,
+                "Preto",
+                45000L,
+                TipoCombustivel.DIESEL,
+                CategoriaVeiculo.CARRO
+        );
+        context = new VeiculoValidationContext(dtoComRenavamResto0, TipoOperacao.CREATE);
+        when(veiculoRepository.existsByRenavam("00000000000")).thenReturn(false);
+        assertDoesNotThrow(() -> renavamValidator.validate(context));
+    }
+
+    @Test
+    @DisplayName("Deve calcular digito como 0 quando resto for 1")
+    public void deveCalcularDigitoZeroQuandoRestoForUm(){
+        VeiculoDTO dtoComRenavamResto1 = new VeiculoDTO(
+                "ABC1D23",
+                "9BWZZZ377VT004251",
+                "12345678900",
+                "Ford",
+                "Bronco",
+                2020,
+                2021,
+                "Preto",
+                45000L,
+                TipoCombustivel.DIESEL,
+                CategoriaVeiculo.CARRO
+        );
+        context = new VeiculoValidationContext(dtoComRenavamResto1, TipoOperacao.CREATE);
+        when(veiculoRepository.existsByRenavam("12345678900")).thenReturn(false);
+        assertDoesNotThrow(() -> renavamValidator.validate(context));
+    }
+
+    @Test
+    @DisplayName("Deve calcular digito como (11 - resto) quando resto > 1")
+    public void deveCalcularDigitoComFormulaQuandoRestoMaiorQue1(){
+        VeiculoDTO dtoComRenavamRestoMaior1 = new VeiculoDTO(
+                "ABC1D23",
+                "9BWZZZ377VT004251",
+                "82106426707",
+                "Ford",
+                "Bronco",
+                2020,
+                2021,
+                "Preto",
+                45000L,
+                TipoCombustivel.DIESEL,
+                CategoriaVeiculo.CARRO
+        );
+        context = new VeiculoValidationContext(dtoComRenavamRestoMaior1, TipoOperacao.CREATE);
+        when(veiculoRepository.existsByRenavam("82106426707")).thenReturn(false);
+        assertDoesNotThrow(() -> renavamValidator.validate(context));
+    }
 }

@@ -46,18 +46,6 @@ public class Orcamento implements Serializable {
     @Column(name = "data_ultima_atualizacao")
     private LocalDateTime dataUltimaAtualizacao;
 
-    public boolean isAprovado(){
-        return StatusOrcamento.APROVADO.equals(this.statusOrcamento);
-    }
-
-    public boolean isReprovado(){
-        return StatusOrcamento.REPROVADO.equals(this.statusOrcamento);
-    }
-
-    public boolean isAguardandoAprovacao(){
-        return StatusOrcamento.AGUARDANDO_APROVACAO.equals(this.statusOrcamento);
-    }
-
     public void aprovar(){
         this.statusOrcamento = StatusOrcamento.APROVADO;
     }

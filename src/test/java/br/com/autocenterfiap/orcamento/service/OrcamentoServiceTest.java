@@ -2,7 +2,7 @@ package br.com.autocenterfiap.orcamento.service;
 
 import br.com.autocenterfiap.orcamento.exception.OrcamentoNaoEncontradoException;
 import br.com.autocenterfiap.orcamento.repository.OrcamentoRepository;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
+import br.com.autocenterfiap.orcamento.model.Orcamento;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OSItemServico;

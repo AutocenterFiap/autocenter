@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.orcamento.model;
 
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

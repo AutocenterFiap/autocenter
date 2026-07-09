@@ -1,8 +1,8 @@
 package br.com.autocenterfiap.ordemservico.validator;
 
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
-import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
+import br.com.autocenterfiap.veiculo.domain.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class VeiculoValidatorTest {
     private VeiculoValidator veiculoValidator;
 
     @Mock
-    private VeiculoRepository veiculoRepository;
+    private VeiculoJpaRepository veiculoRepository;
 
     @Test
     public void devePassarSemExcecaoQuandoVeiculoExistir() {

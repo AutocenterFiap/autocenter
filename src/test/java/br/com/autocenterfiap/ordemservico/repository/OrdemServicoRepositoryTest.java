@@ -6,10 +6,10 @@ import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
-import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
-import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
+import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
+import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,13 +39,13 @@ class OrdemServicoRepositoryTest {
     private OrdemServicoRepository repository;
 
     @Autowired
-    private VeiculoRepository veiculoRepository;
+    private VeiculoJpaRepository veiculoRepository;
 
     @Autowired
     private ClienteRepository clienteRepository;
 
     private Cliente cliente;
-    private Veiculo veiculo;
+    private VeiculoJpaEntity veiculo;
     private OrdemServico ordemServico;
     private OrdemServico ordemServicoSecundaria;
 
@@ -75,7 +75,7 @@ class OrdemServicoRepositoryTest {
         endereco.setEstado("SP");
         cliente.setEndereco(endereco);
 
-        veiculo = new Veiculo();
+        veiculo = new VeiculoJpaEntity();
         veiculo.setPlaca("ABC1D23");
         veiculo.setChassi("9BWZZZ377VT004251");
         veiculo.setRenavam("82106426707");

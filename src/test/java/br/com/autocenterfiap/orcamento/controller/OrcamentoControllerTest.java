@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.orcamento.controller;
 
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
+import br.com.autocenterfiap.orcamento.model.Orcamento;
 import br.com.autocenterfiap.orcamento.service.OrcamentoService;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.security.repository.UsuarioRepository;

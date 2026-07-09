@@ -1,10 +1,13 @@
 package br.com.autocenterfiap.servico.controller;
 
+import br.com.autocenterfiap.ordemservico.model.OSItemServico;
+import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
-import br.com.autocenterfiap.servico.dto.ServicoDto;
-import br.com.autocenterfiap.servico.enums.StatusServico;
-import br.com.autocenterfiap.servico.model.Servico;
-import br.com.autocenterfiap.servico.repository.ServicoRepository;
+import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.servico.adapter.in.dto.ServicoRequestDTO;
+import br.com.autocenterfiap.servico.domain.enums.StatusServico;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.ServicoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,14 +42,17 @@ class ServicoControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ServicoRepository servicoRepository;
+    private ServicoJpaRepository servicoRepository;
 
     @Autowired
     private OSItemServicoRepository osItemServicoRepository;
 
-    private Servico servico;
+    @Autowired
+    private OrdemServicoRepository ordemServicoRepository;
 
-    private ServicoDto servicoDto;
+    private ServicoJpaEntity servico;
+
+    private ServicoRequestDTO servicoDto;
 
     @BeforeEach
     void setUp() {
@@ -54,15 +60,18 @@ class ServicoControllerTest {
         osItemServicoRepository.flush();
         servicoRepository.deleteAll();
         servicoRepository.flush();
-        servico = new Servico();
-        servico.setDescricao("Troca de óleo");
-        servico.setStatus(StatusServico.ATIVO);
-        servico.setValor(BigDecimal.valueOf(100));
+        
+        servico = ServicoJpaEntity.builder()
+                .descricao("Troca de óleo")
+                .status(StatusServico.ATIVO)
+                .valor(BigDecimal.valueOf(100))
+                .build();
 
-        servicoDto = new ServicoDto(
-                "Troca de óleo",
-                StatusServico.ATIVO,
-                BigDecimal.valueOf(100));
+        servicoDto = ServicoRequestDTO.builder()
+                .descricao("Troca de óleo")
+                .status(StatusServico.ATIVO)
+                .valor(BigDecimal.valueOf(100))
+                .build();
     }
 
     @Test
@@ -90,7 +99,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarServicoPorIdComSucesso() throws Exception {
-        Servico servicoSalvo = servicoRepository.save(servico);
+        ServicoJpaEntity servicoSalvo = servicoRepository.save(servico);
         mockMvc.perform(get("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -101,7 +110,6 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoBuscarServicoInexistentePorId() throws Exception {
-
         mockMvc.perform(get("/v1/servicos/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -110,10 +118,11 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveListarServicosPorStatusQuandoExistirem() throws Exception {
-        Servico outro = new Servico();
-        outro.setDescricao("Alinhamento");
-        outro.setStatus(StatusServico.INATIVO);
-        outro.setValor(BigDecimal.valueOf(120));
+        ServicoJpaEntity outro = ServicoJpaEntity.builder()
+                .descricao("Alinhamento")
+                .status(StatusServico.INATIVO)
+                .valor(BigDecimal.valueOf(120))
+                .build();
 
         servicoRepository.save(servico);
         servicoRepository.save(outro);
@@ -154,8 +163,11 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarServicoComDadosInvalidos() throws Exception {
-        Servico servicoInvalido = new Servico();
-        servicoInvalido.setDescricao(""); // descrição vazia
+        ServicoRequestDTO servicoInvalido = ServicoRequestDTO.builder()
+                .descricao("") // descrição vazia
+                .status(StatusServico.ATIVO)
+                .valor(BigDecimal.valueOf(100))
+                .build();
         mockMvc.perform(post("/v1/servicos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(servicoInvalido)))
@@ -165,11 +177,17 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveAtualizarServicoComSucesso() throws Exception {
-        Servico servicoSalvo = servicoRepository.save(servico);
-        servicoSalvo.setDescricao("Troca de filtro");
+        ServicoJpaEntity servicoSalvo = servicoRepository.save(servico);
+        
+        ServicoRequestDTO updateDto = ServicoRequestDTO.builder()
+                .descricao("Troca de filtro")
+                .status(StatusServico.ATIVO)
+                .valor(BigDecimal.valueOf(100))
+                .build();
+                
         mockMvc.perform(put("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(servicoSalvo)))
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricao", is("Troca de filtro")));
     }
@@ -186,7 +204,7 @@ class ServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveDeletarServicoComSucesso() throws Exception {
-        Servico servicoSalvo = servicoRepository.save(servico);
+        ServicoJpaEntity servicoSalvo = servicoRepository.save(servico);
         mockMvc.perform(delete("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -203,5 +221,29 @@ class ServicoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
-}
 
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void deveRetornar409AoDeletarServicoEmUso() throws Exception {
+        ServicoJpaEntity servicoSalvo = servicoRepository.save(servico);
+        servicoRepository.flush();
+
+        OrdemServico os = ordemServicoRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Nenhuma OrdemServico encontrada para associar"));
+
+        OSItemServico item = new OSItemServico();
+        item.setOrdemServico(os);
+        item.setServico(servicoSalvo);
+        item.setValorItemServico(BigDecimal.valueOf(100));
+        item.setStatusServico(br.com.autocenterfiap.ordemservico.enums.StatusItemServico.AGUARDANDO_INICIO);
+        osItemServicoRepository.save(item);
+        osItemServicoRepository.flush();
+
+        mockMvc.perform(delete("/v1/servicos/{id}", servicoSalvo.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.erro", is("Conflito de Dados")))
+                .andExpect(jsonPath("$.mensagem", containsString("Não é possível deletar o serviço")));
+    }
+}

@@ -11,10 +11,10 @@ import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.servico.enums.StatusServico;
-import br.com.autocenterfiap.servico.exception.ServicoInativoException;
-import br.com.autocenterfiap.servico.model.Servico;
-import br.com.autocenterfiap.servico.service.ServicoService;
+import br.com.autocenterfiap.servico.domain.enums.StatusServico;
+import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.ServicoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,13 +47,13 @@ class OSItemServicoServiceTest {
     private OrdemServicoRepository ordemServicoRepository;
 
     @Mock
-    private ServicoService servicoService;
+    private ServicoJpaRepository servicoJpaRepository;
 
     @InjectMocks
     private OSItemServicoService osItemServicoService;
 
     private OrdemServico ordemServico;
-    private Servico servico;
+    private ServicoJpaEntity servico;
     private OSItemServico osItemServico;
 
     @BeforeEach
@@ -61,7 +61,7 @@ class OSItemServicoServiceTest {
         ordemServico = new OrdemServico();
         ordemServico.setId(1L);
 
-        servico = new Servico();
+        servico = new ServicoJpaEntity();
         servico.setId(5L);
         servico.setDescricao("Troca de óleo");
         servico.setValor(BigDecimal.valueOf(150.00));
@@ -107,7 +107,7 @@ class OSItemServicoServiceTest {
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(servicoService.buscarEntidadePorId(5L)).thenReturn(servico);
+        when(servicoJpaRepository.findById(5L)).thenReturn(Optional.of(servico));
         when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.adicionarServicoNaOS(1L, dto);
@@ -116,7 +116,7 @@ class OSItemServicoServiceTest {
         assertThat(resultado.id()).isEqualTo(10L);
         assertThat(resultado.valorItemServico()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
         verify(ordemServicoRepository).findById(1L);
-        verify(servicoService).buscarEntidadePorId(5L);
+        verify(servicoJpaRepository).findById(5L);
         verify(osItemServicoRepository).save(any(OSItemServico.class));
     }
 
@@ -128,14 +128,14 @@ class OSItemServicoServiceTest {
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
         when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(servicoService.buscarEntidadePorId(5L)).thenReturn(servico);
+        when(servicoJpaRepository.findById(5L)).thenReturn(Optional.of(servico));
 
         assertThatThrownBy(() -> osItemServicoService.adicionarServicoNaOS(1L, dto))
                 .isInstanceOf(ServicoInativoException.class)
                 .hasMessageContaining("Troca de óleo");
 
         verify(ordemServicoRepository).findById(1L);
-        verify(servicoService).buscarEntidadePorId(5L);
+        verify(servicoJpaRepository).findById(5L);
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -152,7 +152,7 @@ class OSItemServicoServiceTest {
                 .hasMessageContaining("EM_DIAGNOSTICO");
 
         verify(ordemServicoRepository).findById(1L);
-        verify(servicoService, never()).buscarPorId(any());
+        verify(servicoJpaRepository, never()).findById(any());
         verify(osItemServicoRepository, never()).save(any());
     }
 
@@ -396,11 +396,11 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveAgruparPorServicoDiferente() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        Servico servico2 = new Servico();
+        ServicoJpaEntity servico2 = new ServicoJpaEntity();
         servico2.setId(6L);
         servico2.setDescricao("Alinhamento");
         servico2.setValor(BigDecimal.valueOf(80.00));
-        servico2.setStatus(br.com.autocenterfiap.servico.enums.StatusServico.ATIVO);
+        servico2.setStatus(br.com.autocenterfiap.servico.domain.enums.StatusServico.ATIVO);
 
         OSItemServico itemTrocaOleo = new OSItemServico();
         itemTrocaOleo.setServico(servico);

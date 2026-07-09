@@ -13,10 +13,11 @@ import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.servico.enums.StatusServico;
-import br.com.autocenterfiap.servico.exception.ServicoInativoException;
-import br.com.autocenterfiap.servico.model.Servico;
-import br.com.autocenterfiap.servico.service.ServicoService;
+import br.com.autocenterfiap.servico.domain.enums.StatusServico;
+import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
+import br.com.autocenterfiap.servico.domain.exception.ServicoNaoEncontradoException;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.ServicoJpaRepository;
 import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class OSItemServicoService {
 
     private final OSItemServicoRepository osItemServicoRepository;
     private final OrdemServicoRepository ordemServicoRepository;
-    private final ServicoService servicoService;
+    private final ServicoJpaRepository servicoJpaRepository;
 
     @Transactional(readOnly = true)
     public List<OSItemServicoResponseDTO> listarPorOS(Long ordemServicoId) {
@@ -63,7 +64,8 @@ public class OSItemServicoService {
             throw new StatusOSInvalidoException("Só é possível adicionar serviços em ordens de serviço que estejam no status 'EM_DIAGNOSTICO'");
         }
 
-        Servico servico = servicoService.buscarEntidadePorId(dto.servicoId());
+        ServicoJpaEntity servico = servicoJpaRepository.findById(dto.servicoId())
+                .orElseThrow(() -> new ServicoNaoEncontradoException("Serviço não encontrado com ID: " + dto.servicoId()));
 
         if (servico.getStatus() == StatusServico.INATIVO) {
             log.warn("Tentativa de adicionar serviço inativo: ID={}, Descrição={}",

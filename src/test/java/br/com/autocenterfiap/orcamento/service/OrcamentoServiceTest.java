@@ -8,7 +8,7 @@ import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.produto.model.Produto;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.entity.ProdutoJpaEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class OrcamentoServiceTest {
     @BeforeEach
     void setUp() {
 
-        Produto produto = new Produto();
+        ProdutoJpaEntity produto = new ProdutoJpaEntity();
         produto.setPrecoUnitario(new BigDecimal("200.00"));
 
         OSItemProduto itemProduto = new OSItemProduto();

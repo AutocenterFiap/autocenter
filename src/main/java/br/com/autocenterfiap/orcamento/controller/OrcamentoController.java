@@ -4,7 +4,7 @@ import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.orcamento.dto.EnvioRequest;
 import br.com.autocenterfiap.orcamento.dto.OrcamentoResponse;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
-import br.com.autocenterfiap.orcamento.repository.entity.Orcamento;
+import br.com.autocenterfiap.orcamento.model.Orcamento;
 import br.com.autocenterfiap.orcamento.service.OrcamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -6,8 +6,8 @@ import br.com.autocenterfiap.ordemservico.model.OSItemServico;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.servico.model.Servico;
-import br.com.autocenterfiap.servico.repository.ServicoRepository;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.ServicoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,13 +46,13 @@ class OSItemServicoControllerITest {
     private OrdemServicoRepository ordemServicoRepository;
 
     @Autowired
-    private ServicoRepository servicoRepository;
+    private ServicoJpaRepository servicoRepository;
 
     private OrdemServico osEmDiagnostico;
     private OrdemServico osEmExecucao;
     private OrdemServico osFinalizada;
-    private Servico servicoAtivo;
-    private Servico servicoInativo;
+    private ServicoJpaEntity servicoAtivo;
+    private ServicoJpaEntity servicoInativo;
 
     @BeforeEach
     void setUp() {

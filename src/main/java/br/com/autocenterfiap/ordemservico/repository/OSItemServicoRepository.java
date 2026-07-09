@@ -13,4 +13,6 @@ public interface OSItemServicoRepository extends JpaRepository<OSItemServico, Lo
     List<OSItemServico> findByOrdemServicoId(Long ordemServicoId);
 
     Optional<OSItemServico> findByServicoIdAndOrdemServicoId(Long servicoId, Long ordemServicoId);
+
+    boolean existsByServicoId(Long servicoId);
 }

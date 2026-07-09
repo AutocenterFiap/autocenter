@@ -12,9 +12,9 @@ import br.com.autocenterfiap.ordemservico.exception.OrdemServicoNaoEncontradaExc
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
 import br.com.autocenterfiap.ordemservico.validator.OrdemServicoValidator;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
-import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
+import br.com.autocenterfiap.veiculo.domain.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,10 +27,10 @@ public class OrdemServicoService {
 
     private final OrdemServicoRepository ordemServicoRepository;
     private final ClienteRepository clienteRepositoryl;
-    private final VeiculoRepository veiculoRepository;
+    private final VeiculoJpaRepository veiculoRepository;
     private final List<OrdemServicoValidator> validators;
 
-    public OrdemServicoService(OrdemServicoRepository ordemServicoRepository, ClienteRepository clienteRepositoryl, VeiculoRepository veiculoRepository, List<OrdemServicoValidator> validators) {
+    public OrdemServicoService(OrdemServicoRepository ordemServicoRepository, ClienteRepository clienteRepositoryl, VeiculoJpaRepository veiculoRepository, List<OrdemServicoValidator> validators) {
         this.ordemServicoRepository = ordemServicoRepository;
         this.clienteRepositoryl = clienteRepositoryl;
         this.veiculoRepository = veiculoRepository;
@@ -55,7 +55,7 @@ public class OrdemServicoService {
         // Rodar os Validators da OS
         validators.forEach(v -> v.validate(dto));
 
-        Veiculo veiculo = findVeiculoById(dto.veiculoId());
+        VeiculoJpaEntity veiculo = findVeiculoById(dto.veiculoId());
         Cliente cliente = findClienteById(dto.clienteId());
         OrdemServico ordemServico = new OrdemServico(dto, veiculo, cliente);
         ordemServico = ordemServicoRepository.save(ordemServico);
@@ -88,7 +88,7 @@ public class OrdemServicoService {
                 .orElseThrow(() -> new OrdemServicoNaoEncontradaException("Ordem de Serviço não encontrada com Número: " + numeroOrdemServico));
     }
 
-    private Veiculo findVeiculoById(Long veiculoId) {
+    private VeiculoJpaEntity findVeiculoById(Long veiculoId) {
         return veiculoRepository.findById(veiculoId)
                 .orElseThrow(() -> new VeiculoNaoEncontradoException("Veículo não encontrado com ID: " + veiculoId));
     }

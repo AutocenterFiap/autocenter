@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.orcamento.repository.entity;
+package br.com.autocenterfiap.orcamento.model;
 
 import br.com.autocenterfiap.orcamento.dto.OrcamentoResponse;
 import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;

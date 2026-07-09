@@ -1,15 +1,15 @@
 package br.com.autocenterfiap.ordemservico.validator;
 
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.veiculo.exception.VeiculoNaoEncontradoException;
-import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
+import br.com.autocenterfiap.veiculo.domain.exception.VeiculoNaoEncontradoException;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VeiculoValidator implements OrdemServicoValidator {
-    private final VeiculoRepository veiculoRepository;
+    private final VeiculoJpaRepository veiculoRepository;
 
-    public VeiculoValidator(VeiculoRepository veiculoRepository) {
+    public VeiculoValidator(VeiculoJpaRepository veiculoRepository) {
         this.veiculoRepository = veiculoRepository;
     }
 

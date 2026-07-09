@@ -3,7 +3,7 @@ package br.com.autocenterfiap.ordemservico.model;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,7 +52,7 @@ public class OrdemServico implements Serializable {
     @ManyToOne
     @JoinColumn(name = "veiculo_id", nullable = false)
     @Schema(description = "Veículo vinculado à Ordem de Serviço")
-    private Veiculo veiculo;
+    private VeiculoJpaEntity veiculo;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
@@ -75,7 +75,7 @@ public class OrdemServico implements Serializable {
     @Schema(description = "Data e hora da última atualização do registro", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataUltimaAtualizacao;
 
-    public OrdemServico(OrdemServicoDTO dto,Veiculo veiculo,Cliente cliente) {
+    public OrdemServico(OrdemServicoDTO dto, VeiculoJpaEntity veiculo, Cliente cliente) {
         this.cliente = cliente;
         this.veiculo = veiculo;
         this.statusOS = StatusOS.ABERTA;

@@ -1,8 +1,8 @@
 package br.com.autocenterfiap.comum;
 
 import br.com.autocenterfiap.comum.model.ErroResposta;
-import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
-import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
+import br.com.autocenterfiap.produto.domain.exception.EstoqueInsuficienteException;
+import br.com.autocenterfiap.produto.domain.exception.ProdutoInativoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

@@ -4,14 +4,14 @@ import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
-import br.com.autocenterfiap.produto.enums.UnidadeMedida;
-import br.com.autocenterfiap.produto.exception.EstoqueInsuficienteException;
-import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
-import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
-import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.service.ProdutoService;
+import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoResponseDTO;
+import br.com.autocenterfiap.produto.domain.enums.UnidadeMedida;
+import br.com.autocenterfiap.produto.domain.exception.EstoqueInsuficienteException;
+import br.com.autocenterfiap.produto.domain.exception.OSItemProdutoNaoEncontradoException;
+import br.com.autocenterfiap.produto.domain.exception.ProdutoInativoException;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.entity.ProdutoJpaEntity;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.repository.ProdutoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class OSItemProdutoServiceTest {
     private OSItemProdutoRepository osItemProdutoRepository;
 
     @Mock
-    private ProdutoService produtoService;
+    private ProdutoJpaRepository produtoJpaRepository;
 
     @Mock
     private OrdemServicoRepository ordemServicoRepository;
@@ -44,13 +44,13 @@ class OSItemProdutoServiceTest {
     @InjectMocks
     private OSItemProdutoService osItemProdutoService;
 
-    private Produto produto;
+    private ProdutoJpaEntity produto;
     private OrdemServico os;
     private OSItemProduto osItem;
 
     @BeforeEach
     void setUp() {
-        produto = new Produto();
+        produto = new ProdutoJpaEntity();
         produto.setId(1L);
         produto.setCodigo("FO-001");
         produto.setNome("Filtro de Óleo");
@@ -76,7 +76,7 @@ class OSItemProdutoServiceTest {
     void deveAdicionarProdutoNaOS() {
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 3);
 
-        when(produtoService.buscarOuLancarExcecao(1L)).thenReturn(produto);
+        when(produtoJpaRepository.findById(1L)).thenReturn(Optional.of(produto));
         when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
         when(ordemServicoRepository.getReferenceById(10L)).thenReturn(os);
 
@@ -93,7 +93,7 @@ class OSItemProdutoServiceTest {
         produto.setAtivo(false);
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 2);
 
-        when(produtoService.buscarOuLancarExcecao(1L)).thenReturn(produto);
+        when(produtoJpaRepository.findById(1L)).thenReturn(Optional.of(produto));
 
         assertThrows(ProdutoInativoException.class, () -> osItemProdutoService.adicionarProdutoNaOS(10L, dto));
         verify(osItemProdutoRepository, never()).save(any());
@@ -105,7 +105,7 @@ class OSItemProdutoServiceTest {
         produto.setQuantidadeEstoque(1);
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 5);
 
-        when(produtoService.buscarOuLancarExcecao(1L)).thenReturn(produto);
+        when(produtoJpaRepository.findById(1L)).thenReturn(Optional.of(produto));
 
         assertThrows(EstoqueInsuficienteException.class, () -> osItemProdutoService.adicionarProdutoNaOS(10L, dto));
     }

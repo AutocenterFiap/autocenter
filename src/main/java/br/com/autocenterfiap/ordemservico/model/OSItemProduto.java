@@ -1,6 +1,5 @@
 package br.com.autocenterfiap.ordemservico.model;
 
-import br.com.autocenterfiap.produto.model.Produto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class OSItemProduto implements Serializable {
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
     @Schema(description = "Produto vinculado")
-    private Produto produto;
+    private br.com.autocenterfiap.produto.infrastructure.persistence.jpa.entity.ProdutoJpaEntity produto;
 
     @Column(nullable = false)
     @Schema(description = "Quantidade utilizada", example = "2")

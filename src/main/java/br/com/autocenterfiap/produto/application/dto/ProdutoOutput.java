@@ -1,0 +1,31 @@
+package br.com.autocenterfiap.produto.application.dto;
+
+import br.com.autocenterfiap.produto.domain.enums.TipoProduto;
+import br.com.autocenterfiap.produto.domain.enums.UnidadeMedida;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProdutoOutput {
+    private Long id;
+    private String nome;
+    private String codigo;
+    private String descricao;
+    private UnidadeMedida unidadeMedida;
+    private BigDecimal precoUnitario;
+    private Integer quantidadeEstoque;
+    private Integer estoqueMinimo;
+    private String categoria;
+    private TipoProduto tipo;
+    private Boolean ativo;
+    private LocalDateTime dataCriacao;
+    private LocalDateTime dataUltimaAtualizacao;
+}

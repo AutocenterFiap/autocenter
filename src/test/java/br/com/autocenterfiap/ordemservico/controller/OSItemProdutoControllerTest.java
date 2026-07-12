@@ -4,12 +4,11 @@ import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
-import br.com.autocenterfiap.produto.dto.ProdutoRequestDTO;
-import br.com.autocenterfiap.produto.enums.TipoProduto;
-import br.com.autocenterfiap.produto.enums.UnidadeMedida;
-import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.repository.ProdutoRepository;
+import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.domain.enums.TipoProduto;
+import br.com.autocenterfiap.produto.domain.enums.UnidadeMedida;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.entity.ProdutoJpaEntity;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.repository.ProdutoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +45,7 @@ class OSItemProdutoControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private ProdutoJpaRepository produtoRepository;
 
     @Autowired
     private OrdemServicoRepository ordemServicoRepository;
@@ -54,7 +53,7 @@ class OSItemProdutoControllerTest {
     @Autowired
     private OSItemProdutoRepository osItemProdutoRepository;
 
-    private Produto produto;
+    private ProdutoJpaEntity produto;
     private Long osId;
     private OrdemServico ordemServico;
 
@@ -67,12 +66,19 @@ class OSItemProdutoControllerTest {
         produtoRepository.deleteAll();
         produtoRepository.flush();
 
-        ProdutoRequestDTO dto = new ProdutoRequestDTO(
-                "Filtro de Óleo", "FO-001", null,
-                UnidadeMedida.UNIT, new BigDecimal("45.90"),
-                50, 10, "Motor", TipoProduto.PECAS
-        );
-        produto = produtoRepository.save(new Produto(dto));
+        ProdutoJpaEntity produtoEntity = ProdutoJpaEntity.builder()
+                .nome("Filtro de Óleo")
+                .codigo("FO-001")
+                .descricao(null)
+                .unidadeMedida(UnidadeMedida.UNIT)
+                .precoUnitario(new BigDecimal("45.90"))
+                .quantidadeEstoque(50)
+                .estoqueMinimo(10)
+                .categoria("Motor")
+                .tipo(TipoProduto.PECAS)
+                .ativo(true)
+                .build();
+        produto = produtoRepository.save(produtoEntity);
 
         ordemServico = ordemServicoRepository.save(new OrdemServico());
         osId = ordemServico.getId(); 
@@ -93,8 +99,8 @@ class OSItemProdutoControllerTest {
                 .andExpect(jsonPath("$.quantidade", is(3)))
                 .andExpect(jsonPath("$.subtotal", is(137.70)));
 
-        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
-        org.junit.jupiter.api.Assertions.assertEquals(47, produtoAtualizado.getQuantidadeEstoque());
+        ProdutoJpaEntity produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        assertEquals(47, produtoAtualizado.getQuantidadeEstoque());
     }
 
     @Test
@@ -114,7 +120,7 @@ class OSItemProdutoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("POST /v1/ordem-servicos/{osId}/produtos deve retornar 422 para produto inativo")
     void deveRetornar422ParaProdutoInativo() throws Exception {
-        produto.desativar();
+        produto.setAtivo(false);
         produtoRepository.save(produto);
 
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 1);
@@ -142,8 +148,8 @@ class OSItemProdutoControllerTest {
         mockMvc.perform(delete("/v1/ordem-servicos/{osId}/produtos/{produtoId}", osId, produto.getId()))
                 .andExpect(status().isNoContent());
 
-        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
-        org.junit.jupiter.api.Assertions.assertEquals(50, produtoAtualizado.getQuantidadeEstoque());
+        ProdutoJpaEntity produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        assertEquals(50, produtoAtualizado.getQuantidadeEstoque());
     }
 
     @Test
@@ -188,7 +194,7 @@ class OSItemProdutoControllerTest {
                 .andExpect(jsonPath("$.quantidade", is(5)))
                 .andExpect(jsonPath("$.subtotal", is(229.50)));
 
-        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        ProdutoJpaEntity produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
         assertEquals(45, produtoAtualizado.getQuantidadeEstoque()); // 47 - 2 = 45
     }
 
@@ -217,7 +223,7 @@ class OSItemProdutoControllerTest {
                 .andExpect(jsonPath("$.quantidade", is(2)))
                 .andExpect(jsonPath("$.subtotal", is(91.80)));
 
-        Produto produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
+        ProdutoJpaEntity produtoAtualizado = produtoRepository.findById(produto.getId()).orElseThrow();
         assertEquals(48, produtoAtualizado.getQuantidadeEstoque()); // 45 + 3 = 48
     }
 
@@ -286,6 +292,6 @@ class OSItemProdutoControllerTest {
                 .andExpect(status().isOk());
 
         OSItemProduto itemAtualizado = osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(osId, produto.getId()).orElseThrow();
-        assertNotNull(itemAtualizado.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser atualizada pelo @PreUpdate");
+        assertNotNull(itemAtualizado.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve be updated by @PreUpdate");
     }
 }

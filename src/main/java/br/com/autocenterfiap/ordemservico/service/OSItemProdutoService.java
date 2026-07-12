@@ -4,12 +4,13 @@ import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.model.OrdemServico;
 import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
 import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoRequestDTO;
-import br.com.autocenterfiap.produto.dto.OSItemProdutoResponseDTO;
-import br.com.autocenterfiap.produto.exception.OSItemProdutoNaoEncontradoException;
-import br.com.autocenterfiap.produto.exception.ProdutoInativoException;
-import br.com.autocenterfiap.produto.model.Produto;
-import br.com.autocenterfiap.produto.service.ProdutoService;
+import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoRequestDTO;
+import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoResponseDTO;
+import br.com.autocenterfiap.produto.domain.exception.OSItemProdutoNaoEncontradoException;
+import br.com.autocenterfiap.produto.domain.exception.ProdutoInativoException;
+import br.com.autocenterfiap.produto.domain.exception.ProdutoNaoEncontradoException;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.entity.ProdutoJpaEntity;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.repository.ProdutoJpaRepository;
 import br.com.autocenterfiap.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class OSItemProdutoService {
 
     private final OSItemProdutoRepository osItemProdutoRepository;
     private final OrdemServicoRepository ordemServicoRepository;
-    private final ProdutoService produtoService;
+    private final ProdutoJpaRepository produtoJpaRepository;
 
     public List<OSItemProdutoResponseDTO> listarPorOS(Long ordemServicoId) {
         return osItemProdutoRepository.findByOrdemServicoId(ordemServicoId)
@@ -34,7 +35,8 @@ public class OSItemProdutoService {
 
     @Transactional
     public OSItemProdutoResponseDTO adicionarProdutoNaOS(Long ordemServicoId, OSItemProdutoRequestDTO dto) {
-        Produto produto = produtoService.buscarOuLancarExcecao(dto.produtoId());
+        ProdutoJpaEntity produto = produtoJpaRepository.findById(dto.produtoId())
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(dto.produtoId()));
 
         if (!produto.getAtivo()) {
             throw new ProdutoInativoException(produto.getCodigo());
@@ -64,7 +66,7 @@ public class OSItemProdutoService {
                 .orElseThrow(() -> new OSItemProdutoNaoEncontradoException(ordemServicoId, produtoId));
         
 
-        Produto produto = item.getProduto();
+        ProdutoJpaEntity produto = item.getProduto();
         int diferencaQuantidade = dto.quantidade() - item.getQuantidade();
 
         if (diferencaQuantidade > 0) {

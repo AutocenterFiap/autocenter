@@ -1,0 +1,52 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auto-center-fiap-hpa
+  namespace: auto-center
+  labels:
+    app: auto-center-fiap
+    component: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auto-center-fiap
+  # ─── Limites de réplicas ──────────────────────────────────────────
+  minReplicas: 2
+  maxReplicas: 10
+  # ─── Métricas de escalonamento ────────────────────────────────────
+  metrics:
+    # CPU: escala quando consumo médio ultrapassar 70%
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    # Memória: escala quando consumo médio ultrapassar 80%
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  # ─── Comportamento de escalonamento ──────────────────────────────
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60      # Aguarda 60s antes de escalar para cima
+      policies:
+        - type: Pods
+          value: 2                          # Adiciona no máximo 2 pods por intervalo
+          periodSeconds: 60
+        - type: Percent
+          value: 50                         # Ou 50% dos pods atuais, o que for maior
+          periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300     # Aguarda 5 min antes de reduzir réplicas
+      policies:
+        - type: Pods
+          value: 1                          # Remove no máximo 1 pod por intervalo
+          periodSeconds: 120
+      selectPolicy: Min
+

@@ -32,3 +32,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Terraform ###
+**/.terraform/
+**/.terraform.lock.hcl
+terraform/terraform.tfvars
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfstate.*.backup
+terraform/*.tfplan
+terraform.tfstate
+terraform.tfstate.backup
+
+### Kubernetes Secrets ###
+k8s/secret.yaml
+

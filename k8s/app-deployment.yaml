@@ -1,0 +1,183 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-center-fiap
+  namespace: auto-center
+  labels:
+    app: auto-center-fiap
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auto-center-fiap
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: auto-center-fiap
+        component: api
+    spec:
+      initContainers:
+        # ── 1. Aguarda o MySQL estar disponível ──────────────────────
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - "-c"
+            - |
+              until nc -z mysql-service 3306; do
+                echo "Aguardando MySQL...";
+                sleep 3;
+              done;
+              echo "MySQL disponível!"
+
+        # ── 2. Busca credenciais no Infisical (gratuito) ─────────────
+        # API REST do Infisical: https://app.infisical.com
+        # 1. Autentica via Universal Auth e obtém access token
+        # 2. Busca todos os secrets do projeto/environment
+        # 3. Grava em /vault-secrets/application.properties (RAM)
+        # Nenhum operador extra necessário no cluster.
+        - name: infisical-secrets-fetcher
+          image: alpine:3.19
+          command:
+            - sh
+            - "-c"
+            - |
+              set -e
+              apk add --no-cache curl jq > /dev/null 2>&1
+
+              echo "[Infisical] Autenticando via Universal Auth..."
+              ACCESS_TOKEN=$(curl -sf -X POST \
+                "https://app.infisical.com/api/v1/auth/universal-auth/login" \
+                -H "Content-Type: application/json" \
+                -d "{\"clientId\":\"${INFISICAL_CLIENT_ID}\",\"clientSecret\":\"${INFISICAL_CLIENT_SECRET}\"}" \
+                | jq -r '.accessToken')
+
+              if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+                echo "[Infisical] ERRO: falha na autenticação. Verifique INFISICAL_CLIENT_ID e INFISICAL_CLIENT_SECRET."
+                exit 1
+              fi
+
+              echo "[Infisical] Buscando secrets (project=${INFISICAL_PROJECT_ID}, env=${INFISICAL_ENVIRONMENT})..."
+              SECRETS_JSON=$(curl -sf \
+                "https://app.infisical.com/api/v3/secrets/raw?workspaceId=${INFISICAL_PROJECT_ID}&environment=${INFISICAL_ENVIRONMENT}&secretPath=${INFISICAL_SECRET_PATH}" \
+                -H "Authorization: Bearer ${ACCESS_TOKEN}")
+
+              if [ -z "$SECRETS_JSON" ]; then
+                echo "[Infisical] ERRO: resposta vazia ao buscar secrets."
+                exit 1
+              fi
+
+              mkdir -p /vault-secrets
+
+              # Grava cada secret como propriedade Spring Boot
+              # ex.: SPRING_DATASOURCE_PASSWORD=valor
+              echo "${SECRETS_JSON}" \
+                | jq -r '.secrets[] | "\(.secretKey)=\(.secretValue)"' \
+                > /vault-secrets/application.properties
+
+              echo "[Infisical] Secrets gravados com sucesso (valores ocultados):"
+              sed 's/=.*/=***/' /vault-secrets/application.properties
+          env:
+            - name: INFISICAL_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: auto-center-secrets
+                  key: INFISICAL_CLIENT_ID
+            - name: INFISICAL_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auto-center-secrets
+                  key: INFISICAL_CLIENT_SECRET
+            - name: INFISICAL_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: auto-center-secrets
+                  key: INFISICAL_PROJECT_ID
+          envFrom:
+            - configMapRef:
+                name: auto-center-configmap    # fornece INFISICAL_ENVIRONMENT e INFISICAL_SECRET_PATH
+          volumeMounts:
+            - name: vault-secrets
+              mountPath: /vault-secrets
+
+      containers:
+        - name: auto-center-fiap
+          # Substitua pela imagem publicada no seu registry
+          # Ex: image: seu-registry/auto-center-fiap:1.0.0
+          image: auto-center-fiap:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8097
+              name: http
+              protocol: TCP
+          # ─── Variáveis não-sensíveis via ConfigMap ──────────────────
+          # SPRING_CONFIG_ADDITIONAL_LOCATION aponta para /vault-secrets/
+          # onde o init container gravou as credenciais do HCP.
+          envFrom:
+            - configMapRef:
+                name: auto-center-configmap
+          # ─── Volume com credenciais vindas do HCP Vault Secrets ─────
+          volumeMounts:
+            - name: vault-secrets
+              mountPath: /vault-secrets
+              readOnly: true
+          # ─── Recursos ────────────────────────────────────────────
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          # ─── Health Checks ───────────────────────────────────────
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8097
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8097
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8097
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 12   # Até 120s para a app inicializar
+      # ─── Tolerância e distribuição de pods ────────────────────────
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - auto-center-fiap
+                topologyKey: kubernetes.io/hostname
+      # ─── Volumes ──────────────────────────────────────────────────
+      volumes:
+        # Volume efêmero compartilhado entre o init container e a app.
+        # Os secrets existem apenas em memória (RAM), nunca em disco persistente.
+        - name: vault-secrets
+          emptyDir:
+            medium: Memory   # armazenado apenas em RAM
+      terminationGracePeriodSeconds: 30
+

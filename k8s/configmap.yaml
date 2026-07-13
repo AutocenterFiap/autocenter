@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auto-center-configmap
+  namespace: auto-center
+  labels:
+    app: auto-center-fiap
+data:
+  # ─── Aplicação ───────────────────────────────────────────────────
+  SPRING_PROFILES_ACTIVE: "prod"
+  SERVER_PORT: "8097"
+
+  # ─── Banco de Dados ──────────────────────────────────────────────
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-service:3306/autocenter?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "com.mysql.cj.jdbc.Driver"
+
+  # ─── JPA / Hibernate ─────────────────────────────────────────────
+  SPRING_JPA_DATABASE_PLATFORM: "org.hibernate.dialect.MySQLDialect"
+  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "none"
+  SPRING_JPA_SHOW_SQL: "false"
+
+  # ─── Flyway ──────────────────────────────────────────────────────
+  SPRING_FLYWAY_ENABLED: "true"
+  SPRING_FLYWAY_LOCATIONS: "classpath:db/migration"
+  SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+
+  # ─── Token JWT ───────────────────────────────────────────────────
+  SISTEMA_TOKEN_EXPIRACAO_MINUTOS: "30"
+
+  # ─── Spring Boot — Localização extra de configuração ─────────────
+  # O init container escreve /vault-secrets/application.properties
+  # e o Spring Boot carrega automaticamente a partir desse caminho.
+  SPRING_CONFIG_ADDITIONAL_LOCATION: "file:/vault-secrets/"
+
+  # ─── Infisical — Configuração do ambiente e path ──────────────────
+  # Deve coincidir com o environment e secret path criados no Infisical
+  INFISICAL_ENVIRONMENT: "prod"
+  INFISICAL_SECRET_PATH: "/"
+
+  # ─── Logging ─────────────────────────────────────────────────────
+  LOGGING_LEVEL_ROOT: "INFO"
+  LOGGING_LEVEL_BR_COM_AUTOCENTERFIAP: "INFO"
+

@@ -4,13 +4,13 @@ import br.com.autocenterfiap.cliente.domain.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice
+// Legacy handler kept for reference only; the active global handler lives in
+// br.com.autocenterfiap.cliente.handler.ClienteExceptionHandler.
 @Slf4j
 public class ClienteExceptionHandler {
 

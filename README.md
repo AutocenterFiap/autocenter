@@ -6,129 +6,146 @@
   <img alt="Java" src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java">
   <img alt="Spring Boot" src="https://img.shields.io/badge/Spring_Boot-3.3.4-brightgreen?style=for-the-badge&logo=spring-boot">
   <img alt="MySQL" src="https://img.shields.io/badge/MySQL-Blue?style=for-the-badge&logo=mysql">
+  <img alt="Kubernetes" src="https://img.shields.io/badge/Kubernetes-Kind-326CE5?style=for-the-badge&logo=kubernetes">
+  <img alt="Terraform" src="https://img.shields.io/badge/Terraform-1.6+-7B42BC?style=for-the-badge&logo=terraform">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
 </p>
 
 ## 🚀 Visão Geral
 
-A **API AutoCenter FIAP** é um sistema RESTful desenvolvido para o gerenciamento completo de uma oficina mecânica. Ela permite controlar clientes, veículos, serviços e produtos, provendo uma base sólida para as operações diárias de um Auto Center. 
+A **API AutoCenter FIAP** é um sistema RESTful para gerenciamento completo de uma oficina mecânica — clientes, veículos, serviços e produtos — com segurança **OAuth2/JWT** e documentação interativa via **Swagger**.
 
-A aplicação foi construída com foco em boas práticas, utilizando **Java 21**, **Spring Boot 3.3.4**, e garantindo segurança através de **OAuth2 com JWT**. Toda a API possui documentação interativa via **OpenAPI/Swagger**.
+A infraestrutura roda localmente em **Kubernetes (Kind)** e é provisionada 100% via **Terraform**: cluster, build Docker, carga da imagem e todos os recursos Kubernetes são criados automaticamente com um único comando.
 
-## 🛠️ Tecnologias Utilizadas
+---
 
-- **Linguagem:** Java 21
-- **Framework:** Spring Boot 3.3.4
-- **Persistência:** Spring Data JPA, Flyway (Migrações)
-- **Banco de Dados:** H2 Database (Desenvolvimento) / MySQL (Produção)
-- **Segurança:** Spring Security (OAuth2 + JWT)
-- **Cache:** Caffeine
-- **Documentação:** Springdoc OpenAPI (Swagger)
+## 🛠️ Tecnologias
 
-> *"Optamos pelo MySQL porque é mais simples de configurar e tem suporte nativo em diversas ferramentas que utilizamos no curso. Isso nos permitiu focar na implementação da arquitetura em camadas, segurança com OAuth2/JWT e documentação com Swagger, sem gastar tempo excessivo em ajustes de banco. Além disso, o MySQL é amplamente usado em ambientes acadêmicos e corporativos, o que facilita encontrar suporte e exemplos."*
+| Camada | Tecnologia |
+|---|---|
+| Linguagem | Java 21 |
+| Framework | Spring Boot 3.3.4 |
+| Banco de Dados | MySQL 8.0 (prod) / H2 (dev) |
+| Persistência | Spring Data JPA + Flyway |
+| Segurança | Spring Security (OAuth2 + JWT) |
+| Secrets | Infisical (gerenciador de secrets) |
+| Orquestração | Kubernetes (Kind) |
+| IaC | Terraform |
+| Documentação | Springdoc OpenAPI (Swagger) |
+
+---
 
 ## 📂 Estrutura do Projeto
 
-O projeto segue uma arquitetura baseada em camadas, organizada da seguinte forma:
-
 ```text
-br.com.autocenterfiap.domain
-┌─ controller  # Endpoints REST
-├─ dto         # Objetos de Transferência de Dados
-├─ enums       # Enumerações
-├─ exception   # Tratamento global de erros
-├─ handler     # Manipuladores de exceção
-├─ mapper      # Conversão entre DTOs e Models
-├─ model       # Entidades JPA
-├─ repository  # Interfaces de acesso a dados
-├─ service     # Lógica de negócio
-└─ validator   # Validações customizadas
+auto-center-fiap/
+├── src/                    # Código-fonte Java (Clean Architecture)
+├── docker/                 # Dockerfile e docker-compose
+├── k8s/                    # Manifestos Kubernetes (alternativa ao Terraform)
+├── terraform/              # Infraestrutura como código (recomendado)
+│   ├── main.tf             # Cluster Kind + build Docker (via local-exec)
+│   ├── kubernetes.tf       # Recursos Kubernetes (namespace, MySQL, app, HPA)
+│   ├── variables.tf        # Variáveis de entrada
+│   ├── outputs.tf          # Saídas úteis pós-deploy
+│   └── terraform.tfvars.example  # Modelo de configuração
+└── db/migration/           # Scripts Flyway
 ```
 
-## ⚙️ Como Rodar Localmente
+---
 
-É muito simples rodar o projeto na sua máquina. Siga os passos abaixo:
+## ⚡ Subir a aplicação (Terraform — recomendado)
 
-### Pré-requisitos
-- JDK 21 instalado
-- Git
-- (Opcional) Docker e Docker Compose para rodar com banco MySQL local
+> **Pré-requisitos:** Docker, Kind, kubectl e Terraform instalados.
+> Consulte [terraform/README.md](terraform/README.md) para instruções de instalação.
 
-### Passo a Passo (H2 Database - Memória)
-
-A forma mais rápida de rodar é utilizando o perfil de desenvolvimento (`dev`), que sobe um banco H2 em memória automaticamente.
-
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/liamfer/autocenter-fiap.git
-   cd autocenter-fiap
-   ```
-
-2. **Execute a aplicação usando o Maven Wrapper:**
-   ```bash
-   # No Windows
-   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
-
-   # No Linux/Mac
-   ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-   ```
-
-3. Pronto! A API estará rodando em `http://localhost:8097`.
-
-### Rodando com Docker (MySQL)
-Se quiser rodar a aplicação simulando o ambiente de produção com MySQL utilizando os contêineres já configurados:
+### 1. Configurar variáveis
 
 ```bash
-cd docker
+cd terraform/
+cp terraform.tfvars.example terraform.tfvars
+# Edite terraform.tfvars com suas credenciais do MySQL e Infisical
+```
+
+### 2. Inicializar o Terraform
+
+```bash
+terraform init
+```
+
+### 3. Subir tudo
+
+```bash
+terraform apply -auto-approve
+```
+
+O Terraform cria o cluster Kind, faz o build Docker, carrega a imagem e sobe todos os recursos Kubernetes automaticamente. Aguarde de **8 a 15 minutos** na primeira execução.
+
+### 4. Acessar a aplicação
+
+```bash
+kubectl port-forward service/auto-center-fiap-service 8080:80 -n auto-center
+```
+
+- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
+- **Health Check:** http://localhost:8080/actuator/health
+
+### 5. Remover tudo
+
+```bash
+terraform destroy -auto-approve
+```
+
+---
+
+## 🖥️ Rodar Localmente (sem Kubernetes)
+
+Para desenvolvimento rápido com H2 em memória:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+A API estará em `http://localhost:8097`.
+
+Para rodar com MySQL via Docker Compose:
+
+```bash
+cd docker/
 docker-compose up -d
 ```
 
-## 🔑 Autenticação e Login de Admin
+---
 
-A API é protegida utilizando o padrão OAuth2 com JWT. Para testar os endpoints restritos, você precisará gerar um token de acesso usando as credenciais de administrador padrão.
+## 🔑 Autenticação
 
-**Credenciais de Acesso (Admin):**
-```json
-{
-  "nome": "ADMIN",
-  "senha": "ADMIN"
-}
-```
-
-**Como Autenticar:**
-1. Faça uma requisição `POST` para o endpoint de login (`/v1/oauth/token`) enviando um JSON com as credenciais acima.
-2. Copie o token JWT retornado na resposta.
-3. Se estiver usando o Swagger UI, clique no botão **Authorize** e insira o token, ou adicione o seguinte Header nas suas requisições:
-   ```text
-   Authorization: Bearer <seu_token_jwt>
-   ```
-
-## 📖 Documentação da API
-
-Com a aplicação rodando localmente, você pode acessar a documentação interativa e testar os endpoints diretamente pelo navegador:
-
-- **Swagger UI:** [http://localhost:8097/swagger-ui/index.html](http://localhost:8097/swagger-ui/index.html)
-- **OpenAPI JSON:** [http://localhost:8097/api-docs](http://localhost:8097/v3/api-docs)
-
-## 🥢 Testes
-
-A aplicação conta com uma robusta suíte de testes unitários e de integração. Para executá-los:
+A API usa OAuth2 com JWT. Para obter um token:
 
 ```bash
-# No Windows
-mvnw.cmd test
+curl -X POST http://localhost:8080/v1/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{"nome": "ADMIN", "senha": "ADMIN"}'
+```
 
-# No Linux/Mac
+Use o token retornado no header:
+```
+Authorization: Bearer <token>
+```
+
+Ou clique em **Authorize** no Swagger UI.
+
+---
+
+## 📖 Documentação
+
+- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
+- **Terraform (infra):** [terraform/README.md](terraform/README.md)
+- **Kubernetes (manifests):** [k8s/README.md](k8s/README.md)
+- **Diagramas DDD:** https://miro.com/app/board/uXjVGxJbbQU=/
+
+---
+
+## 🧪 Testes
+
+```bash
 ./mvnw test
 ```
-## 📖 Diagramas DDD
-
-Você pode acessar todos os diagramas de DDD pelo navegador:
-
-- **Plataforma miro:** [https://miro.com/app/board/uXjVGxJbbQU=/](http://localhost:8097/swagger-ui/index.html)
-
-## 📌 Próximos Passos
-
-- [ ] Configurar CI/CD (GitHub Actions)
-- [ ] Adicionar monitoramento (Actuator + Prometheus + Grafana)
-- [ ] Melhorar ainda mais a cobertura de testes (JaCoCo)

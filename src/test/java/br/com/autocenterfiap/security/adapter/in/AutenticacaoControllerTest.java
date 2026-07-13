@@ -12,13 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -29,9 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AutenticacaoController.class)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@MockBean(JpaMetamodelMappingContext.class)
+@ActiveProfiles("test")
 class AutenticacaoControllerTest {
 
     @Autowired
@@ -50,8 +50,6 @@ class AutenticacaoControllerTest {
     private BuscarUsuarioPorNomeUseCase buscarUsuarioPorNomeUseCase;
 
     private List<PerfilJpaEntity> perfisMock;
-    private List<PerfilResponse> perfisResponseMock;
-    private List<PerfilRequest> perfisRequestMock;
 
     @BeforeEach
     void setUp() {

@@ -1,0 +1,21 @@
+# Arquivo de exemplo — NÃO commite o terraform.tfvars real no Git!
+# Copie este arquivo: cp terraform.tfvars.example terraform.tfvars
+# O arquivo terraform.tfvars já está no .gitignore.
+
+cluster_name = "auto-center"
+app_image    = "ghcr.io/SEU_USUARIO/auto-center-fiap:latest"
+app_replicas = 2
+
+# MySQL
+mysql_root_password = "troque-pela-senha-root"
+mysql_database      = "autocenter"
+mysql_user          = "autocenter_user"
+mysql_password      = "troque-pela-senha-app"
+
+# Infisical (https://app.infisical.com)
+infisical_client_id     = "seu-client-id"
+infisical_client_secret = "seu-client-secret"
+infisical_project_id    = "seu-project-id"
+infisical_environment   = "prod"
+infisical_secret_path   = "/"
+

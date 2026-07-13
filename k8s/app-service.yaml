@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auto-center-fiap-service
+  namespace: auto-center
+  labels:
+    app: auto-center-fiap
+    component: api
+spec:
+  # ─── Use LoadBalancer para cloud providers (AWS, GCP, Azure) ───────
+  # ─── Use NodePort para ambientes locais / on-premise ───────────────
+  type: LoadBalancer
+  selector:
+    app: auto-center-fiap
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8097
+      protocol: TCP
+  # sessionAffinity: ClientIP   # descomente se precisar de sticky session
+

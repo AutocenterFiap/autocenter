@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: auto-center
+  labels:
+    app: auto-center-fiap
+    environment: production
+

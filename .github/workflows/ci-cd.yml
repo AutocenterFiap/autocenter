@@ -1,0 +1,231 @@
+name: CI/CD — Auto Center FIAP
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  JAVA_VERSION: '21'
+
+# ──────────────────────────────────────────────────────────────────────────────
+# JOBS
+# ──────────────────────────────────────────────────────────────────────────────
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 1 — Build e Testes
+  # Compila a aplicação e executa os testes automatizados com Maven.
+  # ─────────────────────────────────────────────────────────────────
+  build-and-test:
+    name: 🔨 Build e Testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build e execução dos testes (Maven)
+        run: mvn clean verify --batch-mode
+
+      - name: Publicar relatório de testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 7
+
+      - name: Publicar relatório de cobertura (JaCoCo)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 2 — Build e Push da imagem Docker
+  # Executa apenas no push para main (não em PRs).
+  # Publica no GitHub Container Registry (GHCR) — gratuito.
+  # ─────────────────────────────────────────────────────────────────
+  docker:
+    name: 🐳 Build e Push Docker
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      packages: write   # necessário para publicar no GHCR
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extrair metadados da imagem
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # Tag com SHA curto do commit (ex: sha-a1b2c3d)
+            type=sha,prefix=sha-,format=short
+            # Tag "latest" sempre atualizada na main
+            type=raw,value=latest,enable=true
+
+      - name: Build e Push da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Cache de camadas para acelerar builds futuros
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 3 — Deploy do Banco de Dados
+  # Aplica os manifestos do MySQL no cluster Kubernetes.
+  # Requer o secret KUBECONFIG configurado no repositório.
+  # ─────────────────────────────────────────────────────────────────
+  deploy-database:
+    name: 🗄️ Deploy Banco de Dados
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configurar kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          kubectl cluster-info
+
+      - name: Criar/Atualizar Namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Criar/Atualizar ConfigMap
+        run: kubectl apply -f k8s/configmap.yaml
+
+      - name: Criar/Atualizar Secret
+        # Os secrets vêm do GitHub Secrets (Settings → Secrets and variables → Actions)
+        run: |
+          kubectl create secret generic auto-center-secrets \
+            --namespace=auto-center \
+            --from-literal=MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+            --from-literal=MYSQL_DATABASE="autocenter" \
+            --from-literal=MYSQL_USER="${{ secrets.MYSQL_USER }}" \
+            --from-literal=MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}" \
+            --from-literal=INFISICAL_CLIENT_ID="${{ secrets.INFISICAL_CLIENT_ID }}" \
+            --from-literal=INFISICAL_CLIENT_SECRET="${{ secrets.INFISICAL_CLIENT_SECRET }}" \
+            --from-literal=INFISICAL_PROJECT_ID="${{ secrets.INFISICAL_PROJECT_ID }}" \
+            --save-config \
+            --dry-run=client \
+            -o yaml | kubectl apply -f -
+
+      - name: Deploy do PVC do MySQL
+        run: kubectl apply -f k8s/mysql-pvc.yaml
+
+      - name: Deploy do MySQL
+        run: |
+          kubectl apply -f k8s/mysql-deployment.yaml
+          kubectl apply -f k8s/mysql-service.yaml
+
+      - name: Aguardar MySQL ficar pronto
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l app=mysql \
+            -n auto-center \
+            --timeout=180s
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 4 — Deploy da Aplicação
+  # Aplica os manifestos da API Spring Boot e o HPA.
+  # ─────────────────────────────────────────────────────────────────
+  deploy-app:
+    name: 🚀 Deploy da Aplicação
+    runs-on: ubuntu-latest
+    needs: [docker, deploy-database]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configurar kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Substituir tag da imagem no Deployment
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${SHORT_SHA}"
+          sed -i "s|image: auto-center-fiap:latest|image: ${IMAGE}|g" k8s/app-deployment.yaml
+          echo "Imagem configurada: ${IMAGE}"
+
+      - name: Aplicar manifestos da aplicação
+        run: |
+          kubectl apply -f k8s/app-deployment.yaml
+          kubectl apply -f k8s/app-service.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Aguardar rollout da aplicação
+        run: |
+          kubectl rollout status deployment/auto-center-fiap \
+            -n auto-center \
+            --timeout=180s
+
+      - name: Verificar status final do deploy
+        run: |
+          echo "====== Pods ======"
+          kubectl get pods -n auto-center
+
+          echo "====== Services ======"
+          kubectl get services -n auto-center
+
+          echo "====== HPA ======"
+          kubectl get hpa -n auto-center
+
+          echo "====== Imagem em uso ======"
+          kubectl get deployment auto-center-fiap -n auto-center \
+            -o jsonpath='{.spec.template.spec.containers[0].image}'
+          echo ""
+

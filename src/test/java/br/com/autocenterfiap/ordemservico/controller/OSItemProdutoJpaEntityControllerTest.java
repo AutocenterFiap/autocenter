@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.ordemservico.controller;
 
-import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemProdutoJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.domain.enums.TipoProduto;
 import br.com.autocenterfiap.produto.domain.enums.UnidadeMedida;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("OSItemProdutoController - Testes de Integração")
-class OSItemProdutoControllerTest {
+class OSItemProdutoJpaEntityControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,21 +48,21 @@ class OSItemProdutoControllerTest {
     private ProdutoJpaRepository produtoRepository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @Autowired
-    private OSItemProdutoRepository osItemProdutoRepository;
+    private OSItemProdutoJpaRepository osItemProdutoJpaRepository;
 
     private ProdutoJpaEntity produto;
     private Long osId;
-    private OrdemServico ordemServico;
+    private OrdemServicoJpaEntity ordemServicoJpaEntity;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
-        osItemProdutoRepository.deleteAll();
-        osItemProdutoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
+        osItemProdutoJpaRepository.deleteAll();
+        osItemProdutoJpaRepository.flush();
         produtoRepository.deleteAll();
         produtoRepository.flush();
 
@@ -80,8 +80,8 @@ class OSItemProdutoControllerTest {
                 .build();
         produto = produtoRepository.save(produtoEntity);
 
-        ordemServico = ordemServicoRepository.save(new OrdemServico());
-        osId = ordemServico.getId(); 
+        ordemServicoJpaEntity = ordemServicoJpaRepository.save(new OrdemServicoJpaEntity());
+        osId = ordemServicoJpaEntity.getId();
     }
 
     @Test
@@ -135,12 +135,12 @@ class OSItemProdutoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE /v1/ordem-servicos/{osId}/produtos/{produtoId} deve remover e devolver estoque")
     void deveRemoverProdutoDaOSEDevolverEstoque() throws Exception {
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(5);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         produto.setQuantidadeEstoque(45); // simula estoque já decrementado
         produtoRepository.save(produto);
@@ -156,12 +156,12 @@ class OSItemProdutoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("GET /v1/ordem-servicos/{osId}/produtos deve listar produtos da OS")
     void deveListarProdutosDaOS() throws Exception {
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(2);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         mockMvc.perform(get("/v1/ordem-servicos/{osId}/produtos", osId))
                 .andExpect(status().isOk())
@@ -177,12 +177,12 @@ class OSItemProdutoControllerTest {
         produto.setQuantidadeEstoque(47);
         produtoRepository.save(produto);
 
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(3);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         // Atualiza para quantidade 5 → deve decrementar mais 2 do estoque
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 5);
@@ -206,12 +206,12 @@ class OSItemProdutoControllerTest {
         produto.setQuantidadeEstoque(45);
         produtoRepository.save(produto);
 
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(5);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         // Atualiza para quantidade 2 → deve devolver 3 ao estoque
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 2);
@@ -234,12 +234,12 @@ class OSItemProdutoControllerTest {
         produto.setQuantidadeEstoque(2);
         produtoRepository.save(produto);
 
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(3);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         // Tenta aumentar para 100 → estoque tem só 2, insuficiente para mais 97
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(produto.getId(), 100);
@@ -263,7 +263,7 @@ class OSItemProdutoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dataCriacao", notNullValue()));
 
-        OSItemProduto itemPersistido = osItemProdutoRepository.findByOrdemServicoId(osId).get(0);
+        OSItemProdutoJpaEntity itemPersistido = osItemProdutoJpaRepository.findByOrdemServicoJpaEntityId(osId, ).get(0);
         assertNotNull(itemPersistido.getDataCriacao(), "dataCriacao deve ser preenchida pelo @PrePersist");
         assertNotNull(itemPersistido.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser preenchida pelo @PrePersist");
     }
@@ -272,12 +272,12 @@ class OSItemProdutoControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PUT deve atualizar dataUltimaAtualizacao no OSItemProduto após modificação")
     void deveAtualizarDataUltimaAtualizacaoAoModificar() throws Exception {
-        OSItemProduto item = new OSItemProduto();
-        item.setOrdemServico(ordemServico);
+        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+        item.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
         item.setProduto(produto);
         item.setQuantidade(2);
         item.setPrecoUnitarioNoMomento(produto.getPrecoUnitario());
-        osItemProdutoRepository.save(item);
+        osItemProdutoJpaRepository.save(item);
 
         assertNotNull(item.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser preenchida pelo @PrePersist");
 
@@ -291,7 +291,7 @@ class OSItemProdutoControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
 
-        OSItemProduto itemAtualizado = osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(osId, produto.getId()).orElseThrow();
+        OSItemProdutoJpaEntity itemAtualizado = osItemProdutoJpaRepository.findByOrdemServicoJpaEntityIdAndProdutoId(osId, produto.getId()).orElseThrow();
         assertNotNull(itemAtualizado.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve be updated by @PreUpdate");
     }
 }

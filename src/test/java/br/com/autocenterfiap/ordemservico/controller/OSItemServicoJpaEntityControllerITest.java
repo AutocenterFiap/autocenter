@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.ordemservico.controller;
 
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoRequestDTO;
-import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
-import br.com.autocenterfiap.ordemservico.model.OSItemServico;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoRequestDTO;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
 import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.ServicoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("OSItemServicoController - Testes de Integração")
-class OSItemServicoControllerITest {
+class OSItemServicoJpaEntityControllerITest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,33 +40,33 @@ class OSItemServicoControllerITest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private OSItemServicoRepository osItemServicoRepository;
+    private OSItemServicoJpaRepository osItemServicoJpaRepository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @Autowired
     private ServicoJpaRepository servicoRepository;
 
-    private OrdemServico osEmDiagnostico;
-    private OrdemServico osEmExecucao;
-    private OrdemServico osFinalizada;
+    private OrdemServicoJpaEntity osEmDiagnostico;
+    private OrdemServicoJpaEntity osEmExecucao;
+    private OrdemServicoJpaEntity osFinalizada;
     private ServicoJpaEntity servicoAtivo;
     private ServicoJpaEntity servicoInativo;
 
     @BeforeEach
     void setUp() {
-        osEmDiagnostico = ordemServicoRepository.findAll().stream()
+        osEmDiagnostico = ordemServicoJpaRepository.findAll().stream()
                 .filter(os -> os.getNumeroOrdemServico() != null && os.getNumeroOrdemServico() == 1001L)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("OS 1001 não encontrada na migration"));
 
-        osEmExecucao = ordemServicoRepository.findAll().stream()
+        osEmExecucao = ordemServicoJpaRepository.findAll().stream()
                 .filter(os -> os.getNumeroOrdemServico() != null && os.getNumeroOrdemServico() == 1002L)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("OS 1002 não encontrada na migration"));
 
-        osFinalizada = ordemServicoRepository.findAll().stream()
+        osFinalizada = ordemServicoJpaRepository.findAll().stream()
                 .filter(os -> os.getNumeroOrdemServico() != null && os.getNumeroOrdemServico() == 1003L)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("OS 1003 não encontrada na migration"));
@@ -188,8 +188,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /iniciar - 200 deve iniciar serviço AGUARDANDO_INICIO em OS EM_EXECUCAO")
     void deveIniciarServicoComSucesso() throws Exception {
-        OSItemServico itemAguardando = osItemServicoRepository
-                .findByOrdemServicoId(osEmExecucao.getId()).stream()
+        OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.AGUARDANDO_INICIO)
                 .findFirst()
                 .orElseThrow();
@@ -207,8 +207,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /iniciar - 400 quando OS não está em EM_EXECUCAO")
     void deveRetornar400AoIniciarServicoEmOSComStatusInvalido() throws Exception {
-        OSItemServico itemDiagnostico = osItemServicoRepository
-                .findByOrdemServicoId(osEmDiagnostico.getId()).stream()
+        OSItemServicoJpaEntity itemDiagnostico = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -222,8 +222,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /iniciar - 400 quando item não está em AGUARDANDO_INICIO")
     void deveRetornar400AoIniciarServicoComStatusItemInvalido() throws Exception {
-        OSItemServico itemExecutando = osItemServicoRepository
-                .findByOrdemServicoId(osEmExecucao.getId()).stream()
+        OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.EXECUTANDO)
                 .findFirst()
                 .orElseThrow();
@@ -248,8 +248,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /finalizar - 200 deve finalizar serviço EXECUTANDO")
     void deveFinalizarServicoComSucesso() throws Exception {
-        OSItemServico itemExecutando = osItemServicoRepository
-                .findByOrdemServicoId(osEmExecucao.getId()).stream()
+        OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.EXECUTANDO)
                 .findFirst()
                 .orElseThrow();
@@ -267,8 +267,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("PATCH /finalizar - 400 quando item não está em EXECUTANDO")
     void deveRetornar400AoFinalizarServicoComStatusItemInvalido() throws Exception {
-        OSItemServico itemAguardando = osItemServicoRepository
-                .findByOrdemServicoId(osEmExecucao.getId()).stream()
+        OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.AGUARDANDO_INICIO)
                 .findFirst()
                 .orElseThrow();
@@ -293,8 +293,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE - 204 deve remover serviço AGUARDANDO_INICIO em OS EM_DIAGNOSTICO")
     void deveRemoverServicoComSucesso() throws Exception {
-        OSItemServico itemAguardando = osItemServicoRepository
-                .findByOrdemServicoId(osEmDiagnostico.getId()).stream()
+        OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -313,8 +313,8 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE - 400 quando OS não está em EM_DIAGNOSTICO")
     void deveRetornar400AoRemoverServicoEmOSComStatusInvalido() throws Exception {
-        OSItemServico itemExecutando = osItemServicoRepository
-                .findByOrdemServicoId(osEmExecucao.getId()).stream()
+        OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -328,13 +328,13 @@ class OSItemServicoControllerITest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("DELETE - 400 quando item não está em AGUARDANDO_INICIO")
     void deveRetornar400AoRemoverServicoComStatusItemInvalido() throws Exception {
-        OSItemServico itemDiagnostico = osItemServicoRepository
-                .findByOrdemServicoId(osEmDiagnostico.getId()).stream()
+        OSItemServicoJpaEntity itemDiagnostico = osItemServicoJpaRepository
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
                 .findFirst()
                 .orElseThrow();
 
         itemDiagnostico.setStatusServico(StatusItemServico.EXECUTANDO);
-        osItemServicoRepository.save(itemDiagnostico);
+        osItemServicoJpaRepository.save(itemDiagnostico);
 
         mockMvc.perform(delete("/v1/ordem-servico/{osId}/servicos/{servicoId}",
                         osEmDiagnostico.getId(), itemDiagnostico.getServico().getId())

@@ -4,11 +4,11 @@ import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoUpdateDTO;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("OrdemServicoController - Testes de Integração")
-class OrdemServicoControllerTest {
+class OrdemServicoJpaEntityControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +48,7 @@ class OrdemServicoControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private OrdemServicoRepository repository;
+    private OrdemServicoJpaRepository repository;
 
     @Autowired
     private VeiculoJpaRepository veiculoRepository;
@@ -58,7 +58,7 @@ class OrdemServicoControllerTest {
 
     private Cliente cliente;
     private VeiculoJpaEntity veiculo;
-    private OrdemServico ordemServico;
+    private OrdemServicoJpaEntity ordemServicoJpaEntity;
 
     @BeforeEach
     void setUp() {
@@ -100,18 +100,18 @@ class OrdemServicoControllerTest {
         veiculo.setCategoriaVeiculo(CategoriaVeiculo.CARRO);
         veiculo = veiculoRepository.save(veiculo);
 
-        ordemServico = new OrdemServico();
-        ordemServico.setNumeroOrdemServico(1001L);
-        ordemServico.setStatusOS(StatusOS.ABERTA);
-        ordemServico.setValorTotal(BigDecimal.ZERO);
-        ordemServico.setVeiculo(veiculo);
-        ordemServico.setCliente(cliente);
+        ordemServicoJpaEntity = new OrdemServicoJpaEntity();
+        ordemServicoJpaEntity.setNumeroOrdemServico(1001L);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.ABERTA);
+        ordemServicoJpaEntity.setValorTotal(BigDecimal.ZERO);
+        ordemServicoJpaEntity.setVeiculo(veiculo);
+        ordemServicoJpaEntity.setCliente(cliente);
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveListarTodasAsOrdensDeServico() throws Exception {
-        repository.save(ordemServico);
+        repository.save(ordemServicoJpaEntity);
 
         mockMvc.perform(get("/v1/ordem-servicos")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -132,7 +132,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarOrdemServicoPorIdComSucesso() throws Exception {
-        OrdemServico saved = repository.save(ordemServico);
+        OrdemServicoJpaEntity saved = repository.save(ordemServicoJpaEntity);
 
         mockMvc.perform(get("/v1/ordem-servicos/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -153,7 +153,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarOrdemServicoPorNumeroComSucesso() throws Exception {
-        repository.save(ordemServico);
+        repository.save(ordemServicoJpaEntity);
 
         mockMvc.perform(get("/v1/ordem-servicos/numero/{numeroOs}", 1001L)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -201,7 +201,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveAtualizarStatusOrdemServicoComSucesso() throws Exception {
-        OrdemServico saved = repository.save(ordemServico);
+        OrdemServicoJpaEntity saved = repository.save(ordemServicoJpaEntity);
 
         OrdemServicoUpdateDTO dto = new OrdemServicoUpdateDTO(StatusOS.RECEBIDA);
         String json = objectMapper.writeValueAsString(dto);
@@ -217,7 +217,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoTentarAtualizarComStatusInvalido() throws Exception {
-        OrdemServico saved = repository.save(ordemServico);
+        OrdemServicoJpaEntity saved = repository.save(ordemServicoJpaEntity);
 
         OrdemServicoUpdateDTO dto = new OrdemServicoUpdateDTO(StatusOS.AGUARDANDO_APROVACAO);
         String json = objectMapper.writeValueAsString(dto);
@@ -243,7 +243,7 @@ class OrdemServicoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveDeletarOrdemServicoComSucesso() throws Exception {
-        OrdemServico saved = repository.save(ordemServico);
+        OrdemServicoJpaEntity saved = repository.save(ordemServicoJpaEntity);
 
         mockMvc.perform(delete("/v1/ordem-servicos/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON))

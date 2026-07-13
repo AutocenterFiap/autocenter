@@ -2,7 +2,8 @@ package br.com.autocenterfiap.ordemservico.validator;
 
 import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.application.validator.ClienteValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

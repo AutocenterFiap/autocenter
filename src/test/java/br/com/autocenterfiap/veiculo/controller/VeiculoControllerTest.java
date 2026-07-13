@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.veiculo.controller;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.adapter.in.dto.VeiculoRequestDTO;
 import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
@@ -41,15 +41,15 @@ class VeiculoControllerTest {
     private VeiculoJpaRepository repository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     private VeiculoJpaEntity veiculo;
     private VeiculoJpaEntity veiculoSegundo;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
         repository.deleteAll();
         repository.flush();
 

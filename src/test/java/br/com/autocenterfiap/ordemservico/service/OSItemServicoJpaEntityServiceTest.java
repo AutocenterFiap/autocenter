@@ -1,16 +1,16 @@
 package br.com.autocenterfiap.ordemservico.service;
 
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoRequestDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
-import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.exception.OSItemServicoNaoEncontradoException;
-import br.com.autocenterfiap.ordemservico.exception.StatusOSInvalidoException;
-import br.com.autocenterfiap.ordemservico.exception.StatusOSItemInvalidoException;
-import br.com.autocenterfiap.ordemservico.model.OSItemServico;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoRequestDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoResponseDTO;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.application.exception.OSItemServicoNaoEncontradoException;
+import br.com.autocenterfiap.ordemservico.application.exception.StatusOSInvalidoException;
+import br.com.autocenterfiap.ordemservico.application.exception.StatusOSItemInvalidoException;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.servico.domain.enums.StatusServico;
 import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import br.com.autocenterfiap.ordemservico.dto.MetricaTempoGastoServicoDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.MetricaTempoGastoServicoDTO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,13 +38,13 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OSItemServicoService - Testes Unitários")
-class OSItemServicoServiceTest {
+class OSItemServicoJpaEntityServiceTest {
 
     @Mock
-    private OSItemServicoRepository osItemServicoRepository;
+    private OSItemServicoJpaRepository osItemServicoJpaRepository;
 
     @Mock
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @Mock
     private ServicoJpaRepository servicoJpaRepository;
@@ -52,14 +52,14 @@ class OSItemServicoServiceTest {
     @InjectMocks
     private OSItemServicoService osItemServicoService;
 
-    private OrdemServico ordemServico;
+    private OrdemServicoJpaEntity ordemServicoJpaEntity;
     private ServicoJpaEntity servico;
-    private OSItemServico osItemServico;
+    private OSItemServicoJpaEntity osItemServicoJpaEntity;
 
     @BeforeEach
     void setUp() {
-        ordemServico = new OrdemServico();
-        ordemServico.setId(1L);
+        ordemServicoJpaEntity = new OrdemServicoJpaEntity();
+        ordemServicoJpaEntity.setId(1L);
 
         servico = new ServicoJpaEntity();
         servico.setId(5L);
@@ -67,281 +67,281 @@ class OSItemServicoServiceTest {
         servico.setValor(BigDecimal.valueOf(150.00));
         servico.setStatus(StatusServico.ATIVO);
 
-        osItemServico = new OSItemServico();
-        osItemServico.setId(10L);
-        osItemServico.setOrdemServico(ordemServico);
-        osItemServico.setServico(servico);
-        osItemServico.setValorItemServico(BigDecimal.valueOf(150.00));
-        osItemServico.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
-        osItemServico.setDataHoraInicio(LocalDateTime.now());
+        osItemServicoJpaEntity = new OSItemServicoJpaEntity();
+        osItemServicoJpaEntity.setId(10L);
+        osItemServicoJpaEntity.setOrdemServicoJpaEntity(ordemServicoJpaEntity);
+        osItemServicoJpaEntity.setServico(servico);
+        osItemServicoJpaEntity.setValorItemServico(BigDecimal.valueOf(150.00));
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        osItemServicoJpaEntity.setDataHoraInicio(LocalDateTime.now());
     }
 
     @Test
     @DisplayName("Deve listar todos os serviços de uma ordem de serviço")
     void deveListarTodosServicos() {
-        List<OSItemServico> itens = List.of(osItemServico);
-        when(osItemServicoRepository.findByOrdemServicoId(1L)).thenReturn(itens);
+        List<OSItemServicoJpaEntity> itens = List.of(osItemServicoJpaEntity);
+        when(osItemServicoJpaRepository.findByOrdemServicoJpaEntityId(1L, )).thenReturn(itens);
 
         List<OSItemServicoResponseDTO> resultado = osItemServicoService.listarPorOS(1L);
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().id()).isEqualTo(10L);
-        verify(osItemServicoRepository).findByOrdemServicoId(1L);
+        verify(osItemServicoJpaRepository).findByOrdemServicoJpaEntityId(1L, );
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há serviços na OS")
     void deveRetornarListaVaziaQuandoNaoHaServicos() {
-        when(osItemServicoRepository.findByOrdemServicoId(1L)).thenReturn(List.of());
+        when(osItemServicoJpaRepository.findByOrdemServicoJpaEntityId(1L, )).thenReturn(List.of());
 
         List<OSItemServicoResponseDTO> resultado = osItemServicoService.listarPorOS(1L);
 
         assertThat(resultado).isEmpty();
-        verify(osItemServicoRepository).findByOrdemServicoId(1L);
+        verify(osItemServicoJpaRepository).findByOrdemServicoJpaEntityId(1L, );
     }
 
     @Test
     @DisplayName("Deve adicionar serviço ativo na ordem de serviço")
     void deveAdicionarServicoNaOS() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
         when(servicoJpaRepository.findById(5L)).thenReturn(Optional.of(servico));
-        when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
+        when(osItemServicoJpaRepository.save(any(OSItemServicoJpaEntity.class))).thenReturn(osItemServicoJpaEntity);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.adicionarServicoNaOS(1L, dto);
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.id()).isEqualTo(10L);
         assertThat(resultado.valorItemServico()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
-        verify(ordemServicoRepository).findById(1L);
+        verify(ordemServicoJpaRepository).findById(1L);
         verify(servicoJpaRepository).findById(5L);
-        verify(osItemServicoRepository).save(any(OSItemServico.class));
+        verify(osItemServicoJpaRepository).save(any(OSItemServicoJpaEntity.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar adicionar serviço inativo")
     void deveLancarExcecaoAoAdicionarServicoInativo() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
         servico.setStatus(StatusServico.INATIVO);
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
         when(servicoJpaRepository.findById(5L)).thenReturn(Optional.of(servico));
 
         assertThatThrownBy(() -> osItemServicoService.adicionarServicoNaOS(1L, dto))
                 .isInstanceOf(ServicoInativoException.class)
                 .hasMessageContaining("Troca de óleo");
 
-        verify(ordemServicoRepository).findById(1L);
+        verify(ordemServicoJpaRepository).findById(1L);
         verify(servicoJpaRepository).findById(5L);
-        verify(osItemServicoRepository, never()).save(any());
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar adicionar serviço em OS com status inválido")
     void deveLancarExcecaoAoAdicionarServicoEmOSComStatusInvalido() {
-        ordemServico.setStatusOS(StatusOS.ABERTA);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.ABERTA);
         OSItemServicoRequestDTO dto = new OSItemServicoRequestDTO(5L);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
 
         assertThatThrownBy(() -> osItemServicoService.adicionarServicoNaOS(1L, dto))
                 .isInstanceOf(StatusOSInvalidoException.class)
                 .hasMessageContaining("EM_DIAGNOSTICO");
 
-        verify(ordemServicoRepository).findById(1L);
+        verify(ordemServicoJpaRepository).findById(1L);
         verify(servicoJpaRepository, never()).findById(any());
-        verify(osItemServicoRepository, never()).save(any());
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve iniciar serviço com sucesso")
     void deveIniciarServico() {
-        ordemServico.setStatusOS(StatusOS.EM_EXECUCAO);
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
-        when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_EXECUCAO);
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
+        when(osItemServicoJpaRepository.save(any(OSItemServicoJpaEntity.class))).thenReturn(osItemServicoJpaEntity);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.iniciarServico(1L, 5L);
 
         assertThat(resultado).isNotNull();
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository).save(any(OSItemServico.class));
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository).save(any(OSItemServicoJpaEntity.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao iniciar serviço não encontrado")
     void deveLancarExcecaoAoIniciarServicoNaoEncontrado() {
-        ordemServico.setStatusOS(StatusOS.EM_EXECUCAO);
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_EXECUCAO);
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> osItemServicoService.iniciarServico(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).save(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao iniciar serviço em OS com status inválido")
     void deveLancarExcecaoAoIniciarServicoEmOSComStatusInvalido() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
 
         assertThatThrownBy(() -> osItemServicoService.iniciarServico(1L, 5L))
                 .isInstanceOf(StatusOSInvalidoException.class)
                 .hasMessageContaining("EM_EXECUCAO");
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository, never()).findById(any());
-        verify(osItemServicoRepository, never()).save(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository, never()).findById(any());
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao iniciar serviço que não está em AGUARDANDO_INICIO")
     void deveLancarExcecaoAoIniciarServicoComStatusInvalido() {
-        ordemServico.setStatusOS(StatusOS.EM_EXECUCAO);
-        osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_EXECUCAO);
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.EXECUTANDO);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
 
         assertThatThrownBy(() -> osItemServicoService.iniciarServico(1L, 5L))
                 .isInstanceOf(StatusOSItemInvalidoException.class)
                 .hasMessageContaining("AGUARDANDO_INICIO");
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).save(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve finalizar serviço com sucesso")
     void deveFinalizarServico() {
-        osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
-        when(osItemServicoRepository.save(any(OSItemServico.class))).thenReturn(osItemServico);
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.EXECUTANDO);
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
+        when(osItemServicoJpaRepository.save(any(OSItemServicoJpaEntity.class))).thenReturn(osItemServicoJpaEntity);
 
         OSItemServicoResponseDTO resultado = osItemServicoService.finalizarServico(1L, 5L);
 
         assertThat(resultado).isNotNull();
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository).save(any(OSItemServico.class));
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository).save(any(OSItemServicoJpaEntity.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao finalizar serviço não encontrado")
     void deveLancarExcecaoAoFinalizarServicoNaoEncontrado() {
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> osItemServicoService.finalizarServico(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).save(any());
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao finalizar serviço que não está em EXECUTANDO")
     void deveLancarExcecaoAoFinalizarServicoComStatusInvalido() {
-        osItemServico.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
         assertThatThrownBy(() -> osItemServicoService.finalizarServico(1L, 5L))
                 .isInstanceOf(StatusOSInvalidoException.class)
                 .hasMessageContaining("EXECUTANDO");
 
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).save(any());
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Deve remover serviço da OS com sucesso")
     void deveRemoverServicoDaOS() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
-        ordemServico.getOsItensServicos().add(osItemServico);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        ordemServicoJpaEntity.getOsItensServicos().add(osItemServicoJpaEntity);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
 
         osItemServicoService.removerServicoDaOS(1L, 5L);
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        assertEquals(0, ordemServico.getOsItensServicos().size(), "O item deveria ter sido removido da lista");
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        assertEquals(0, ordemServicoJpaEntity.getOsItensServicos().size(), "O item deveria ter sido removido da lista");
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao remover serviço não encontrado")
     void deveLancarExcecaoAoRemoverServicoNaoEncontrado() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.empty());
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> osItemServicoService.removerServicoDaOS(1L, 5L))
                 .isInstanceOf(OSItemServicoNaoEncontradoException.class);
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).delete(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).delete(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao remover serviço de OS com status inválido")
     void deveLancarExcecaoAoRemoverServicoDeOSComStatusInvalido() {
-        ordemServico.setStatusOS(StatusOS.FINALIZADA);
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
+        ordemServicoJpaEntity.setStatusOS(StatusOS.FINALIZADA);
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
 
         assertThatThrownBy(() -> osItemServicoService.removerServicoDaOS(1L, 5L))
                 .isInstanceOf(StatusOSInvalidoException.class)
                 .hasMessageContaining("EM_DIAGNOSTICO");
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository, never()).findById(any());
-        verify(osItemServicoRepository, never()).delete(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository, never()).findById(any());
+        verify(osItemServicoJpaRepository, never()).delete(any());
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao remover serviço que não está em AGUARDANDO_INICIO")
     void deveLancarExcecaoAoRemoverServicoComStatusInvalido() {
-        ordemServico.setStatusOS(StatusOS.EM_DIAGNOSTICO);
-        osItemServico.setStatusServico(StatusItemServico.EXECUTANDO);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.EM_DIAGNOSTICO);
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.EXECUTANDO);
 
-        when(ordemServicoRepository.findById(1L)).thenReturn(Optional.of(ordemServico));
-        when(osItemServicoRepository.findByServicoIdAndOrdemServicoId(5L, 1L)).thenReturn(Optional.of(osItemServico));
+        when(ordemServicoJpaRepository.findById(1L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(osItemServicoJpaRepository.findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L)).thenReturn(Optional.of(osItemServicoJpaEntity));
 
         assertThatThrownBy(() -> osItemServicoService.removerServicoDaOS(1L, 5L))
                 .isInstanceOf(StatusOSItemInvalidoException.class)
                 .hasMessageContaining("AGUARDANDO_INICIO");
 
-        verify(ordemServicoRepository).findById(1L);
-        verify(osItemServicoRepository).findByServicoIdAndOrdemServicoId(5L, 1L);
-        verify(osItemServicoRepository, never()).delete(any());
+        verify(ordemServicoJpaRepository).findById(1L);
+        verify(osItemServicoJpaRepository).findByServicoIdAndOrdemServicoJpaEntityId(5L, 1L);
+        verify(osItemServicoJpaRepository, never()).delete(any());
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há serviços finalizados")
     void getMetricaTempoGastoServico_deveRetornarListaVaziaQuandoSemServicosFinalizados() {
-        osItemServico.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
         assertThat(resultado).isEmpty();
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não há itens no repositório")
     void getMetricaTempoGastoServico_deveRetornarListaVaziaQuandoRepositorioVazio() {
-        when(osItemServicoRepository.findAll()).thenReturn(List.of());
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of());
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
         assertThat(resultado).isEmpty();
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
@@ -350,18 +350,18 @@ class OSItemServicoServiceTest {
         LocalDateTime inicio = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
         LocalDateTime fim = LocalDateTime.of(2026, 1, 1, 9, 0, 0);
 
-        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
-        osItemServico.setDataHoraInicio(inicio);
-        osItemServico.setDataHoraFim(fim);
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServicoJpaEntity.setDataHoraInicio(inicio);
+        osItemServicoJpaEntity.setDataHoraFim(fim);
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
         assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("01:00:00");
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
@@ -369,26 +369,26 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveCalcularMediaParaMesmoServico() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        OSItemServico item1 = new OSItemServico();
+        OSItemServicoJpaEntity item1 = new OSItemServicoJpaEntity();
         item1.setServico(servico);
         item1.setStatusServico(StatusItemServico.FINALIZADO);
         item1.setDataHoraInicio(base);
         item1.setDataHoraFim(base.plusHours(1));
 
-        OSItemServico item2 = new OSItemServico();
+        OSItemServicoJpaEntity item2 = new OSItemServicoJpaEntity();
         item2.setServico(servico);
         item2.setStatusServico(StatusItemServico.FINALIZADO);
         item2.setDataHoraInicio(base);
         item2.setDataHoraFim(base.plusHours(3));
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(item1, item2));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(item1, item2));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
         assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:00:00");
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
@@ -402,19 +402,19 @@ class OSItemServicoServiceTest {
         servico2.setValor(BigDecimal.valueOf(80.00));
         servico2.setStatus(br.com.autocenterfiap.servico.domain.enums.StatusServico.ATIVO);
 
-        OSItemServico itemTrocaOleo = new OSItemServico();
+        OSItemServicoJpaEntity itemTrocaOleo = new OSItemServicoJpaEntity();
         itemTrocaOleo.setServico(servico);
         itemTrocaOleo.setStatusServico(StatusItemServico.FINALIZADO);
         itemTrocaOleo.setDataHoraInicio(base);
         itemTrocaOleo.setDataHoraFim(base.plusHours(1));
 
-        OSItemServico itemAlinhamento = new OSItemServico();
+        OSItemServicoJpaEntity itemAlinhamento = new OSItemServicoJpaEntity();
         itemAlinhamento.setServico(servico2);
         itemAlinhamento.setStatusServico(StatusItemServico.FINALIZADO);
         itemAlinhamento.setDataHoraInicio(base);
         itemAlinhamento.setDataHoraFim(base.plusMinutes(30));
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemTrocaOleo, itemAlinhamento));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(itemTrocaOleo, itemAlinhamento));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -432,7 +432,7 @@ class OSItemServicoServiceTest {
 
         assertThat(metricaTrocaOleo.tempoGastoMinutos()).isEqualTo("01:00:00");
         assertThat(metricaAlinhamento.tempoGastoMinutos()).isEqualTo("00:30:00");
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
@@ -440,30 +440,30 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveIgnorarServicosNaoFinalizados() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        OSItemServico itemFinalizado = new OSItemServico();
+        OSItemServicoJpaEntity itemFinalizado = new OSItemServicoJpaEntity();
         itemFinalizado.setServico(servico);
         itemFinalizado.setStatusServico(StatusItemServico.FINALIZADO);
         itemFinalizado.setDataHoraInicio(base);
         itemFinalizado.setDataHoraFim(base.plusHours(2));
 
-        OSItemServico itemExecutando = new OSItemServico();
+        OSItemServicoJpaEntity itemExecutando = new OSItemServicoJpaEntity();
         itemExecutando.setServico(servico);
         itemExecutando.setStatusServico(StatusItemServico.EXECUTANDO);
         itemExecutando.setDataHoraInicio(base);
 
-        OSItemServico itemAguardando = new OSItemServico();
+        OSItemServicoJpaEntity itemAguardando = new OSItemServicoJpaEntity();
         itemAguardando.setServico(servico);
         itemAguardando.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
         itemAguardando.setDataHoraInicio(base);
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando, itemAguardando));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando, itemAguardando));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().nomeServico()).isEqualTo("Troca de óleo");
         assertThat(resultado.getFirst().tempoGastoMinutos()).isEqualTo("02:00:00");
-        verify(osItemServicoRepository).findAll();
+        verify(osItemServicoJpaRepository).findAll();
     }
 
     @Test
@@ -471,11 +471,11 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveFormatarTempoZeroCorretamente() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
-        osItemServico.setDataHoraInicio(base);
-        osItemServico.setDataHoraFim(base);
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServicoJpaEntity.setDataHoraInicio(base);
+        osItemServicoJpaEntity.setDataHoraFim(base);
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -488,11 +488,11 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveFormatarApenasSegundosCorretamente() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
-        osItemServico.setDataHoraInicio(base);
-        osItemServico.setDataHoraFim(base.plusSeconds(45));
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServicoJpaEntity.setDataHoraInicio(base);
+        osItemServicoJpaEntity.setDataHoraFim(base.plusSeconds(45));
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -505,11 +505,11 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveFormatarTempoCompletoCorretamente() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
-        osItemServico.setDataHoraInicio(base);
-        osItemServico.setDataHoraFim(base.plusHours(2).plusMinutes(30).plusSeconds(15)); // 2h30m15s
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServicoJpaEntity.setDataHoraInicio(base);
+        osItemServicoJpaEntity.setDataHoraFim(base.plusHours(2).plusMinutes(30).plusSeconds(15)); // 2h30m15s
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -522,25 +522,25 @@ class OSItemServicoServiceTest {
     void calculaMediaServicos_deveCalcularMediaCorretaParaMultiplasExecucoes() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        OSItemServico item1 = new OSItemServico();
+        OSItemServicoJpaEntity item1 = new OSItemServicoJpaEntity();
         item1.setServico(servico);
         item1.setStatusServico(StatusItemServico.FINALIZADO);
         item1.setDataHoraInicio(base);
         item1.setDataHoraFim(base.plusMinutes(30));
 
-        OSItemServico item2 = new OSItemServico();
+        OSItemServicoJpaEntity item2 = new OSItemServicoJpaEntity();
         item2.setServico(servico);
         item2.setStatusServico(StatusItemServico.FINALIZADO);
         item2.setDataHoraInicio(base);
         item2.setDataHoraFim(base.plusMinutes(60));
 
-        OSItemServico item3 = new OSItemServico();
+        OSItemServicoJpaEntity item3 = new OSItemServicoJpaEntity();
         item3.setServico(servico);
         item3.setStatusServico(StatusItemServico.FINALIZADO);
         item3.setDataHoraInicio(base);
         item3.setDataHoraFim(base.plusMinutes(90));
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(item1, item2, item3));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(item1, item2, item3));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -554,18 +554,18 @@ class OSItemServicoServiceTest {
     void calculaMediaServicos_deveExcluirItensNaoFinalizados() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        OSItemServico itemFinalizado = new OSItemServico();
+        OSItemServicoJpaEntity itemFinalizado = new OSItemServicoJpaEntity();
         itemFinalizado.setServico(servico);
         itemFinalizado.setStatusServico(StatusItemServico.FINALIZADO);
         itemFinalizado.setDataHoraInicio(base);
         itemFinalizado.setDataHoraFim(base.plusHours(2));
 
-        OSItemServico itemExecutando = new OSItemServico();
+        OSItemServicoJpaEntity itemExecutando = new OSItemServicoJpaEntity();
         itemExecutando.setServico(servico);
         itemExecutando.setStatusServico(StatusItemServico.EXECUTANDO);
         itemExecutando.setDataHoraInicio(base);
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(itemFinalizado, itemExecutando));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 
@@ -578,11 +578,11 @@ class OSItemServicoServiceTest {
     void getMetricaTempoGastoServico_deveRetornarNomeServicoCorreto() {
         LocalDateTime base = LocalDateTime.of(2026, 1, 1, 8, 0, 0);
 
-        osItemServico.setStatusServico(StatusItemServico.FINALIZADO);
-        osItemServico.setDataHoraInicio(base);
-        osItemServico.setDataHoraFim(base.plusHours(1));
+        osItemServicoJpaEntity.setStatusServico(StatusItemServico.FINALIZADO);
+        osItemServicoJpaEntity.setDataHoraInicio(base);
+        osItemServicoJpaEntity.setDataHoraFim(base.plusHours(1));
 
-        when(osItemServicoRepository.findAll()).thenReturn(List.of(osItemServico));
+        when(osItemServicoJpaRepository.findAll()).thenReturn(List.of(osItemServicoJpaEntity));
 
         List<MetricaTempoGastoServicoDTO> resultado = osItemServicoService.getMetricaTempoGastoServico();
 

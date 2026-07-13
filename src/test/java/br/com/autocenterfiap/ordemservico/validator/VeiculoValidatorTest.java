@@ -1,6 +1,7 @@
 package br.com.autocenterfiap.ordemservico.validator;
 
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.application.validator.VeiculoValidator;
 import br.com.autocenterfiap.veiculo.domain.exception.VeiculoNaoEncontradoException;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.junit.jupiter.api.Assertions;

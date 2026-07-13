@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.ordemservico.service;
 
-import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OSItemProdutoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemProdutoJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoRequestDTO;
 import br.com.autocenterfiap.produto.adapter.in.dto.OSItemProdutoResponseDTO;
 import br.com.autocenterfiap.produto.domain.enums.UnidadeMedida;
@@ -30,23 +30,23 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OSItemProdutoService - Testes Unitários")
-class OSItemProdutoServiceTest {
+class OSItemProdutoJpaEntityServiceTest {
 
     @Mock
-    private OSItemProdutoRepository osItemProdutoRepository;
+    private OSItemProdutoJpaRepository osItemProdutoJpaRepository;
 
     @Mock
     private ProdutoJpaRepository produtoJpaRepository;
 
     @Mock
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @InjectMocks
     private OSItemProdutoService osItemProdutoService;
 
     private ProdutoJpaEntity produto;
-    private OrdemServico os;
-    private OSItemProduto osItem;
+    private OrdemServicoJpaEntity os;
+    private OSItemProdutoJpaEntity osItem;
 
     @BeforeEach
     void setUp() {
@@ -61,12 +61,12 @@ class OSItemProdutoServiceTest {
         produto.setCategoria("Motor");
         produto.setAtivo(true);
 
-        os = new OrdemServico();
+        os = new OrdemServicoJpaEntity();
         os.setId(10L);
 
-        osItem = new OSItemProduto();
+        osItem = new OSItemProdutoJpaEntity();
         osItem.setId(1L);
-        osItem.setOrdemServico(os);
+        osItem.setOrdemServicoJpaEntity(os);
         osItem.setProduto(produto);
         osItem.setQuantidade(2);
     }
@@ -77,14 +77,14 @@ class OSItemProdutoServiceTest {
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 3);
 
         when(produtoJpaRepository.findById(1L)).thenReturn(Optional.of(produto));
-        when(osItemProdutoRepository.save(any(OSItemProduto.class))).thenReturn(osItem);
-        when(ordemServicoRepository.getReferenceById(10L)).thenReturn(os);
+        when(osItemProdutoJpaRepository.save(any(OSItemProdutoJpaEntity.class))).thenReturn(osItem);
+        when(ordemServicoJpaRepository.getReferenceById(10L)).thenReturn(os);
 
         OSItemProdutoResponseDTO result = osItemProdutoService.adicionarProdutoNaOS(10L, dto);
 
         assertNotNull(result);
         assertEquals(47, produto.getQuantidadeEstoque()); // 50 - 3 = 47
-        verify(osItemProdutoRepository, times(1)).save(any(OSItemProduto.class));
+        verify(osItemProdutoJpaRepository, times(1)).save(any(OSItemProdutoJpaEntity.class));
     }
 
     @Test
@@ -96,7 +96,7 @@ class OSItemProdutoServiceTest {
         when(produtoJpaRepository.findById(1L)).thenReturn(Optional.of(produto));
 
         assertThrows(ProdutoInativoException.class, () -> osItemProdutoService.adicionarProdutoNaOS(10L, dto));
-        verify(osItemProdutoRepository, never()).save(any());
+        verify(osItemProdutoJpaRepository, never()).save(any());
     }
 
     @Test
@@ -115,7 +115,7 @@ class OSItemProdutoServiceTest {
     void deveRemoverProdutoDaOSEDevolverEstoque() {
         os.getOsItensProdutos().add(osItem);
         
-        when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
+        when(osItemProdutoJpaRepository.findByOrdemServicoJpaEntityIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
 
         osItemProdutoService.removerProdutoDaOS(10L, 1L);
@@ -128,7 +128,7 @@ class OSItemProdutoServiceTest {
     @Test
     @DisplayName("Deve lançar OSItemProdutoNaoEncontradoException ao remover produto não vinculado")
     void deveLancarExcecaoAoRemoverItemInexistente() {
-        when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 99L))
+        when(osItemProdutoJpaRepository.findByOrdemServicoJpaEntityIdAndProdutoId(10L, 99L))
                 .thenReturn(Optional.empty());
 
         assertThrows(OSItemProdutoNaoEncontradoException.class,
@@ -138,7 +138,7 @@ class OSItemProdutoServiceTest {
     @Test
     @DisplayName("Deve listar produtos de uma OS")
     void deveListarProdutosDaOS() {
-        when(osItemProdutoRepository.findByOrdemServicoId(10L)).thenReturn(List.of(osItem));
+        when(osItemProdutoJpaRepository.findByOrdemServicoJpaEntityId(10L, )).thenReturn(List.of(osItem));
 
         List<OSItemProdutoResponseDTO> result = osItemProdutoService.listarPorOS(10L);
 
@@ -151,7 +151,7 @@ class OSItemProdutoServiceTest {
     void deveAtualizarQuantidadeAumentandoEstoque() {
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 5); // era 2, agora 5
 
-        when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
+        when(osItemProdutoJpaRepository.findByOrdemServicoJpaEntityIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);
@@ -164,7 +164,7 @@ class OSItemProdutoServiceTest {
     void deveAtualizarQuantidadeReduzindoEstoque() {
         OSItemProdutoRequestDTO dto = new OSItemProdutoRequestDTO(1L, 1); // era 2, agora 1
 
-        when(osItemProdutoRepository.findByOrdemServicoIdAndProdutoId(10L, 1L))
+        when(osItemProdutoJpaRepository.findByOrdemServicoJpaEntityIdAndProdutoId(10L, 1L))
                 .thenReturn(Optional.of(osItem));
 
         osItemProdutoService.atualizarQuantidade(10L, 1L, dto);

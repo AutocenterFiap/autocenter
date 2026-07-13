@@ -9,7 +9,7 @@ import br.com.autocenterfiap.cliente.mapper.ClienteMapper;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class ClienteServiceTest {
     private ClienteRepository clienteRepository;
 
     @Mock
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @Mock
     private ClienteMapper clienteMapper;
@@ -564,25 +564,25 @@ class ClienteServiceTest {
     @Test
     void deveDeletarClienteComSucesso() {
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(clientePF));
-        when(ordemServicoRepository.existsByClienteId(1L)).thenReturn(false);
+        when(ordemServicoJpaRepository.existsByClienteId(1L)).thenReturn(false);
         doNothing().when(clienteRepository).delete(any(Cliente.class));
 
         assertDoesNotThrow(() -> clienteService.deletar(1L));
 
         verify(clienteRepository, times(1)).findById(1L);
-        verify(ordemServicoRepository, times(1)).existsByClienteId(1L);
+        verify(ordemServicoJpaRepository, times(1)).existsByClienteId(1L);
         verify(clienteRepository, times(1)).delete(clientePF);
     }
 
     @Test
     void deveLancarExcecaoAoDeletarClienteEmUso() {
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(clientePF));
-        when(ordemServicoRepository.existsByClienteId(1L)).thenReturn(true);
+        when(ordemServicoJpaRepository.existsByClienteId(1L)).thenReturn(true);
 
         assertThrows(ClienteEmUsoException.class, () -> clienteService.deletar(1L));
 
         verify(clienteRepository, times(1)).findById(1L);
-        verify(ordemServicoRepository, times(1)).existsByClienteId(1L);
+        verify(ordemServicoJpaRepository, times(1)).existsByClienteId(1L);
         verify(clienteRepository, never()).delete(any(Cliente.class));
     }
 

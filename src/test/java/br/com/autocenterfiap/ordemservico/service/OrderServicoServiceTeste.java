@@ -1,7 +1,8 @@
 package br.com.autocenterfiap.ordemservico.service;
 
 import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.exception.StatusOSInvalidoException;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.application.exception.StatusOSInvalidoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

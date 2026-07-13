@@ -1,9 +1,10 @@
 package br.com.autocenterfiap.servico.controller;
 
-import br.com.autocenterfiap.ordemservico.model.OSItemServico;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
-import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.servico.adapter.in.dto.ServicoRequestDTO;
 import br.com.autocenterfiap.servico.domain.enums.StatusServico;
 import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.entity.ServicoJpaEntity;
@@ -45,10 +46,10 @@ class ServicoControllerTest {
     private ServicoJpaRepository servicoRepository;
 
     @Autowired
-    private OSItemServicoRepository osItemServicoRepository;
+    private OSItemServicoJpaRepository osItemServicoJpaRepository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     private ServicoJpaEntity servico;
 
@@ -56,8 +57,8 @@ class ServicoControllerTest {
 
     @BeforeEach
     void setUp() {
-        osItemServicoRepository.deleteAll();
-        osItemServicoRepository.flush();
+        osItemServicoJpaRepository.deleteAll();
+        osItemServicoJpaRepository.flush();
         servicoRepository.deleteAll();
         servicoRepository.flush();
         
@@ -228,17 +229,17 @@ class ServicoControllerTest {
         ServicoJpaEntity servicoSalvo = servicoRepository.save(servico);
         servicoRepository.flush();
 
-        OrdemServico os = ordemServicoRepository.findAll().stream()
+        OrdemServicoJpaEntity os = ordemServicoJpaRepository.findAll().stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Nenhuma OrdemServico encontrada para associar"));
 
-        OSItemServico item = new OSItemServico();
-        item.setOrdemServico(os);
+        OSItemServicoJpaEntity item = new OSItemServicoJpaEntity();
+        item.setOrdemServicoJpaEntity(os);
         item.setServico(servicoSalvo);
         item.setValorItemServico(BigDecimal.valueOf(100));
-        item.setStatusServico(br.com.autocenterfiap.ordemservico.enums.StatusItemServico.AGUARDANDO_INICIO);
-        osItemServicoRepository.save(item);
-        osItemServicoRepository.flush();
+        item.setStatusServico(StatusItemServico.AGUARDANDO_INICIO);
+        osItemServicoJpaRepository.save(item);
+        osItemServicoJpaRepository.flush();
 
         mockMvc.perform(delete("/v1/servicos/{id}", servicoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))

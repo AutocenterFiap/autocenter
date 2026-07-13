@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.veiculo.repository;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
@@ -31,15 +31,15 @@ class VeiculoRepositoryTest {
     private VeiculoJpaRepository repository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     private VeiculoJpaEntity veiculo;
     private VeiculoJpaEntity veiculoSegundo;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
         repository.deleteAll();
         repository.flush();
 

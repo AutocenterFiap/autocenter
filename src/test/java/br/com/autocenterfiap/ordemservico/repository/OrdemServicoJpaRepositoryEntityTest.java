@@ -4,8 +4,9 @@ import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
 import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
@@ -30,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("OrdemServicoRepository - Testes de Integração")
-class OrdemServicoRepositoryTest {
+class OrdemServicoJpaRepositoryEntityTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private OrdemServicoRepository repository;
+    private OrdemServicoJpaRepository repository;
 
     @Autowired
     private VeiculoJpaRepository veiculoRepository;
@@ -46,8 +47,8 @@ class OrdemServicoRepositoryTest {
 
     private Cliente cliente;
     private VeiculoJpaEntity veiculo;
-    private OrdemServico ordemServico;
-    private OrdemServico ordemServicoSecundaria;
+    private OrdemServicoJpaEntity ordemServicoJpaEntity;
+    private OrdemServicoJpaEntity ordemServicoJpaEntitySecundaria;
 
     @BeforeEach
     void setUp() {
@@ -88,30 +89,30 @@ class OrdemServicoRepositoryTest {
         veiculo.setTipoCombustivel(TipoCombustivel.DIESEL);
         veiculo.setCategoriaVeiculo(CategoriaVeiculo.CARRO);
 
-        ordemServico = new OrdemServico();
-        ordemServico.setNumeroOrdemServico(1001L);
-        ordemServico.setStatusOS(StatusOS.ABERTA);
-        ordemServico.setValorTotal(BigDecimal.ZERO);
+        ordemServicoJpaEntity = new OrdemServicoJpaEntity();
+        ordemServicoJpaEntity.setNumeroOrdemServico(1001L);
+        ordemServicoJpaEntity.setStatusOS(StatusOS.ABERTA);
+        ordemServicoJpaEntity.setValorTotal(BigDecimal.ZERO);
 
-        ordemServicoSecundaria = new OrdemServico();
-        ordemServicoSecundaria.setNumeroOrdemServico(1002L);
-        ordemServicoSecundaria.setStatusOS(StatusOS.FINALIZADA);
-        ordemServicoSecundaria.setValorTotal(BigDecimal.valueOf(150.0));
+        ordemServicoJpaEntitySecundaria = new OrdemServicoJpaEntity();
+        ordemServicoJpaEntitySecundaria.setNumeroOrdemServico(1002L);
+        ordemServicoJpaEntitySecundaria.setStatusOS(StatusOS.FINALIZADA);
+        ordemServicoJpaEntitySecundaria.setValorTotal(BigDecimal.valueOf(150.0));
     }
 
     private void persistDependencies() {
         cliente = entityManager.persist(cliente);
         veiculo = entityManager.persist(veiculo);
-        ordemServico.setCliente(cliente);
-        ordemServico.setVeiculo(veiculo);
-        ordemServicoSecundaria.setCliente(cliente);
-        ordemServicoSecundaria.setVeiculo(veiculo);
+        ordemServicoJpaEntity.setCliente(cliente);
+        ordemServicoJpaEntity.setVeiculo(veiculo);
+        ordemServicoJpaEntitySecundaria.setCliente(cliente);
+        ordemServicoJpaEntitySecundaria.setVeiculo(veiculo);
     }
 
     @Test
     public void deveSalvarOrdemServicoQuandoValida() {
         persistDependencies();
-        OrdemServico salvo = entityManager.persist(ordemServico);
+        OrdemServicoJpaEntity salvo = entityManager.persist(ordemServicoJpaEntity);
         entityManager.flush();
 
         assertNotNull(salvo.getId());
@@ -122,11 +123,11 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveRetornarListaDeOrdensDeServicoQuandoHouverCadastradas() {
         persistDependencies();
-        entityManager.persist(ordemServico);
-        entityManager.persist(ordemServicoSecundaria);
+        entityManager.persist(ordemServicoJpaEntity);
+        entityManager.persist(ordemServicoJpaEntitySecundaria);
         entityManager.flush();
 
-        List<OrdemServico> ordens = repository.findAll();
+        List<OrdemServicoJpaEntity> ordens = repository.findAll();
 
         assertNotNull(ordens);
         assertEquals(2, ordens.size());
@@ -135,24 +136,24 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveDeletarOrdemServicoQuandoIdExistir() {
         persistDependencies();
-        OrdemServico salvo = entityManager.persist(ordemServico);
+        OrdemServicoJpaEntity salvo = entityManager.persist(ordemServicoJpaEntity);
         entityManager.flush();
 
         repository.deleteById(salvo.getId());
         entityManager.flush();
 
-        Optional<OrdemServico> deletado = repository.findById(salvo.getId());
+        Optional<OrdemServicoJpaEntity> deletado = repository.findById(salvo.getId());
         assertTrue(deletado.isEmpty());
     }
 
     @Test
     public void deveRetornarListaDeOrdensQuandoBuscarPorStatusExistente() {
         persistDependencies();
-        entityManager.persist(ordemServico);
-        entityManager.persist(ordemServicoSecundaria);
+        entityManager.persist(ordemServicoJpaEntity);
+        entityManager.persist(ordemServicoJpaEntitySecundaria);
         entityManager.flush();
 
-        List<OrdemServico> encontradas = repository.findByStatus(StatusOS.ABERTA);
+        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.ABERTA);
 
         assertNotNull(encontradas);
         assertEquals(1, encontradas.size());
@@ -162,10 +163,10 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveRetornarListaVaziaQuandoBuscarPorStatusInexistente() {
         persistDependencies();
-        entityManager.persist(ordemServico);
+        entityManager.persist(ordemServicoJpaEntity);
         entityManager.flush();
 
-        List<OrdemServico> encontradas = repository.findByStatus(StatusOS.CANCELADA);
+        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.CANCELADA);
 
         assertNotNull(encontradas);
         assertTrue(encontradas.isEmpty());
@@ -174,10 +175,10 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveRetornarOrdemServicoQuandoBuscarPorNumeroExistente() {
         persistDependencies();
-        entityManager.persist(ordemServico);
+        entityManager.persist(ordemServicoJpaEntity);
         entityManager.flush();
 
-        Optional<OrdemServico> encontrada = repository.findByNumeroOrdemServico(1001L);
+        Optional<OrdemServicoJpaEntity> encontrada = repository.findByNumeroOrdemServico(1001L);
 
         assertTrue(encontrada.isPresent());
         assertEquals(1001L, encontrada.get().getNumeroOrdemServico());
@@ -185,7 +186,7 @@ class OrdemServicoRepositoryTest {
 
     @Test
     public void deveRetornarVazioQuandoBuscarPorNumeroInexistente() {
-        Optional<OrdemServico> encontrada = repository.findByNumeroOrdemServico(9999L);
+        Optional<OrdemServicoJpaEntity> encontrada = repository.findByNumeroOrdemServico(9999L);
         assertTrue(encontrada.isEmpty());
     }
 
@@ -193,7 +194,7 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveRetornarTrueQuandoVeiculoTiverOrdemServicoComStatusEspecifico() {
         persistDependencies();
-        entityManager.persist(ordemServico); // Status ABERTA
+        entityManager.persist(ordemServicoJpaEntity); // Status ABERTA
         entityManager.flush();
 
         boolean existe = repository.existsByVeiculoIdAndStatusOSIn(veiculo.getId(), List.of(StatusOS.ABERTA, StatusOS.RECEBIDA));
@@ -204,7 +205,7 @@ class OrdemServicoRepositoryTest {
     @Test
     public void deveRetornarFalseQuandoVeiculoTiverOrdemServicoMasComOutroStatus() {
         persistDependencies();
-        entityManager.persist(ordemServico); // Status ABERTA
+        entityManager.persist(ordemServicoJpaEntity); // Status ABERTA
         entityManager.flush();
 
         boolean existe = repository.existsByVeiculoIdAndStatusOSIn(veiculo.getId(), List.of(StatusOS.FINALIZADA, StatusOS.CANCELADA));

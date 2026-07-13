@@ -4,7 +4,7 @@ import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;
 import br.com.autocenterfiap.cliente.model.Endereco;
 import br.com.autocenterfiap.cliente.repository.ClienteRepository;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ class ClienteControllerITest {
     private ClienteRepository clienteRepository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     private Cliente clientePF;
     private Cliente clientePJ;
@@ -50,8 +50,8 @@ class ClienteControllerITest {
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
         clienteRepository.deleteAll();
         clienteRepository.flush();
 

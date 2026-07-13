@@ -6,7 +6,6 @@ import br.com.autocenterfiap.ordemservico.domain.entity.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.produto.domain.exception.OSItemProdutoNaoEncontradoException;
 import br.com.autocenterfiap.util.Util;
-import org.springframework.transaction.annotation.Transactional;
 
 public class RemoverProdutoNaOrdemServicoUseCase {
 
@@ -19,7 +18,6 @@ public class RemoverProdutoNaOrdemServicoUseCase {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
     }
 
-    @Transactional
     public void executar(Long ordemServicoId, Long produtoId) {
         OSItemProduto item = this.itemProdutoRepositoryPort.findByOrdemServicoIdAndProdutoId(ordemServicoId, produtoId)
                 .orElseThrow(() -> new OSItemProdutoNaoEncontradoException(ordemServicoId, produtoId));

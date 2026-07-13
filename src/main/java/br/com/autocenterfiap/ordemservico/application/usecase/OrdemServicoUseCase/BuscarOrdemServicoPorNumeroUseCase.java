@@ -5,7 +5,6 @@ import br.com.autocenterfiap.ordemservico.application.exception.OrdemServicoNaoE
 import br.com.autocenterfiap.ordemservico.application.mapper.OrdemServicoApplicationMapper;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
-import org.springframework.transaction.annotation.Transactional;
 
 public class BuscarOrdemServicoPorNumeroUseCase {
 
@@ -16,7 +15,6 @@ public class BuscarOrdemServicoPorNumeroUseCase {
         this.repositoryPort = repositoryPort;
     }
 
-    @Transactional(readOnly = true)
     public OrdemServicoOutput executar(Long numero) {
         OrdemServico ordemServico = this.repositoryPort.findByNumeroOrdemServico(numero)
                 .orElseThrow(() -> new OrdemServicoNaoEncontradaException("Ordem de serviço não encontrada para o número: " + numero));

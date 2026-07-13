@@ -3,7 +3,6 @@ package br.com.autocenterfiap.ordemservico.application.usecase.OrdemServicoUseCa
 import br.com.autocenterfiap.ordemservico.application.exception.OrdemServicoNaoEncontradaException;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
-import org.springframework.transaction.annotation.Transactional;
 
 public class DeletarOrdemServicoUseCase {
 
@@ -13,7 +12,6 @@ public class DeletarOrdemServicoUseCase {
         this.repositoryPort = repositoryPort;
     }
 
-    @Transactional
     public void executar(Long id) {
         OrdemServico ordemServico = this.repositoryPort.findById(id)
                 .orElseThrow(() -> new OrdemServicoNaoEncontradaException("Ordem de Serviço não encontrada para o id: "

@@ -5,7 +5,6 @@ import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
 import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
@@ -20,7 +19,6 @@ public class BuscarMetricasTempoGastoServicoUseCase {
         this.itemServicoRepositoryPort = itemServicoRepositoryPort;
     }
 
-    @Transactional(readOnly = true)
     public PageResult<MetricaTempoGastoServicoOutput> executar(PaginationRequest pagination) {
         log.info("Calculando métrica de tempo gasto por serviço");
 

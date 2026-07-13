@@ -8,7 +8,6 @@ import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoReposito
 import br.com.autocenterfiap.ordemservico.domain.entity.OSItemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,7 +21,6 @@ public class FinalizarServicoUseCase {
         this.itemServicoRepositoryPort = itemServicoRepositoryPort;
     }
 
-    @Transactional
     public OSItemServicoOutput executar(Long servicoId, Long ordemServicoId) {
 
         OSItemServico osItemServico = this.itemServicoRepositoryPort.findByServicoIdAndOrdemServicoId(servicoId, ordemServicoId)

@@ -5,7 +5,6 @@ import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
 import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
 import br.com.autocenterfiap.ordemservico.application.mapper.OSItemServicoApplicationMapper;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
-import org.springframework.transaction.annotation.Transactional;
 
 public class ListarTodosPorOrdemServicoUseCase {
 
@@ -15,7 +14,6 @@ public class ListarTodosPorOrdemServicoUseCase {
         this.itemServicoRepositoryPort = itemServicoRepositoryPort;
     }
 
-    @Transactional(readOnly = true)
     public PageResult<OSItemServicoOutput> executar(Long ordermServicoId, PaginationRequest pagination) {
         return this.itemServicoRepositoryPort.findByOrdemServicoId(ordermServicoId ,pagination)
                 .map(OSItemServicoApplicationMapper::toOutput);

@@ -9,7 +9,6 @@ import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.produto.domain.entity.Produto;
 import br.com.autocenterfiap.produto.domain.exception.OSItemProdutoNaoEncontradoException;
 import br.com.autocenterfiap.util.Util;
-import org.springframework.transaction.annotation.Transactional;
 
 public class AtualizarQuantidadeUseCase {
 
@@ -20,7 +19,6 @@ public class AtualizarQuantidadeUseCase {
         this.itemProdutoRepositoryPort = itemProdutoRepositoryPort;
     }
 
-    @Transactional
     public OSItemProdutoOutput executar(Long ordemServicoId, Long produtoId, OSItemProdutoQuantidadeInput quantidadeInput) {
         OSItemProduto item = this.itemProdutoRepositoryPort.findByOrdemServicoIdAndProdutoId(ordemServicoId, produtoId)
                 .orElseThrow(() -> new OSItemProdutoNaoEncontradoException(ordemServicoId, produtoId));

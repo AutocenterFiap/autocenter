@@ -12,8 +12,6 @@ import br.com.autocenterfiap.ordemservico.application.validator.OrdemServicoVali
 import br.com.autocenterfiap.veiculo.application.port.VeiculoRepositoryPort;
 import br.com.autocenterfiap.veiculo.domain.entity.Veiculo;
 import br.com.autocenterfiap.veiculo.domain.exception.VeiculoNaoEncontradoException;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 public class CriarOrdemServicoUseCase {
@@ -30,7 +28,6 @@ public class CriarOrdemServicoUseCase {
         this.validators = validators;
     }
 
-    @Transactional
     public OrdemServicoOutput executar(CriarOrdemServicoInput input) {
         validators.forEach(validator -> validator.validate(input));
 

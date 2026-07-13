@@ -7,8 +7,6 @@ import br.com.autocenterfiap.ordemservico.application.mapper.OrdemServicoApplica
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
-import org.springframework.transaction.annotation.Transactional;
-
 public class AtualizarOrdemServicoUseCase {
 
     private final OrdemServicoRepositoryPort repositoryPort;
@@ -17,7 +15,6 @@ public class AtualizarOrdemServicoUseCase {
         this.repositoryPort = repositoryPort;
     }
 
-    @Transactional
     public OrdemServicoOutput executar(Long id, AtualizarOrdemServicoInput ordemServicoInput) {
 
         OrdemServico ordemServico = this.repositoryPort.findById(id)

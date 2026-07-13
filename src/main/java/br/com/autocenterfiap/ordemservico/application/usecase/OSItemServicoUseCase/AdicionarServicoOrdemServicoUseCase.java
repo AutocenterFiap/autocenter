@@ -18,7 +18,6 @@ import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.domain.exception.ServicoNaoEncontradoException;
 import br.com.autocenterfiap.util.Util;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 public class AdicionarServicoOrdemServicoUseCase {
@@ -37,7 +36,6 @@ public class AdicionarServicoOrdemServicoUseCase {
         this.servicoRepositoryPort = servicoRepositoryPort;
     }
 
-    @Transactional
     public OSItemServicoOutput executar(Long ordemServicoId, OSItemServicoInput itemServicoInput) {
         log.info("Adicionando serviço ID={} na Ordem de Serviço ID={}", itemServicoInput.servicoId(), ordemServicoId);
 

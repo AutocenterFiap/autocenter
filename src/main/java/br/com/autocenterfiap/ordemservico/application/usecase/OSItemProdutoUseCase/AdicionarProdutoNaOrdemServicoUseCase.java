@@ -13,7 +13,6 @@ import br.com.autocenterfiap.produto.domain.entity.Produto;
 import br.com.autocenterfiap.produto.domain.exception.ProdutoInativoException;
 import br.com.autocenterfiap.produto.domain.exception.ProdutoNaoEncontradoException;
 import br.com.autocenterfiap.util.Util;
-import org.springframework.transaction.annotation.Transactional;
 
 public class AdicionarProdutoNaOrdemServicoUseCase {
 
@@ -27,7 +26,6 @@ public class AdicionarProdutoNaOrdemServicoUseCase {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
     }
 
-    @Transactional
     public OSItemProdutoOutput executar(Long ordemServicoId, OSItemProdutoQuantidadeInput itemProdutoInput) {
         Produto produto = this.produtoRepositoryPort.buscarPorId(itemProdutoInput.produtoId())
                 .orElseThrow(() -> new ProdutoNaoEncontradoException(itemProdutoInput.produtoId()));

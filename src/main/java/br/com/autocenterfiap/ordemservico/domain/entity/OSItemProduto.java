@@ -1,7 +1,6 @@
 package br.com.autocenterfiap.ordemservico.domain.entity;
 
 import br.com.autocenterfiap.produto.domain.entity.Produto;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,16 +36,5 @@ public class OSItemProduto implements Serializable {
         if (isNull(precoUnitarioNoMomento) || isNull(quantidade))
             return BigDecimal.ZERO;
         return this.precoUnitarioNoMomento.multiply(BigDecimal.valueOf(this.quantidade));
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.dataCriacao = LocalDateTime.now();
-        this.dataUltimaAtualizacao = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.dataUltimaAtualizacao = LocalDateTime.now();
     }
 }

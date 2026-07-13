@@ -13,7 +13,6 @@ import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +30,6 @@ public class IniciarServicoUseCase {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
     }
 
-    @Transactional
     public OSItemServicoOutput executar(Long ordemServicoId, Long servicoId) {
         log.info("Iniciando execução do serviço: OS ID={}, Serviço ID={}", ordemServicoId, servicoId);
 

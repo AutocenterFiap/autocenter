@@ -12,7 +12,6 @@ import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import br.com.autocenterfiap.util.Util;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 public class RemoverServicoDaOrdemServicoUseCase {
@@ -28,7 +27,6 @@ public class RemoverServicoDaOrdemServicoUseCase {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
     }
 
-    @Transactional
     public void executar(Long ordemServicoId, Long servicoId) {
         log.info("Removendo serviço da OS: OS ID={}, Serviço ID={}", ordemServicoId, servicoId);
 

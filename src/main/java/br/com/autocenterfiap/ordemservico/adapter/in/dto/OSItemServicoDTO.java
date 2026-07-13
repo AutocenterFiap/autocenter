@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.ordemservico.dto;
+package br.com.autocenterfiap.ordemservico.adapter.in.dto;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;

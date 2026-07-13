@@ -1,9 +1,15 @@
-package br.com.autocenterfiap.ordemservico.controller;
+package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoDTO;
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoResponseDTO;
-import br.com.autocenterfiap.ordemservico.dto.OrdemServicoUpdateDTO;
-import br.com.autocenterfiap.ordemservico.service.OrdemServicoService;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoResponseDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoUpdateDTO;
+import br.com.autocenterfiap.ordemservico.adapter.mapper.OrdemServicoAdapterMapper;
+import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.AtualizarOrdemServicoInput;
+import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.CriarOrdemServicoInput;
+import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServicoOutput;
+import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
+import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
+import br.com.autocenterfiap.ordemservico.application.usecase.OrdemServicoUseCase.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +28,21 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Ordens de Serviço", description = "API para gerenciamento de ordens de serviço da oficina")
 public class OrdemServicoController {
 
-    private final OrdemServicoService ordemServicoService;
+    private final CriarOrdemServicoUseCase criarOrdemServicoUseCase;
+    private final ListarTodasOrdensServicosUseCase listarTodasOrdensServicosUseCase;
+    private final BuscarOrdemServicoPorIdUseCase buscarOrdemServicoPorIdUseCase;
+    private final BuscarOrdemServicoPorNumeroUseCase buscarOrdemServicoPorNumeroUseCase;
+    private final AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase;
+    private final DeletarOrdemServicoUseCase deletarOrdemServicoUseCase;
 
-    public OrdemServicoController(OrdemServicoService ordemServicoService) {
-        this.ordemServicoService = ordemServicoService;
+
+    public OrdemServicoController(CriarOrdemServicoUseCase criarOrdemServicoUseCase, ListarTodasOrdensServicosUseCase listarTodasOrdensServicosUseCase, BuscarOrdemServicoPorIdUseCase buscarOrdemServicoPorIdUseCase, BuscarOrdemServicoPorNumeroUseCase buscarOrdemServicoPorNumeroUseCase, AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase, DeletarOrdemServicoUseCase deletarOrdemServicoUseCase) {
+        this.criarOrdemServicoUseCase = criarOrdemServicoUseCase;
+        this.listarTodasOrdensServicosUseCase = listarTodasOrdensServicosUseCase;
+        this.buscarOrdemServicoPorIdUseCase = buscarOrdemServicoPorIdUseCase;
+        this.buscarOrdemServicoPorNumeroUseCase = buscarOrdemServicoPorNumeroUseCase;
+        this.atualizarOrdemServicoUseCase = atualizarOrdemServicoUseCase;
+        this.deletarOrdemServicoUseCase = deletarOrdemServicoUseCase;
     }
 
     @Operation(
@@ -38,8 +54,14 @@ public class OrdemServicoController {
             description = "Lista de ordens de serviço retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<Page<OrdemServicoResponseDTO>> listarTodos(Pageable pageable) {
-        return ResponseEntity.ok(ordemServicoService.listarTodos(pageable));
+    public ResponseEntity<PageResult<OrdemServicoResponseDTO>> listarTodos(Pageable pageable) {
+
+        PaginationRequest pagination = new PaginationRequest(pageable.getPageNumber(), pageable.getPageSize());
+
+        return ResponseEntity.ok(
+            listarTodasOrdensServicosUseCase.executar(pagination)
+                .map(OrdemServicoAdapterMapper::ordemServicoToOrdemServicoResponseDTO)
+        );
     }
 
     @Operation(
@@ -60,7 +82,13 @@ public class OrdemServicoController {
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServicoResponseDTO> buscarPorId(@Parameter(description = "ID da Ordem de Serviço a ser buscada", required = true) 
                                                                @PathVariable Long id) {
-        return ResponseEntity.ok(ordemServicoService.buscarPorId(id));
+
+        OrdemServicoOutput ordemServicoOutput = buscarOrdemServicoPorIdUseCase.executar(id);
+
+        OrdemServicoResponseDTO responseDTO = OrdemServicoAdapterMapper
+                .ordemServicoToOrdemServicoResponseDTO(ordemServicoOutput);
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     @Operation(
@@ -81,7 +109,13 @@ public class OrdemServicoController {
     @GetMapping("/numero/{numeroOs}")
     public ResponseEntity<OrdemServicoResponseDTO> buscarPorNumero(@Parameter(description = "Número da Ordem de Serviço a ser buscada", required = true) 
                                                                    @PathVariable Long numeroOs){
-        return ResponseEntity.ok(ordemServicoService.buscarPorNumeroOrdemServico(numeroOs));
+
+        OrdemServicoOutput ordemServicoOutput = buscarOrdemServicoPorNumeroUseCase.executar(numeroOs);
+
+        OrdemServicoResponseDTO ordemServicoResponseDTO = OrdemServicoAdapterMapper
+                .ordemServicoToOrdemServicoResponseDTO(ordemServicoOutput);
+
+        return ResponseEntity.ok(ordemServicoResponseDTO);
     }
 
     @Operation(
@@ -106,7 +140,11 @@ public class OrdemServicoController {
     @PostMapping
     public ResponseEntity<OrdemServicoResponseDTO> criar(@Parameter(description = "Dados para criação da ordem de serviço", required = true)
                                                          @RequestBody @Valid OrdemServicoDTO dto) {
-        OrdemServicoResponseDTO responseDTO = ordemServicoService.criar(dto);
+
+        CriarOrdemServicoInput servicoInput = OrdemServicoAdapterMapper.ordemServicoToCriarOrdemServicoInput(dto);
+        OrdemServicoOutput output = criarOrdemServicoUseCase.executar(servicoInput);
+
+        OrdemServicoResponseDTO responseDTO = OrdemServicoAdapterMapper.ordemServicoToOrdemServicoResponseDTO(output);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
@@ -134,7 +172,14 @@ public class OrdemServicoController {
                                                              @PathVariable Long id, 
                                                              @Parameter(description = "Novo status da ordem de serviço", required = true)
                                                              @RequestBody @Valid OrdemServicoUpdateDTO dto) {
-        return ResponseEntity.ok(ordemServicoService.atualizar(id, dto));
+
+        AtualizarOrdemServicoInput atualizarOrdemServicoInput = new AtualizarOrdemServicoInput(dto.statusOS());
+
+        OrdemServicoOutput output = atualizarOrdemServicoUseCase.executar(id, atualizarOrdemServicoInput);
+
+        OrdemServicoResponseDTO responseDTO = OrdemServicoAdapterMapper.ordemServicoToOrdemServicoResponseDTO(output);
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     @Operation(
@@ -154,7 +199,7 @@ public class OrdemServicoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@Parameter(description = "ID da Ordem de Serviço a ser deletada", required = true) 
                                         @PathVariable Long id) {
-        ordemServicoService.deletar(id);
+        this.deletarOrdemServicoUseCase.executar(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.dto;
+package br.com.autocenterfiap.ordemservico.adapter.in.dto;
 
 import jakarta.validation.constraints.NotNull;
 

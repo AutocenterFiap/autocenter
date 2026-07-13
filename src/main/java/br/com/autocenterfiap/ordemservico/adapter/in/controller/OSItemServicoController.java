@@ -1,8 +1,13 @@
-package br.com.autocenterfiap.ordemservico.controller;
+package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoRequestDTO;
-import br.com.autocenterfiap.ordemservico.dto.OSItemServicoResponseDTO;
-import br.com.autocenterfiap.ordemservico.service.OSItemServicoService;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoRequestDTO;
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoResponseDTO;
+import br.com.autocenterfiap.ordemservico.application.dto.OSItemServico.OSItemServicoInput;
+import br.com.autocenterfiap.ordemservico.application.dto.OSItemServico.OSItemServicoOutput;
+import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
+import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
+import br.com.autocenterfiap.ordemservico.application.mapper.OSItemServicoApplicationMapper;
+import br.com.autocenterfiap.ordemservico.application.usecase.OSItemServicoUseCase.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,20 +15,37 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/v1/ordem-servico/{ordemServicoId}/servicos")
-@RequiredArgsConstructor
 @Tag(name = "Serviços na OS", description = "Endpoints para gerenciamento de serviços em ordens de serviço")
 public class OSItemServicoController {
 
-    private final OSItemServicoService osItemServicoService;
+    private final AdicionarServicoOrdemServicoUseCase adicionarServicoOrdemServicoUseCase;
+    private final FinalizarServicoUseCase finalizarServicoUseCase;
+    private final IniciarServicoUseCase iniciarServico;
+    private final ListarTodosPorOrdemServicoUseCase listarTodosPorOrdemServicoUseCase;
+    private final RemoverServicoDaOrdemServicoUseCase removerServicoDaOrdemServicoUseCase;
+
+    public OSItemServicoController(
+            AdicionarServicoOrdemServicoUseCase adicionarServicoOrdemServicoUseCase,
+             FinalizarServicoUseCase finalizarServicoUseCase,
+             IniciarServicoUseCase iniciarServico,
+             ListarTodosPorOrdemServicoUseCase listarTodosPorOrdemServicoUseCase,
+             RemoverServicoDaOrdemServicoUseCase removerServicoDaOrdemServicoUseCase
+            ) {
+        this.adicionarServicoOrdemServicoUseCase = adicionarServicoOrdemServicoUseCase;
+        this.finalizarServicoUseCase = finalizarServicoUseCase;
+        this.iniciarServico = iniciarServico;
+        this.listarTodosPorOrdemServicoUseCase = listarTodosPorOrdemServicoUseCase;
+        this.removerServicoDaOrdemServicoUseCase = removerServicoDaOrdemServicoUseCase;
+    }
 
     @Operation(
             summary = "Listar serviços da ordem de serviço",
@@ -34,12 +56,21 @@ public class OSItemServicoController {
             @ApiResponse(responseCode = "404", description = "Ordem de serviço não encontrada", content = @Content)
     })
     @GetMapping
-    public ResponseEntity<List<OSItemServicoResponseDTO>> listarServicos(
+    public ResponseEntity<Page<OSItemServicoResponseDTO>> listarServicos(
             @Parameter(description = "ID da ordem de serviço", required = true, example = "1")
-            @PathVariable Long ordemServicoId
+            @PathVariable Long ordemServicoId, Pageable pageable
     ) {
-        List<OSItemServicoResponseDTO> servicos = osItemServicoService.listarPorOS(ordemServicoId);
-        return ResponseEntity.ok(servicos);
+        PaginationRequest pagination = new PaginationRequest(pageable.getPageNumber(), pageable.getPageSize());
+
+        PageResult<OSItemServicoOutput> servicos = this.listarTodosPorOrdemServicoUseCase.executar(ordemServicoId, pagination);
+
+        Page<OSItemServicoResponseDTO> responseDTOS = new PageImpl<>(
+                servicos.getContent().stream()
+                        .map(OSItemServicoApplicationMapper::osItemServicoOutputToOSItemServicoResponseDTO)
+                        .toList()
+        );
+
+        return ResponseEntity.ok(responseDTOS);
     }
 
     @Operation(
@@ -58,10 +89,12 @@ public class OSItemServicoController {
             @Parameter(description = "Dados do serviço a ser adicionado", required = true)
             @Valid @RequestBody OSItemServicoRequestDTO dto
     ) {
-        OSItemServicoResponseDTO response = osItemServicoService.adicionarServicoNaOS(ordemServicoId, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+        OSItemServicoInput itemServicoInput = new OSItemServicoInput(dto.servicoId());
+        OSItemServicoOutput output = this.adicionarServicoOrdemServicoUseCase.executar(ordemServicoId, itemServicoInput);
+        OSItemServicoResponseDTO responseDTO = OSItemServicoApplicationMapper.osItemServicoOutputToOSItemServicoResponseDTO(output);
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
 
     @Operation(
             summary = "Iniciar execução do serviço",
@@ -78,7 +111,9 @@ public class OSItemServicoController {
             @Parameter(description = "ID do serviço", required = true, example = "5")
             @PathVariable Long servicoId
     ) {
-        OSItemServicoResponseDTO response = osItemServicoService.iniciarServico(ordemServicoId, servicoId);
+        OSItemServicoOutput output = this.iniciarServico.executar(ordemServicoId, servicoId);
+        OSItemServicoResponseDTO response = OSItemServicoApplicationMapper.osItemServicoOutputToOSItemServicoResponseDTO(output);
+
         return ResponseEntity.ok(response);
     }
 
@@ -97,7 +132,9 @@ public class OSItemServicoController {
             @Parameter(description = "ID do serviço", required = true, example = "5")
             @PathVariable Long servicoId
     ) {
-        OSItemServicoResponseDTO response = osItemServicoService.finalizarServico(ordemServicoId, servicoId);
+        OSItemServicoOutput output = this.finalizarServicoUseCase.executar(servicoId, ordemServicoId);
+        OSItemServicoResponseDTO response = OSItemServicoApplicationMapper.osItemServicoOutputToOSItemServicoResponseDTO(output);
+
         return ResponseEntity.ok(response);
     }
 
@@ -116,7 +153,7 @@ public class OSItemServicoController {
             @Parameter(description = "ID do serviço", required = true, example = "5")
             @PathVariable Long servicoId
     ) {
-        osItemServicoService.removerServicoDaOS(ordemServicoId, servicoId);
+        this.removerServicoDaOrdemServicoUseCase.executar(ordemServicoId, servicoId);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.ordemservico.dto;
+package br.com.autocenterfiap.ordemservico.adapter.in.dto;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import jakarta.validation.constraints.NotNull;
 
 public record OrdemServicoUpdateDTO(

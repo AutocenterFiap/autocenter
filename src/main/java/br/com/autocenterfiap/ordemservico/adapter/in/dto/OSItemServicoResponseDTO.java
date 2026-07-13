@@ -1,7 +1,7 @@
-package br.com.autocenterfiap.ordemservico.dto;
+package br.com.autocenterfiap.ordemservico.adapter.in.dto;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusItemServico;
-import br.com.autocenterfiap.ordemservico.model.OSItemServico;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ public record OSItemServicoResponseDTO(
     LocalDateTime dataHoraInicio,
     LocalDateTime dataHoraFim
 ) {
-    public OSItemServicoResponseDTO(OSItemServico model) {
+    public OSItemServicoResponseDTO(OSItemServicoJpaEntity model) {
         this(
             model.getId(),
             model.getValorItemServico(),

@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.ordemservico.handler;
 
 import br.com.autocenterfiap.comum.model.ErroResposta;
-import br.com.autocenterfiap.ordemservico.exception.*;
+import br.com.autocenterfiap.ordemservico.application.exception.*;
 import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.domain.exception.ServicoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;

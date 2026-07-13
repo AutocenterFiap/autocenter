@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.orcamento.exception;
+package br.com.autocenterfiap.orcamento.application.exception;
 
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
 

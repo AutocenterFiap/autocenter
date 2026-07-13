@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
 @RequestMapping("/v1/clientes")
 @Tag(name = "Clientes", description = "API para gerenciamento de clientes da oficina")
 public class ClienteController {

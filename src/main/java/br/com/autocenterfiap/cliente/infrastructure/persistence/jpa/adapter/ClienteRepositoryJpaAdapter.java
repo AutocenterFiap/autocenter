@@ -52,6 +52,11 @@ public class ClienteRepositoryJpaAdapter implements ClienteRepositoryPort {
     }
 
     @Override
+    public boolean existePorId(Long id) {
+        return clienteJpaRepository.existsById(id);
+    }
+
+    @Override
     public Cliente salvar(Cliente cliente) {
         ClienteJpaEntity jpaEntity = ClienteJpaMapper.toJpa(cliente);
         ClienteJpaEntity savedEntity = clienteJpaRepository.save(jpaEntity);

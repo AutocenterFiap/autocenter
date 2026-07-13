@@ -3,6 +3,7 @@ package br.com.autocenterfiap.cliente.adapter.in;
 import br.com.autocenterfiap.cliente.adapter.in.dto.ClienteRequestDTO;
 import br.com.autocenterfiap.cliente.adapter.in.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.cliente.adapter.mapper.ClienteAdapterMapper;
+import br.com.autocenterfiap.cliente.application.dto.PageResult;
 import br.com.autocenterfiap.cliente.application.dto.PaginationRequest;
 import br.com.autocenterfiap.cliente.application.usecase.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,8 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,23 +57,15 @@ public class ClienteController {
         description = "Lista de clientes retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<Page<ClienteResponseDTO>> listarTodos(Pageable pageable) {
+    public ResponseEntity<PageResult<ClienteResponseDTO>> listarTodos(Pageable pageable) {
         PaginationRequest pagination = new PaginationRequest(
             pageable.getPageNumber(),
             pageable.getPageSize()
         );
-
-        var pageResultOutput = listarClientesUseCase.executar(pagination);
-
-        Page<ClienteResponseDTO> response = new PageImpl<>(
-            pageResultOutput.getContent().stream()
+        return ResponseEntity.ok(
+            listarClientesUseCase.executar(pagination)
                 .map(ClienteAdapterMapper::clienteOutputToClienteResponse)
-                .toList(),
-            pageable,
-            pageResultOutput.getTotalElements()
         );
-
-        return ResponseEntity.ok(response);
     }
 
     @Operation(

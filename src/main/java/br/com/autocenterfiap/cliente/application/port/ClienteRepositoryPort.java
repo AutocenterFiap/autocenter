@@ -18,6 +18,8 @@ public interface ClienteRepositoryPort {
 
     boolean existePorEmail(String email);
 
+    boolean existePorId(Long id);
+
     Cliente salvar(Cliente cliente);
 
     void deletarPorId(Long id);

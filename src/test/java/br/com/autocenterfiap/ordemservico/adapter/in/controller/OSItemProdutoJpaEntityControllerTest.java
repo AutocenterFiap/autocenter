@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.controller;
+package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;

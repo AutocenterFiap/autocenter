@@ -1,7 +1,5 @@
-package br.com.autocenterfiap.ordemservico.service;
+package br.com.autocenterfiap.ordemservico.domain.enums;
 
-import br.com.autocenterfiap.ordemservico.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.application.exception.StatusOSInvalidoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("StatusOS - Testes de Transição de Status")
-class OrderServicoServiceTeste {
+class StatusOSTest {
 
     @Test
     @DisplayName("ABERTA pode mudar para RECEBIDA")
@@ -70,7 +68,7 @@ class OrderServicoServiceTeste {
     }
 
     @Test
-    @DisplayName("Permite CANCELADA de qualquer status (exceto se já é CANCELADA/ENTREGUE/FINALIZADA)")
+    @DisplayName("Permite CANCELADA de qualquer status válido")
     void devePermitirCancelarDeQualquerStatusValido() {
         assertDoesNotThrow(() -> StatusOS.ABERTA.podeMudarPara(StatusOS.CANCELADA));
         assertDoesNotThrow(() -> StatusOS.RECEBIDA.podeMudarPara(StatusOS.CANCELADA));
@@ -80,7 +78,7 @@ class OrderServicoServiceTeste {
     }
 
     @Test
-    @DisplayName("Permite FINALIZADA de qualquer status (exceto se já é CANCELADA/ENTREGUE/FINALIZADA)")
+    @DisplayName("Permite FINALIZADA de qualquer status válido")
     void devePermitirFinalizarDeQualquerStatusValido() {
         assertDoesNotThrow(() -> StatusOS.ABERTA.podeMudarPara(StatusOS.FINALIZADA));
         assertDoesNotThrow(() -> StatusOS.RECEBIDA.podeMudarPara(StatusOS.FINALIZADA));
@@ -88,7 +86,7 @@ class OrderServicoServiceTeste {
     }
 
     @Test
-    @DisplayName("Permite ENTREGUE de qualquer status (exceto se já é CANCELADA/ENTREGUE/FINALIZADA)")
+    @DisplayName("Permite ENTREGUE de qualquer status válido")
     void devePermitirEntregarDeQualquerStatusValido() {
         assertDoesNotThrow(() -> StatusOS.ABERTA.podeMudarPara(StatusOS.ENTREGUE));
         assertDoesNotThrow(() -> StatusOS.RECEBIDA.podeMudarPara(StatusOS.ENTREGUE));
@@ -129,4 +127,3 @@ class OrderServicoServiceTeste {
         assertTrue(exception.getMessage().contains("APROVADA"));
     }
 }
-

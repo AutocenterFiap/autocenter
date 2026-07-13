@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.controller;
+package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
 import br.com.autocenterfiap.ordemservico.adapter.in.dto.OSItemServicoRequestDTO;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;

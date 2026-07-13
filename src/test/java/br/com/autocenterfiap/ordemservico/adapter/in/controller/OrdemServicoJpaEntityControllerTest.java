@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.controller;
+package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;

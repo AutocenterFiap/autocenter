@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.repository;
+package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository;
 
 import br.com.autocenterfiap.cliente.enums.TipoCliente;
 import br.com.autocenterfiap.cliente.model.Cliente;

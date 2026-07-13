@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.ordemservico.enums;
+package br.com.autocenterfiap.ordemservico.domain.enums;
 
 public enum StatusItemServico {
     FINALIZADO,

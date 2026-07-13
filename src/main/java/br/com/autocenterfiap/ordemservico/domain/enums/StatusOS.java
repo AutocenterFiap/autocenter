@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.ordemservico.enums;
+package br.com.autocenterfiap.ordemservico.domain.enums;
 
-import br.com.autocenterfiap.ordemservico.exception.StatusOSInvalidoException;
+import br.com.autocenterfiap.ordemservico.application.exception.StatusOSInvalidoException;
 
 public enum StatusOS {
     ABERTA,

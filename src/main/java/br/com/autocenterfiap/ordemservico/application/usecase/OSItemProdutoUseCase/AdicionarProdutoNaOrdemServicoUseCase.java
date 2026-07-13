@@ -36,6 +36,7 @@ public class AdicionarProdutoNaOrdemServicoUseCase {
 
         // Decrementa o estoque imediatamente (reserva o produto)
         produto.decrementarEstoque(itemProdutoInput.quantidade());
+        this.produtoRepositoryPort.salvar(produto);
 
         OrdemServico ordemServico = this.ordemServicoRepositoryPort.findById(ordemServicoId)
                 .orElseThrow(() -> new OrdemServicoNaoEncontradaException("Ordem de serviço não encontrada para o id: "

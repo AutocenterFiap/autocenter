@@ -10,7 +10,6 @@ import br.com.autocenterfiap.ordemservico.domain.entity.OSItemServico;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusItemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
-import br.com.autocenterfiap.util.Util;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -51,9 +50,7 @@ public class RemoverServicoDaOrdemServicoUseCase {
                     + StatusItemServico.AGUARDANDO_INICIO.name());
         }
 
-        // Recalcula o valor total da OS após remover o serviço
-        ordemServico.getOsItensServicos().remove(itemServico);
-        ordemServico.setValorTotal(Util.calcularValorTotal(ordemServico));
+        this.itemServicoRepositoryPort.deleteById(itemServico.getId());
 
         log.info("Serviço removido da OS com sucesso: Item ID={}, Serviço={}",
                 itemServico.getId(), itemServico.getServico().getDescricao());

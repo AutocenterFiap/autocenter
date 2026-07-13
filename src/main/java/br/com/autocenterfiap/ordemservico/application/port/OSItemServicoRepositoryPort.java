@@ -18,4 +18,6 @@ public interface OSItemServicoRepositoryPort {
 
     OSItemServico save(OSItemServico item);
 
+    void deleteById(Long id);
+
 }

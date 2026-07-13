@@ -1,9 +1,10 @@
 package br.com.autocenterfiap.cliente.repository;
 
-import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.model.Cliente;
-import br.com.autocenterfiap.cliente.model.Endereco;
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.EnderecoJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.repository.ClienteJpaRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,25 +30,25 @@ class ClienteRepositoryTest {
     private TestEntityManager entityManager;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteJpaRepository clienteJpaRepository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
-    private Cliente clientePF;
-    private Cliente clientePJ;
-    private Endereco endereco;
+    private ClienteJpaEntity clientePF;
+    private ClienteJpaEntity clientePJ;
+    private EnderecoJpaEntity endereco;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
-        clienteRepository.deleteAll();
-        clienteRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
+        clienteJpaRepository.deleteAll();
+        clienteJpaRepository.flush();
         entityManager.flush();
 
         // Setup Endereço
-        endereco = new Endereco(
+        endereco = new EnderecoJpaEntity(
                 "01310100",
                 "Avenida Paulista",
                 "1578",
@@ -58,7 +59,7 @@ class ClienteRepositoryTest {
         );
 
         // Setup Cliente Pessoa Física
-        clientePF = new Cliente();
+        clientePF = new ClienteJpaEntity();
         clientePF.setNome("João da Silva");
         clientePF.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clientePF.setDocumento("11144477735");
@@ -68,7 +69,7 @@ class ClienteRepositoryTest {
         clientePF.setDataNascimento(LocalDate.of(1990, 5, 15));
 
         // Setup Cliente Pessoa Jurídica
-        clientePJ = new Cliente();
+        clientePJ = new ClienteJpaEntity();
         clientePJ.setNome("Empresa ABC LTDA");
         clientePJ.setTipoCliente(TipoCliente.PESSOA_JURIDICA);
         clientePJ.setDocumento("11222333000181");
@@ -79,7 +80,7 @@ class ClienteRepositoryTest {
 
     @Test
     void deveSalvarClientePessoaFisicaComSucesso() {
-        Cliente clienteSalvo = clienteRepository.save(clientePF);
+        ClienteJpaEntity clienteSalvo = clienteJpaRepository.save(clientePF);
 
         assertNotNull(clienteSalvo.getId());
         assertEquals("João da Silva", clienteSalvo.getNome());
@@ -91,7 +92,7 @@ class ClienteRepositoryTest {
 
     @Test
     void deveSalvarClientePessoaJuridicaComSucesso() {
-        Cliente clienteSalvo = clienteRepository.save(clientePJ);
+        ClienteJpaEntity clienteSalvo = clienteJpaRepository.save(clientePJ);
 
         assertNotNull(clienteSalvo.getId());
         assertEquals("Empresa ABC LTDA", clienteSalvo.getNome());
@@ -104,7 +105,7 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        Optional<Cliente> clienteEncontrado = clienteRepository.findByDocumento("11144477735");
+        Optional<ClienteJpaEntity> clienteEncontrado = clienteJpaRepository.findByDocumento("11144477735");
 
         assertTrue(clienteEncontrado.isPresent());
         assertEquals("João da Silva", clienteEncontrado.get().getNome());
@@ -113,7 +114,7 @@ class ClienteRepositoryTest {
 
     @Test
     void deveRetornarOptionalVazioAoBuscarPorDocumentoInexistente() {
-        Optional<Cliente> clienteEncontrado = clienteRepository.findByDocumento("99999999999");
+        Optional<ClienteJpaEntity> clienteEncontrado = clienteJpaRepository.findByDocumento("99999999999");
 
         assertFalse(clienteEncontrado.isPresent());
     }
@@ -123,7 +124,7 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        Optional<Cliente> clienteEncontrado = clienteRepository.findByEmail("joao.silva@email.com");
+        Optional<ClienteJpaEntity> clienteEncontrado = clienteJpaRepository.findByEmail("joao.silva@email.com");
 
         assertTrue(clienteEncontrado.isPresent());
         assertEquals("João da Silva", clienteEncontrado.get().getNome());
@@ -132,7 +133,7 @@ class ClienteRepositoryTest {
 
     @Test
     void deveRetornarOptionalVazioAoBuscarPorEmailInexistente() {
-        Optional<Cliente> clienteEncontrado = clienteRepository.findByEmail("naoexiste@email.com");
+        Optional<ClienteJpaEntity> clienteEncontrado = clienteJpaRepository.findByEmail("naoexiste@email.com");
 
         assertFalse(clienteEncontrado.isPresent());
     }
@@ -142,8 +143,8 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        boolean existe = clienteRepository.existsByDocumento("11144477735");
-        boolean naoExiste = clienteRepository.existsByDocumento("99999999999");
+        boolean existe = clienteJpaRepository.existsByDocumento("11144477735");
+        boolean naoExiste = clienteJpaRepository.existsByDocumento("99999999999");
 
         assertTrue(existe);
         assertFalse(naoExiste);
@@ -154,8 +155,8 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        boolean existe = clienteRepository.existsByEmail("joao.silva@email.com");
-        boolean naoExiste = clienteRepository.existsByEmail("naoexiste@email.com");
+        boolean existe = clienteJpaRepository.existsByEmail("joao.silva@email.com");
+        boolean naoExiste = clienteJpaRepository.existsByEmail("naoexiste@email.com");
 
         assertTrue(existe);
         assertFalse(naoExiste);
@@ -163,12 +164,12 @@ class ClienteRepositoryTest {
 
     @Test
     void deveAtualizarClienteComSucesso() {
-        Cliente clienteSalvo = entityManager.persist(clientePF);
+        ClienteJpaEntity clienteSalvo = entityManager.persist(clientePF);
         entityManager.flush();
 
         clienteSalvo.setNome("João da Silva Updated");
         clienteSalvo.setTelefone("11999998888");
-        Cliente clienteAtualizado = clienteRepository.save(clienteSalvo);
+        ClienteJpaEntity clienteAtualizado = clienteJpaRepository.save(clienteSalvo);
         entityManager.flush();
 
         assertEquals("João da Silva Updated", clienteAtualizado.getNome());
@@ -178,14 +179,14 @@ class ClienteRepositoryTest {
 
     @Test
     void deveDeletarClienteComSucesso() {
-        Cliente clienteSalvo = entityManager.persist(clientePF);
+        ClienteJpaEntity clienteSalvo = entityManager.persist(clientePF);
         entityManager.flush();
         Long clienteId = clienteSalvo.getId();
 
-        clienteRepository.delete(clienteSalvo);
+        clienteJpaRepository.delete(clienteSalvo);
         entityManager.flush();
 
-        Optional<Cliente> clienteDeletado = clienteRepository.findById(clienteId);
+        Optional<ClienteJpaEntity> clienteDeletado = clienteJpaRepository.findById(clienteId);
         assertFalse(clienteDeletado.isPresent());
     }
 
@@ -195,7 +196,7 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePJ);
         entityManager.flush();
 
-        var clientes = clienteRepository.findAll();
+        var clientes = clienteJpaRepository.findAll();
 
         assertNotNull(clientes);
         assertEquals(2, clientes.size());
@@ -206,7 +207,7 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        Cliente clienteDuplicado = new Cliente();
+        ClienteJpaEntity clienteDuplicado = new ClienteJpaEntity();
         clienteDuplicado.setNome("Maria da Silva");
         clienteDuplicado.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteDuplicado.setDocumento("11144477735"); // mesmo documento
@@ -225,7 +226,7 @@ class ClienteRepositoryTest {
         entityManager.persist(clientePF);
         entityManager.flush();
 
-        Cliente clienteDuplicado = new Cliente();
+        ClienteJpaEntity clienteDuplicado = new ClienteJpaEntity();
         clienteDuplicado.setNome("Maria da Silva");
         clienteDuplicado.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteDuplicado.setDocumento("52998224725");

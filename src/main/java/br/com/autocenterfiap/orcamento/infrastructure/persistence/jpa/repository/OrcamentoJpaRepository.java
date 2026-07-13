@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface OrcamentoJpaRepository extends JpaRepository<OrcamentoJpaEntity, Long> {
 
-    @Query("SELECT o FROM OrcamentoJpaEntity o WHERE o.statusOrcamento = 'AGUARDANDO_APROVACAO' and o.ordemServico = :os")
+    @Query("SELECT o FROM OrcamentoJpaEntity o WHERE o.statusOrcamento = 'AGUARDANDO_APROVACAO' and o.ordemServicoJpaEntity = :os")
     Optional<OrcamentoJpaEntity> buscarOrcamentoAguardandoAprovacaoPorOS(OrdemServicoJpaEntity os);
 
     Page<OrcamentoJpaEntity> findByStatusOrcamento(StatusOrcamento status, Pageable pageable);

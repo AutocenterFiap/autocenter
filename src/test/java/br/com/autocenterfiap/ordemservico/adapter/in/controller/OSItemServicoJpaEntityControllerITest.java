@@ -21,6 +21,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Pageable;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -89,11 +91,11 @@ class OSItemServicoJpaEntityControllerITest {
         mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osEmExecucao.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", notNullValue()))
-                .andExpect(jsonPath("$[0].valorItemServico", notNullValue()))
-                .andExpect(jsonPath("$[0].statusItemServico", notNullValue()));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id", notNullValue()))
+                .andExpect(jsonPath("$.content[0].valorItemServico", notNullValue()))
+                .andExpect(jsonPath("$.content[0].statusItemServico", notNullValue()));
     }
 
     @Test
@@ -103,8 +105,8 @@ class OSItemServicoJpaEntityControllerITest {
         mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osFinalizada.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
@@ -189,7 +191,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("PATCH /iniciar - 200 deve iniciar serviço AGUARDANDO_INICIO em OS EM_EXECUCAO")
     void deveIniciarServicoComSucesso() throws Exception {
         OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), Pageable.unpaged()).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.AGUARDANDO_INICIO)
                 .findFirst()
                 .orElseThrow();
@@ -208,7 +210,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("PATCH /iniciar - 400 quando OS não está em EM_EXECUCAO")
     void deveRetornar400AoIniciarServicoEmOSComStatusInvalido() throws Exception {
         OSItemServicoJpaEntity itemDiagnostico = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), Pageable.unpaged()).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -223,7 +225,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("PATCH /iniciar - 400 quando item não está em AGUARDANDO_INICIO")
     void deveRetornar400AoIniciarServicoComStatusItemInvalido() throws Exception {
         OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), Pageable.unpaged()).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.EXECUTANDO)
                 .findFirst()
                 .orElseThrow();
@@ -249,7 +251,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("PATCH /finalizar - 200 deve finalizar serviço EXECUTANDO")
     void deveFinalizarServicoComSucesso() throws Exception {
         OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), Pageable.unpaged()).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.EXECUTANDO)
                 .findFirst()
                 .orElseThrow();
@@ -268,7 +270,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("PATCH /finalizar - 400 quando item não está em EXECUTANDO")
     void deveRetornar400AoFinalizarServicoComStatusItemInvalido() throws Exception {
         OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), Pageable.unpaged()).stream()
                 .filter(i -> i.getStatusServico() == StatusItemServico.AGUARDANDO_INICIO)
                 .findFirst()
                 .orElseThrow();
@@ -294,7 +296,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("DELETE - 204 deve remover serviço AGUARDANDO_INICIO em OS EM_DIAGNOSTICO")
     void deveRemoverServicoComSucesso() throws Exception {
         OSItemServicoJpaEntity itemAguardando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), Pageable.unpaged()).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -306,7 +308,7 @@ class OSItemServicoJpaEntityControllerITest {
         mockMvc.perform(get("/v1/ordem-servico/{id}/servicos", osEmDiagnostico.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
@@ -314,7 +316,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("DELETE - 400 quando OS não está em EM_DIAGNOSTICO")
     void deveRetornar400AoRemoverServicoEmOSComStatusInvalido() throws Exception {
         OSItemServicoJpaEntity itemExecutando = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmExecucao.getId(), Pageable.unpaged()).stream()
                 .findFirst()
                 .orElseThrow();
 
@@ -329,7 +331,7 @@ class OSItemServicoJpaEntityControllerITest {
     @DisplayName("DELETE - 400 quando item não está em AGUARDANDO_INICIO")
     void deveRetornar400AoRemoverServicoComStatusItemInvalido() throws Exception {
         OSItemServicoJpaEntity itemDiagnostico = osItemServicoJpaRepository
-                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), ).stream()
+                .findByOrdemServicoJpaEntityId(osEmDiagnostico.getId(), Pageable.unpaged()).stream()
                 .findFirst()
                 .orElseThrow();
 

@@ -16,4 +16,6 @@ public interface OSItemProdutoRepositoryPort {
     BigDecimal calcularTotalProdutosPorOS(Long ordemServicoId);
 
     OSItemProduto save(OSItemProduto item);
+
+    void deleteById(Long id);
 }

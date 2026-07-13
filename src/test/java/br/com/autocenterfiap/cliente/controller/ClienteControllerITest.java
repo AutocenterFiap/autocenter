@@ -100,7 +100,7 @@ class ClienteControllerITest {
                 .andExpect(jsonPath("$.content[1].nome", notNullValue()))
                 .andExpect(jsonPath("$.totalElements", is(2)))
                 .andExpect(jsonPath("$.totalPages", is(1)))
-                .andExpect(jsonPath("$.size", is(20)));
+                .andExpect(jsonPath("$.pageSize", is(20)));
     }
 
     @Test

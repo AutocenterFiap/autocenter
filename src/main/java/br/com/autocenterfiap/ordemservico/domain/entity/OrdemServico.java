@@ -30,8 +30,10 @@ public class OrdemServico implements Serializable {
 
     private Cliente cliente;
 
+    @Builder.Default
     private List<OSItemServico> osItensServicos = new ArrayList<>();
 
+    @Builder.Default
     private List<OSItemProduto> osItensProdutos = new ArrayList<>();
 
     private LocalDateTime dataCriacao;

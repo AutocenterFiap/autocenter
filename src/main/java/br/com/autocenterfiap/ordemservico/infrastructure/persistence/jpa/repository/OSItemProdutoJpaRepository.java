@@ -4,6 +4,7 @@ import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,8 @@ public interface OSItemProdutoJpaRepository extends JpaRepository<OSItemProdutoJ
             WHERE i.ordemServicoJpaEntity.id = :ordemServicoId
             """)
     BigDecimal calcularTotalProdutosPorOS(@Param("ordemServicoId") Long ordemServicoId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM OSItemProdutoJpaEntity o WHERE o.id = :id")
+    void deleteByIdDirect(Long id);
 }

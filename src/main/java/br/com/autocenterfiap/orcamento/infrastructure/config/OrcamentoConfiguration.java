@@ -5,6 +5,7 @@ import br.com.autocenterfiap.orcamento.application.usecase.*;
 import br.com.autocenterfiap.orcamento.infrastructure.persistence.jpa.adapter.OrcamentoRepositoryJpaAdapter;
 import br.com.autocenterfiap.orcamento.infrastructure.persistence.jpa.repository.OrcamentoJpaRepository;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

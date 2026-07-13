@@ -2,6 +2,7 @@ package br.com.autocenterfiap.ordemservico.domain.entity;
 
 import br.com.autocenterfiap.produto.domain.entity.Produto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import static java.util.Objects.isNull;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OSItemProduto implements Serializable {

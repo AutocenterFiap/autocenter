@@ -1,8 +1,6 @@
 package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity;
 
 import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
-import br.com.autocenterfiap.cliente.model.Cliente;
-import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -60,11 +58,11 @@ public class OrdemServicoJpaEntity implements Serializable {
     @Schema(description = "Cliente vinculado à Ordem de Serviço")
     private ClienteJpaEntity cliente;
 
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "ordemServicoJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @Schema(description = "Lista de serviços vinculados à Ordem de Serviço")
     private List<OSItemServicoJpaEntity> osItensServicos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "ordemServicoJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @Schema(description = "Lista de produtos vinculados à Ordem de Serviço")
     private List<OSItemProdutoJpaEntity> osItensProdutos = new ArrayList<>();
 
@@ -75,13 +73,6 @@ public class OrdemServicoJpaEntity implements Serializable {
     @LastModifiedDate
     @Schema(description = "Data e hora da última atualização do registro", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime dataUltimaAtualizacao;
-
-    public OrdemServicoJpaEntity(OrdemServicoDTO dto, VeiculoJpaEntity veiculo, ClienteJpaEntity cliente) {
-        this.cliente = cliente;
-        this.veiculo = veiculo;
-        this.statusOS = StatusOS.ABERTA;
-        this.valorTotal = BigDecimal.ZERO;
-    }
 
     public void aprovar(){
         this.statusOS = StatusOS.APROVADA;

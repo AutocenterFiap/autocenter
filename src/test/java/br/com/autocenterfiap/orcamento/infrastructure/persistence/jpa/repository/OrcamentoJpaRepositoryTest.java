@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.orcamento.infrastructure.persistence.jpa.repository;
 
-import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.model.Cliente;
-import br.com.autocenterfiap.cliente.model.Endereco;
-import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.EnderecoJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.repository.ClienteJpaRepository;
 import br.com.autocenterfiap.orcamento.domain.enums.StatusOrcamento;
 import br.com.autocenterfiap.orcamento.infrastructure.persistence.jpa.entity.OrcamentoJpaEntity;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
@@ -49,7 +49,7 @@ class OrcamentoJpaRepositoryTest {
     private VeiculoJpaRepository veiculoRepository;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteJpaRepository clienteRepository;
 
     private OrdemServicoJpaEntity ordemServicoJpaEntity;
 
@@ -65,7 +65,7 @@ class OrcamentoJpaRepositoryTest {
         clienteRepository.flush();
         entityManager.flush();
 
-        Endereco endereco = new Endereco();
+        EnderecoJpaEntity endereco = new EnderecoJpaEntity();
         endereco.setCep("01000-00");
         endereco.setLogradouro("Rua Teste");
         endereco.setNumero("123");
@@ -73,7 +73,7 @@ class OrcamentoJpaRepositoryTest {
         endereco.setCidade("São Paulo");
         endereco.setEstado("SP");
 
-        Cliente cliente = new Cliente();
+        ClienteJpaEntity cliente = new ClienteJpaEntity();
         cliente.setNome("João da Silva");
         cliente.setTipoCliente(TipoCliente.PESSOA_FISICA);
         cliente.setDocumento("12345678901");

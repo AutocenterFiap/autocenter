@@ -26,6 +26,7 @@ public class ClienteAdapterMapper {
 
         return AtualizarClienteInput.builder()
             .nome(request.getNome())
+            .documento(request.getDocumento())
             .email(request.getEmail())
             .telefone(request.getTelefone())
             .endereco(enderecoRequestToEnderecoInput(request.getEndereco()))

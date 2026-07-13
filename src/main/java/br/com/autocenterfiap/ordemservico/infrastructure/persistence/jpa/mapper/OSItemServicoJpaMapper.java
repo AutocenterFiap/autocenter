@@ -2,6 +2,7 @@ package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.mapper
 
 import br.com.autocenterfiap.ordemservico.domain.entity.OSItemServico;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
+import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.mapper.ServicoJpaMapper;
 
 public class OSItemServicoJpaMapper {
 
@@ -10,8 +11,8 @@ public class OSItemServicoJpaMapper {
 
         return OSItemServico.builder()
                 .id(entity.getId())
-                .ordemServico(OrdemServicoJpaMapper.toDomain(entity.getOrdemServicoJpaEntity()))
-                .servico(entity.getServico())
+                .ordemServico(OrdemServicoJpaMapper.toDomainShallow(entity.getOrdemServicoJpaEntity()))
+                .servico(ServicoJpaMapper.toDomain(entity.getServico()))
                 .valorItemServico(entity.getValorItemServico())
                 .statusServico(entity.getStatusServico())
                 .dataHoraInicio(entity.getDataHoraInicio())
@@ -26,8 +27,8 @@ public class OSItemServicoJpaMapper {
 
         return OSItemServicoJpaEntity.builder()
                 .id(domain.getId())
-                .ordemServicoJpaEntity(OrdemServicoJpaMapper.toJpa(domain.getOrdemServico()))
-                .servico(domain.getServico())
+                .ordemServicoJpaEntity(OrdemServicoJpaMapper.toJpaShallow(domain.getOrdemServico()))
+                .servico(ServicoJpaMapper.toJpa(domain.getServico()))
                 .valorItemServico(domain.getValorItemServico())
                 .statusServico(domain.getStatusServico())
                 .dataHoraInicio(domain.getDataHoraInicio())

@@ -122,40 +122,5 @@ public class ClienteExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
-        IllegalArgumentException ex,
-        WebRequest request
-    ) {
-        log.warn("Erro de validação: {}", ex.getMessage());
-
-        ErrorResponse response = ErrorResponse.builder()
-            .timestamp(LocalDateTime.now())
-            .status(HttpStatus.BAD_REQUEST.value())
-            .error("Bad Request")
-            .message(ex.getMessage())
-            .path(request.getDescription(false).replace("uri=", ""))
-            .build();
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-        Exception ex,
-        WebRequest request
-    ) {
-        log.error("Erro não previsto: {}", ex.getMessage(), ex);
-
-        ErrorResponse response = ErrorResponse.builder()
-            .timestamp(LocalDateTime.now())
-            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .error("Internal Server Error")
-            .message("Erro ao processar a requisição")
-            .path(request.getDescription(false).replace("uri=", ""))
-            .build();
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }
 

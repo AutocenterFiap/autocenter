@@ -2,7 +2,7 @@ package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.mapper
 
 import br.com.autocenterfiap.ordemservico.domain.entity.OSItemProduto;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
+import br.com.autocenterfiap.produto.infrastructure.persistence.jpa.mapper.ProdutoJpaMapper;
 
 public class OSItemProdutoJpaMapper {
 
@@ -12,8 +12,8 @@ public class OSItemProdutoJpaMapper {
         return OSItemProduto
                 .builder()
                 .id(entity.getId())
-                .ordemServico(OrdemServicoJpaMapper.toDomain(entity.getOrdemServicoJpaEntity()))
-                .produto(entity.getProduto())
+                .ordemServico(OrdemServicoJpaMapper.toDomainShallow(entity.getOrdemServicoJpaEntity()))
+                .produto(ProdutoJpaMapper.toDomain(entity.getProduto()))
                 .quantidade(entity.getQuantidade())
                 .precoUnitarioNoMomento(entity.getPrecoUnitarioNoMomento())
                 .dataCriacao(entity.getDataCriacao())
@@ -27,8 +27,8 @@ public class OSItemProdutoJpaMapper {
         return OSItemProdutoJpaEntity
                 .builder()
                 .id(domain.getId())
-                .ordemServicoJpaEntity(OrdemServicoJpaMapper.toJpa(domain.getOrdemServico()))
-                .produto(domain.getProduto())
+                .ordemServicoJpaEntity(OrdemServicoJpaMapper.toJpaShallow(domain.getOrdemServico()))
+                .produto(ProdutoJpaMapper.toJpaEntity(domain.getProduto()))
                 .quantidade(domain.getQuantidade())
                 .precoUnitarioNoMomento(domain.getPrecoUnitarioNoMomento())
                 .dataCriacao(domain.getDataCriacao())

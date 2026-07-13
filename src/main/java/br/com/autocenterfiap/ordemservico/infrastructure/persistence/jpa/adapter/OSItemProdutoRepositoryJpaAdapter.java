@@ -62,4 +62,9 @@ public class OSItemProdutoRepositoryJpaAdapter implements OSItemProdutoRepositor
 
         return OSItemProdutoJpaMapper.toDomain(salvo);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        this.osItemProdutoJpaRepository.deleteByIdDirect(id);
+    }
 }

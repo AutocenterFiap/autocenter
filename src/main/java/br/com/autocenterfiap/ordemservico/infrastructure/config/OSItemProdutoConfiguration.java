@@ -34,13 +34,15 @@ public class OSItemProdutoConfiguration {
     }
 
     @Bean
-    public AtualizarQuantidadeUseCase atualizarQuantidadeUseCase(OSItemProdutoRepositoryPort itemProdutoRepositoryPort)
+    public AtualizarQuantidadeUseCase atualizarQuantidadeUseCase(OSItemProdutoRepositoryPort itemProdutoRepositoryPort,
+                                                                  OrdemServicoRepositoryPort ordemServicoRepositoryPort,
+                                                                  ProdutoRepositoryPort produtoRepositoryPort)
     {
-        return new AtualizarQuantidadeUseCase(itemProdutoRepositoryPort);
+        return new AtualizarQuantidadeUseCase(itemProdutoRepositoryPort, ordemServicoRepositoryPort, produtoRepositoryPort);
     }
 
-    @Bean
-    public ListarTodosPorOrdemServicoUseCase listarTodosPorOrdemServicoUseCase(
+    @Bean("listarTodosProdutosPorOrdemServicoUseCase")
+    public ListarTodosPorOrdemServicoUseCase listarTodosProdutosPorOrdemServicoUseCase(
             OSItemProdutoRepositoryPort itemProdutoRepositoryPort)
     {
         return new ListarTodosPorOrdemServicoUseCase(itemProdutoRepositoryPort);
@@ -49,8 +51,8 @@ public class OSItemProdutoConfiguration {
     @Bean
     public RemoverProdutoNaOrdemServicoUseCase removerProdutoNaOrdemServicoUseCase(
             OSItemProdutoRepositoryPort itemProdutoRepositoryPort,
-            OrdemServicoRepositoryPort ordemServicoRepositoryPort)
+            ProdutoRepositoryPort produtoRepositoryPort)
     {
-        return new RemoverProdutoNaOrdemServicoUseCase(itemProdutoRepositoryPort, ordemServicoRepositoryPort);
+        return new RemoverProdutoNaOrdemServicoUseCase(itemProdutoRepositoryPort, produtoRepositoryPort);
     }
 }

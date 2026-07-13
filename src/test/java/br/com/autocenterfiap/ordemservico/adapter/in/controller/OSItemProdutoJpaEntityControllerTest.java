@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.*;
+import org.springframework.data.domain.Pageable;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -165,8 +167,8 @@ class OSItemProdutoJpaEntityControllerTest {
 
         mockMvc.perform(get("/v1/ordem-servicos/{osId}/produtos", osId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].codigoProduto", is("FO-001")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].codigoProduto", is("FO-001")));
     }
 
     @Test
@@ -263,7 +265,7 @@ class OSItemProdutoJpaEntityControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dataCriacao", notNullValue()));
 
-        OSItemProdutoJpaEntity itemPersistido = osItemProdutoJpaRepository.findByOrdemServicoJpaEntityId(osId, ).get(0);
+        OSItemProdutoJpaEntity itemPersistido = osItemProdutoJpaRepository.findByOrdemServicoJpaEntityId(osId, Pageable.unpaged()).getContent().get(0);
         assertNotNull(itemPersistido.getDataCriacao(), "dataCriacao deve ser preenchida pelo @PrePersist");
         assertNotNull(itemPersistido.getDataUltimaAtualizacao(), "dataUltimaAtualizacao deve ser preenchida pelo @PrePersist");
     }

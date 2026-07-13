@@ -81,4 +81,9 @@ public class OSItemServicoRepositoryJpaAdapter implements OSItemServicoRepositor
 
         return OSItemServicoJpaMapper.toDomain(salvo);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        this.osItemServicoJpaRepository.deleteByIdDirect(id);
+    }
 }

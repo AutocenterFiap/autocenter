@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.ordemservico.application.validator;
 
 import br.com.autocenterfiap.cliente.application.port.ClienteRepositoryPort;
-import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
+import br.com.autocenterfiap.cliente.domain.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.CriarOrdemServicoInput;
 import org.springframework.stereotype.Component;
 

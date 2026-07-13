@@ -6,7 +6,6 @@ import br.com.autocenterfiap.ordemservico.application.usecase.OSItemServicoUseCa
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.adapter.OSItemServicoRepositoryJpaAdapter;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
 import br.com.autocenterfiap.servico.application.port.ServicoRepositoryPort;
-import br.com.autocenterfiap.servico.application.usecase.BuscarServicoPorIdUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,11 +24,6 @@ public class OSItemServicoConfiguration {
             ServicoRepositoryPort servicoRepositoryPort
     ) {
         return new AdicionarServicoOrdemServicoUseCase(osItemServicoRepositoryPort, ordemServicoRepositoryPort, servicoRepositoryPort);
-    }
-
-    @Bean
-    public BuscarServicoPorIdUseCase buscarServicoPorIdUseCase(ServicoRepositoryPort servicoRepositoryPort) {
-        return new BuscarServicoPorIdUseCase(servicoRepositoryPort);
     }
 
     @Bean
@@ -52,8 +46,8 @@ public class OSItemServicoConfiguration {
         return new IniciarServicoUseCase(itemServicoRepositoryPort, ordemServicoRepositoryPort);
     }
 
-    @Bean
-    public ListarTodosPorOrdemServicoUseCase listarTodosPorOrdemServicoUseCase(
+    @Bean("listarTodosServicosPorOrdemServicoUseCase")
+    public ListarTodosPorOrdemServicoUseCase listarTodosServicosPorOrdemServicoUseCase(
             OSItemServicoRepositoryPort itemServicoRepositoryPort
     ) {
         return new ListarTodosPorOrdemServicoUseCase(itemServicoRepositoryPort);

@@ -1,8 +1,8 @@
 package br.com.autocenterfiap.util;
 
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemServicoJpaEntity;
+import br.com.autocenterfiap.ordemservico.domain.entity.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.domain.entity.OSItemServico;
+import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,22 +15,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayName("Util - calcularValorTotal")
 class UtilTest {
 
-    private OrdemServicoJpaEntity osVazia() {
-        OrdemServicoJpaEntity os = new OrdemServicoJpaEntity();
+    private OrdemServico osVazia() {
+        OrdemServico os = new OrdemServico();
         os.setOsItensProdutos(new ArrayList<>());
         os.setOsItensServicos(new ArrayList<>());
         return os;
     }
 
-    private OSItemProdutoJpaEntity itemProduto(BigDecimal precoUnitario, int quantidade) {
-        OSItemProdutoJpaEntity item = new OSItemProdutoJpaEntity();
+    private OSItemProduto itemProduto(BigDecimal precoUnitario, int quantidade) {
+        OSItemProduto item = new OSItemProduto();
         item.setPrecoUnitarioNoMomento(precoUnitario);
         item.setQuantidade(quantidade);
         return item;
     }
 
-    private OSItemServicoJpaEntity itemServico(BigDecimal valor) {
-        OSItemServicoJpaEntity item = new OSItemServicoJpaEntity();
+    private OSItemServico itemServico(BigDecimal valor) {
+        OSItemServico item = new OSItemServico();
         item.setValorItemServico(valor);
         return item;
     }
@@ -38,7 +38,7 @@ class UtilTest {
     @Test
     @DisplayName("Deve retornar zero para OS sem produtos e sem serviços")
     void deveRetornarZeroParaOSVazia() {
-        OrdemServicoJpaEntity os = osVazia();
+        OrdemServico os = osVazia();
 
         BigDecimal resultado = Util.calcularValorTotal(os);
 
@@ -48,7 +48,7 @@ class UtilTest {
     @Test
     @DisplayName("Deve calcular valor total somente com produtos")
     void deveCalcularValorTotalSomenteProdutos() {
-        OrdemServicoJpaEntity os = osVazia();
+        OrdemServico os = osVazia();
         // Produto 1: R$ 45,90 x 2 = R$ 91,80
         // Produto 2: R$ 100,00 x 3 = R$ 300,00
         // Total esperado: R$ 391,80
@@ -65,7 +65,7 @@ class UtilTest {
     @Test
     @DisplayName("Deve calcular valor total somente com serviços")
     void deveCalcularValorTotalSomenteServicos() {
-        OrdemServicoJpaEntity os = osVazia();
+        OrdemServico os = osVazia();
         // Serviço 1: R$ 200,00
         // Serviço 2: R$ 150,50
         // Total esperado: R$ 350,50
@@ -82,7 +82,7 @@ class UtilTest {
     @Test
     @DisplayName("Deve calcular valor total com produtos e serviços")
     void deveCalcularValorTotalComProdutosEServicos() {
-        OrdemServicoJpaEntity os = osVazia();
+        OrdemServico os = osVazia();
         // Produto: R$ 50,00 x 4 = R$ 200,00
         // Serviço: R$ 300,00
         // Total esperado: R$ 500,00
@@ -97,7 +97,7 @@ class UtilTest {
     @Test
     @DisplayName("Deve calcular valor total com múltiplos produtos e múltiplos serviços")
     void deveCalcularValorTotalComMultiplosProdutosEServicos() {
-        OrdemServicoJpaEntity os = osVazia();
+        OrdemServico os = osVazia();
         // Produto 1: R$ 10,00 x 5 = R$ 50,00
         // Produto 2: R$ 20,00 x 2 = R$ 40,00
         // Serviço 1: R$ 80,00

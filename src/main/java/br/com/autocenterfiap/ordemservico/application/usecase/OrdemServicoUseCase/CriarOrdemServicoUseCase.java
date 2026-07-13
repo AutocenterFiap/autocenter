@@ -2,7 +2,7 @@ package br.com.autocenterfiap.ordemservico.application.usecase.OrdemServicoUseCa
 
 import br.com.autocenterfiap.cliente.application.port.ClienteRepositoryPort;
 import br.com.autocenterfiap.cliente.domain.entity.Cliente;
-import br.com.autocenterfiap.cliente.exception.ClienteNaoEncontradoException;
+import br.com.autocenterfiap.cliente.domain.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.CriarOrdemServicoInput;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServicoOutput;
 import br.com.autocenterfiap.ordemservico.application.mapper.OrdemServicoApplicationMapper;

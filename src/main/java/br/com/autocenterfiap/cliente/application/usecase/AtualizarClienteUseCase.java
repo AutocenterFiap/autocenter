@@ -6,6 +6,7 @@ import br.com.autocenterfiap.cliente.application.mapper.ClienteApplicationMapper
 import br.com.autocenterfiap.cliente.application.port.ClienteRepositoryPort;
 import br.com.autocenterfiap.cliente.domain.entity.Cliente;
 import br.com.autocenterfiap.cliente.domain.entity.Endereco;
+import br.com.autocenterfiap.cliente.domain.exception.ClienteDocumentoNaoPodeSerAlteradoException;
 import br.com.autocenterfiap.cliente.domain.exception.ClienteEmailJaCadastradoException;
 import br.com.autocenterfiap.cliente.domain.exception.ClienteNaoEncontradoException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,11 @@ public class AtualizarClienteUseCase {
                 log.warn("Tentativa de atualizar cliente inexistente: ID={}", id);
                 return new ClienteNaoEncontradoException(id);
             });
+
+        if (input.getDocumento() != null && !clienteExistente.getDocumento().equals(input.getDocumento())) {
+            log.warn("Tentativa de alterar documento do cliente ID={}", id);
+            throw new ClienteDocumentoNaoPodeSerAlteradoException();
+        }
 
         if (!clienteExistente.getEmail().equals(input.getEmail())) {
             if (clienteRepositoryPort.existePorEmail(input.getEmail())) {

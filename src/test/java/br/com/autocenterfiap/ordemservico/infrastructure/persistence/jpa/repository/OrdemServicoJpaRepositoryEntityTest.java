@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository;
 
-import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.model.Cliente;
-import br.com.autocenterfiap.cliente.model.Endereco;
-import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.EnderecoJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.repository.ClienteJpaRepository;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
@@ -19,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,9 +45,9 @@ class OrdemServicoJpaRepositoryEntityTest {
     private VeiculoJpaRepository veiculoRepository;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteJpaRepository clienteRepository;
 
-    private Cliente cliente;
+    private ClienteJpaEntity cliente;
     private VeiculoJpaEntity veiculo;
     private OrdemServicoJpaEntity ordemServicoJpaEntity;
     private OrdemServicoJpaEntity ordemServicoJpaEntitySecundaria;
@@ -60,14 +62,14 @@ class OrdemServicoJpaRepositoryEntityTest {
         clienteRepository.flush();
         entityManager.flush();
 
-        cliente = new Cliente();
+        cliente = new ClienteJpaEntity();
         cliente.setNome("João da Silva");
         cliente.setTipoCliente(TipoCliente.PESSOA_FISICA);
         cliente.setDocumento("12345678901");
         cliente.setEmail("joao@email.com");
         cliente.setTelefone("11999999999");
         cliente.setDataNascimento(LocalDate.of(1990, 1, 1));
-        Endereco endereco = new Endereco();
+        EnderecoJpaEntity endereco = new EnderecoJpaEntity();
         endereco.setCep("01000-00");
         endereco.setLogradouro("Rua Teste");
         endereco.setNumero("123");
@@ -153,7 +155,7 @@ class OrdemServicoJpaRepositoryEntityTest {
         entityManager.persist(ordemServicoJpaEntitySecundaria);
         entityManager.flush();
 
-        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.ABERTA);
+        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.ABERTA, Pageable.unpaged()).getContent();
 
         assertNotNull(encontradas);
         assertEquals(1, encontradas.size());
@@ -166,7 +168,7 @@ class OrdemServicoJpaRepositoryEntityTest {
         entityManager.persist(ordemServicoJpaEntity);
         entityManager.flush();
 
-        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.CANCELADA);
+        List<OrdemServicoJpaEntity> encontradas = repository.findByStatus(StatusOS.CANCELADA, Pageable.unpaged()).getContent();
 
         assertNotNull(encontradas);
         assertTrue(encontradas.isEmpty());

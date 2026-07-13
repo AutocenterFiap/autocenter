@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 public class AtualizarClienteInput {
     private String nome;
+    private String documento;
     private String email;
     private String telefone;
     private EnderecoInput endereco;

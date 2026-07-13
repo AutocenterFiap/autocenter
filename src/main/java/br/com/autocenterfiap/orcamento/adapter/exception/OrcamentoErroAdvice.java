@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.orcamento.handler;
+package br.com.autocenterfiap.orcamento.adapter.exception;
 
 import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;

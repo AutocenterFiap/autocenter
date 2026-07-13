@@ -1,11 +1,14 @@
-package br.com.autocenterfiap.orcamento.controller;
+package br.com.autocenterfiap.orcamento.adapter.in;
 
 import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
-import br.com.autocenterfiap.orcamento.dto.EnvioRequest;
-import br.com.autocenterfiap.orcamento.dto.OrcamentoResponse;
-import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
-import br.com.autocenterfiap.orcamento.model.Orcamento;
-import br.com.autocenterfiap.orcamento.service.OrcamentoService;
+import br.com.autocenterfiap.orcamento.adapter.in.dto.EnvioRequest;
+import br.com.autocenterfiap.orcamento.adapter.in.dto.OrcamentoResponse;
+import br.com.autocenterfiap.orcamento.adapter.mapper.OrcamentoAdapterMapper;
+import br.com.autocenterfiap.orcamento.application.dto.OrcamentoOutput;
+import br.com.autocenterfiap.orcamento.application.dto.PageResult;
+import br.com.autocenterfiap.orcamento.application.dto.PaginationRequest;
+import br.com.autocenterfiap.orcamento.application.usecase.*;
+import br.com.autocenterfiap.orcamento.domain.enums.StatusOrcamento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,20 +16,32 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/v1/orcamentos")
 @Tag(name = "Orcamentos", description = "API para gerenciamento de Orcamentos da oficina")
 public class OrcamentoController {
 
-    private final OrcamentoService orcamentoService;
+    private final BuscarOrcamentoPorIdUseCase buscarOrcamentoPorIdUseCase;
+    private final BuscarTodosOrcamentosUseCase buscarTodosOrcamentosUseCase;
+    private final AprovarOrcamentoUseCase aprovarOrcamentoUseCase;
+    private final ReprovarOrcamentoUseCase reprovarOrcamentoUseCase;
+
+    public OrcamentoController(
+            BuscarOrcamentoPorIdUseCase buscarOrcamentoPorIdUseCase,
+            BuscarTodosOrcamentosUseCase buscarTosOrcamentosUseCase,
+            AprovarOrcamentoUseCase aprovarOrcamentoUseCase,
+            ReprovarOrcamentoUseCase reprovarOrcamentoUseCase
+    ) {
+        this.buscarOrcamentoPorIdUseCase = buscarOrcamentoPorIdUseCase;
+        this.buscarTodosOrcamentosUseCase = buscarTosOrcamentosUseCase;
+        this.aprovarOrcamentoUseCase = aprovarOrcamentoUseCase;
+        this.reprovarOrcamentoUseCase = reprovarOrcamentoUseCase;
+    }
 
     @Operation(
             summary = "Aprovar orcamento",
@@ -52,8 +67,8 @@ public class OrcamentoController {
             @Parameter(description = "ID do orcamento a ser aprovado", required = true)
             @PathVariable Long id
     ) {
-        Orcamento orcamento = orcamentoService.aprovar(id);
-        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
+        OrcamentoOutput orcamento = this.aprovarOrcamentoUseCase.executar(id);
+        return ResponseEntity.ok(OrcamentoAdapterMapper.orcamentoOutputToOrcamentoResponse(orcamento));
     }
 
     @Operation(
@@ -80,8 +95,8 @@ public class OrcamentoController {
             @Parameter(description = "ID do orcamento a ser reprovado", required = true)
             @PathVariable Long id
     ) {
-        Orcamento orcamento = orcamentoService.reprovar(id);
-        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
+        OrcamentoOutput orcamento = this.reprovarOrcamentoUseCase.executar(id);
+        return ResponseEntity.ok(OrcamentoAdapterMapper.orcamentoOutputToOrcamentoResponse(orcamento));
     }
 
     @Operation(
@@ -124,13 +139,16 @@ public class OrcamentoController {
             description = "Lista de orcamentos retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<Page<OrcamentoResponse>> listarTodos(
-            @RequestParam(required = true) StatusOrcamento status,
-            Pageable pageable) {
-        Page<Orcamento> orcamentos = orcamentoService.listarTodos(status, pageable);
-        Page<OrcamentoResponse> orcamentoResponses = orcamentos.map(Orcamento::paraOrcamentoResponse);
+    public ResponseEntity<PageResult<OrcamentoResponse>> listarTodos
+            (@RequestParam(required = true) StatusOrcamento status, Pageable pageable) {
 
-        return ResponseEntity.ok(orcamentoResponses);
+        PaginationRequest pagination = new PaginationRequest(
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        return ResponseEntity.ok(
+            this.buscarTodosOrcamentosUseCase.executar(status, pagination)
+                .map(OrcamentoAdapterMapper::orcamentoOutputToOrcamentoResponse)
+        );
     }
 
     @Operation(
@@ -152,8 +170,8 @@ public class OrcamentoController {
     public ResponseEntity<OrcamentoResponse> buscarPorId(
             @Parameter(description = "ID do orcamento a ser buscado", required = true)
             @PathVariable Long id) {
-        Orcamento orcamento = orcamentoService.findById(id);
+        OrcamentoOutput orcamento = this.buscarOrcamentoPorIdUseCase.executar(id);
 
-        return ResponseEntity.ok(orcamento.paraOrcamentoResponse());
+        return ResponseEntity.ok(OrcamentoAdapterMapper.orcamentoOutputToOrcamentoResponse(orcamento));
     }
 }

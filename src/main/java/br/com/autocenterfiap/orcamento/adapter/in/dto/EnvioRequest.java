@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.orcamento.dto;
+package br.com.autocenterfiap.orcamento.adapter.in.dto;
 
-import br.com.autocenterfiap.orcamento.enums.TipoEnvio;
+import br.com.autocenterfiap.orcamento.domain.enums.TipoEnvio;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

@@ -1,6 +1,6 @@
-package br.com.autocenterfiap.orcamento.dto;
+package br.com.autocenterfiap.orcamento.adapter.in.dto;
 
-import br.com.autocenterfiap.orcamento.enums.StatusOrcamento;
+import br.com.autocenterfiap.orcamento.domain.enums.StatusOrcamento;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.orcamento.enums;
+package br.com.autocenterfiap.orcamento.domain.enums;
 
 public enum StatusOrcamento {
     GERADO,

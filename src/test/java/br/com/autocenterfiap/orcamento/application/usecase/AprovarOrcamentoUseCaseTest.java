@@ -5,8 +5,9 @@ import br.com.autocenterfiap.orcamento.application.exception.OrcamentoNaoEncontr
 import br.com.autocenterfiap.orcamento.application.port.OrcamentoRepositoryPort;
 import br.com.autocenterfiap.orcamento.domain.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.domain.enums.StatusOrcamento;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
+import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
+import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,18 +31,19 @@ class AprovarOrcamentoUseCaseTest {
     private OrcamentoRepositoryPort orcamentoRepositoryPort;
 
     @Mock
-    private OrdemServicoJpaRepository ordemServicoJpaRepository;
+    private OrdemServicoRepositoryPort ordemServicoRepositoryPort;
 
     @InjectMocks
     private AprovarOrcamentoUseCase aprovarOrcamentoUseCase;
 
     private Orcamento orcamento;
-    private OrdemServicoJpaEntity ordemServicoJpaEntity;
+    private OrdemServico ordemServico;
 
     @BeforeEach
     void setUp() {
-        ordemServicoJpaEntity = OrdemServicoJpaEntity.builder()
+        ordemServico = OrdemServico.builder()
                 .id(10L)
+                .statusOS(StatusOS.AGUARDANDO_APROVACAO)
                 .build();
 
         orcamento = Orcamento.builder()
@@ -57,7 +59,7 @@ class AprovarOrcamentoUseCaseTest {
     void deveAprovarOrcamentoEAtualizarStatusParaAprovado() {
         when(orcamentoRepositoryPort.buscarPorId(1L)).thenReturn(Optional.of(orcamento));
         when(orcamentoRepositoryPort.salvar(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(ordemServicoJpaRepository.findById(10L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(ordemServicoRepositoryPort.findById(10L)).thenReturn(Optional.of(ordemServico));
 
         OrcamentoOutput output = aprovarOrcamentoUseCase.executar(1L);
 
@@ -70,11 +72,11 @@ class AprovarOrcamentoUseCaseTest {
     void deveAprovarOrdemServicoVinculada() {
         when(orcamentoRepositoryPort.buscarPorId(1L)).thenReturn(Optional.of(orcamento));
         when(orcamentoRepositoryPort.salvar(any(Orcamento.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(ordemServicoJpaRepository.findById(10L)).thenReturn(Optional.of(ordemServicoJpaEntity));
+        when(ordemServicoRepositoryPort.findById(10L)).thenReturn(Optional.of(ordemServico));
 
         aprovarOrcamentoUseCase.executar(1L);
 
-        verify(ordemServicoJpaRepository).findById(10L);
+        verify(ordemServicoRepositoryPort).findById(10L);
     }
 
     @Test

@@ -5,9 +5,11 @@ import br.com.autocenterfiap.orcamento.application.dto.OrcamentoOutput;
 import br.com.autocenterfiap.orcamento.application.port.OrcamentoRepositoryPort;
 import br.com.autocenterfiap.orcamento.domain.entity.Orcamento;
 import br.com.autocenterfiap.orcamento.domain.enums.StatusOrcamento;
+import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
+import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
+import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OrdemServicoJpaEntity;
-import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,16 +37,16 @@ class GerarOrcamentoUseCaseTest {
     private CriarOrcamentoUseCase criarOrcamentoUseCase;
 
     @Mock
-    private OrdemServicoJpaRepository ordemServicoJpaRepository;
+    private OrdemServicoRepositoryPort ordemServicoRepositoryPort;
 
     @InjectMocks
     private GerarOrcamentoUseCase gerarOrcamentoUseCase;
 
-    private OrdemServicoJpaEntity ordemServicoJpaEntity;
+    private OrdemServico ordemServico;
 
     @BeforeEach
     void setUp() {
-        ordemServicoJpaEntity = OrdemServicoJpaEntity.builder()
+        ordemServico = OrdemServico.builder()
                 .id(1L)
                 .valorTotal(BigDecimal.valueOf(500))
                 .statusOS(StatusOS.AGUARDANDO_APROVACAO)
@@ -53,8 +56,10 @@ class GerarOrcamentoUseCaseTest {
     @Test
     @DisplayName("Deve gerar orçamento para OS aguardando aprovação sem orçamento existente")
     void deveGerarOrcamentoParaOSAguardandoAprovacao() {
-        when(ordemServicoJpaRepository.findByStatus(StatusOS.AGUARDANDO_APROVACAO))
-                .thenReturn(List.of(ordemServicoJpaEntity));
+        PageResult<OrdemServico> page = new PageResult<>(List.of(ordemServico), 0, 100, 1L, 1L);
+
+        when(ordemServicoRepositoryPort.findByStatus(eq(StatusOS.AGUARDANDO_APROVACAO), any(PaginationRequest.class)))
+                .thenReturn(page);
         when(orcamentoRepositoryPort.buscarOrcamentoAguardandoAprovacaoPorOS(1L))
                 .thenReturn(Optional.empty());
         when(criarOrcamentoUseCase.executar(any(CriarOrcamentoInput.class)))
@@ -79,8 +84,10 @@ class GerarOrcamentoUseCaseTest {
                 .statusOrcamento(StatusOrcamento.AGUARDANDO_APROVACAO)
                 .build();
 
-        when(ordemServicoJpaRepository.findByStatus(StatusOS.AGUARDANDO_APROVACAO))
-                .thenReturn(List.of(ordemServicoJpaEntity));
+        PageResult<OrdemServico> page = new PageResult<>(List.of(ordemServico), 0, 100, 1L, 1L);
+
+        when(ordemServicoRepositoryPort.findByStatus(eq(StatusOS.AGUARDANDO_APROVACAO), any(PaginationRequest.class)))
+                .thenReturn(page);
         when(orcamentoRepositoryPort.buscarOrcamentoAguardandoAprovacaoPorOS(1L))
                 .thenReturn(Optional.of(orcamentoExistente));
 
@@ -92,8 +99,10 @@ class GerarOrcamentoUseCaseTest {
     @Test
     @DisplayName("Deve ignorar quando não houver OS aguardando aprovação")
     void deveIgnorarQuandoNaoHouverOSAguardandoAprovacao() {
-        when(ordemServicoJpaRepository.findByStatus(StatusOS.AGUARDANDO_APROVACAO))
-                .thenReturn(List.of());
+        PageResult<OrdemServico> pageVazia = new PageResult<>(List.of(), 0, 100, 0L, 0L);
+
+        when(ordemServicoRepositoryPort.findByStatus(eq(StatusOS.AGUARDANDO_APROVACAO), any(PaginationRequest.class)))
+                .thenReturn(pageVazia);
 
         gerarOrcamentoUseCase.executar();
 

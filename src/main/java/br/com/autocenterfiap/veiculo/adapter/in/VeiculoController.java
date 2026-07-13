@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import br.com.autocenterfiap.veiculo.adapter.in.dto.VeiculoRequestDTO;
 import br.com.autocenterfiap.veiculo.adapter.in.dto.VeiculoResponseDTO;
 import br.com.autocenterfiap.veiculo.adapter.mapper.VeiculoAdapterMapper;
+import br.com.autocenterfiap.veiculo.application.dto.PageResult;
 import br.com.autocenterfiap.veiculo.application.dto.PaginationRequest;
 import br.com.autocenterfiap.veiculo.application.usecase.*;
 
@@ -108,23 +107,15 @@ public class VeiculoController {
         description = "Lista de veículos retornada com sucesso"
     )
     @GetMapping
-    public ResponseEntity<Page<VeiculoResponseDTO>> listarTodos(Pageable pageable) {
+    public ResponseEntity<PageResult<VeiculoResponseDTO>> listarTodos(Pageable pageable) {
         PaginationRequest pagination = new PaginationRequest(
             pageable.getPageNumber(),
             pageable.getPageSize()
         );
-
-        var pageResultOutput = listarVeiculosUseCase.executar(pagination);
-
-        Page<VeiculoResponseDTO> response = new PageImpl<>(
-            pageResultOutput.getContent().stream()
+        return ResponseEntity.ok(
+            listarVeiculosUseCase.executar(pagination)
                 .map(VeiculoAdapterMapper::veiculoOutputToVeiculoResponse)
-                .toList(),
-            pageable,
-            pageResultOutput.getTotalElements()
         );
-
-        return ResponseEntity.ok(response);
     }
 
     @Operation(

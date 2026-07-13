@@ -3,6 +3,7 @@ package br.com.autocenterfiap.servico.adapter.in;
 import br.com.autocenterfiap.servico.adapter.in.dto.ServicoRequestDTO;
 import br.com.autocenterfiap.servico.adapter.in.dto.ServicoResponseDTO;
 import br.com.autocenterfiap.servico.adapter.mapper.ServicoAdapterMapper;
+import br.com.autocenterfiap.servico.application.dto.PageResult;
 import br.com.autocenterfiap.servico.application.dto.PaginationRequest;
 import br.com.autocenterfiap.servico.application.usecase.*;
 import br.com.autocenterfiap.servico.domain.enums.StatusServico;
@@ -11,8 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,23 +63,15 @@ public class ServicoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de serviços retornada com sucesso")
     })
-    public ResponseEntity<Page<ServicoResponseDTO>> listarTodos(Pageable pageable) {
+    public ResponseEntity<PageResult<ServicoResponseDTO>> listarTodos(Pageable pageable) {
         PaginationRequest pagination = new PaginationRequest(
                 pageable.getPageNumber(),
                 pageable.getPageSize()
         );
-
-        var pageResult = listarServicosUseCase.executar(pagination);
-
-        Page<ServicoResponseDTO> response = new PageImpl<>(
-                pageResult.getContent().stream()
-                        .map(ServicoAdapterMapper::servicoOutputToServicoResponse)
-                        .toList(),
-                pageable,
-                pageResult.getTotalElements()
+        return ResponseEntity.ok(
+            listarServicosUseCase.executar(pagination)
+                .map(ServicoAdapterMapper::servicoOutputToServicoResponse)
         );
-
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -100,23 +91,15 @@ public class ServicoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de serviços filtrada por status retornada com sucesso")
     })
-    public ResponseEntity<Page<ServicoResponseDTO>> listaServicosPorStatus(@PathVariable StatusServico status, Pageable pageable) {
+    public ResponseEntity<PageResult<ServicoResponseDTO>> listaServicosPorStatus(@PathVariable StatusServico status, Pageable pageable) {
         PaginationRequest pagination = new PaginationRequest(
                 pageable.getPageNumber(),
                 pageable.getPageSize()
         );
-
-        var pageResult = listarServicosPorStatusUseCase.executar(status, pagination);
-
-        Page<ServicoResponseDTO> response = new PageImpl<>(
-                pageResult.getContent().stream()
-                        .map(ServicoAdapterMapper::servicoOutputToServicoResponse)
-                        .toList(),
-                pageable,
-                pageResult.getTotalElements()
+        return ResponseEntity.ok(
+            listarServicosPorStatusUseCase.executar(status, pagination)
+                .map(ServicoAdapterMapper::servicoOutputToServicoResponse)
         );
-
-        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")

@@ -7,7 +7,7 @@ import br.com.autocenterfiap.servico.infrastructure.persistence.jpa.repository.S
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
 
 @Configuration
 public class ServicoConfiguration {
@@ -15,9 +15,9 @@ public class ServicoConfiguration {
     @Bean
     public ServicoRepositoryPort servicoRepositoryPort(
         ServicoJpaRepository servicoJpaRepository,
-        OSItemServicoRepository osItemServicoRepository
+        OSItemServicoJpaRepository osItemServicoJpaRepository
     ) {
-        return new ServicoRepositoryJpaAdapter(servicoJpaRepository, osItemServicoRepository);
+        return new ServicoRepositoryJpaAdapter(servicoJpaRepository, osItemServicoJpaRepository);
     }
 
     @Bean

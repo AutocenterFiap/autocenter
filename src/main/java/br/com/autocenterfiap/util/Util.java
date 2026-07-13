@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.util;
 
-import br.com.autocenterfiap.ordemservico.model.OSItemServico;
-import br.com.autocenterfiap.ordemservico.model.OrdemServico;
+import br.com.autocenterfiap.ordemservico.domain.entity.OSItemServico;
+import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 
 import java.math.BigDecimal;
 

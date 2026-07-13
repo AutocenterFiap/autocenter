@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.veiculo.infrastructure.config;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.application.port.VeiculoRepositoryPort;
 import br.com.autocenterfiap.veiculo.application.usecase.*;
 import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.adapter.VeiculoRepositoryJpaAdapter;
@@ -15,9 +15,9 @@ public class VeiculoConfiguration {
     @Bean
     public VeiculoRepositoryPort veiculoRepositoryPort(
         VeiculoJpaRepository veiculoJpaRepository,
-        OrdemServicoRepository ordemServicoRepository
+        OrdemServicoJpaRepository ordemServicoJpaRepository
     ) {
-        return new VeiculoRepositoryJpaAdapter(veiculoJpaRepository, ordemServicoRepository);
+        return new VeiculoRepositoryJpaAdapter(veiculoJpaRepository, ordemServicoJpaRepository);
     }
 
     @Bean

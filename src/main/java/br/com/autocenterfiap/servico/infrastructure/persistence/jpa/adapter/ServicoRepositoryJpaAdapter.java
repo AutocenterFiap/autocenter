@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.servico.infrastructure.persistence.jpa.adapter;
 
-import br.com.autocenterfiap.ordemservico.repository.OSItemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OSItemServicoJpaRepository;
 import br.com.autocenterfiap.servico.application.dto.PageResult;
 import br.com.autocenterfiap.servico.application.dto.PaginationRequest;
 import br.com.autocenterfiap.servico.application.port.ServicoRepositoryPort;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class ServicoRepositoryJpaAdapter implements ServicoRepositoryPort {
 
     private final ServicoJpaRepository servicoJpaRepository;
-    private final OSItemServicoRepository osItemServicoRepository;
+    private final OSItemServicoJpaRepository osItemServicoJpaRepository;
 
     @Override
     public Optional<Servico> buscarPorId(Long id) {
@@ -84,7 +84,7 @@ public class ServicoRepositoryJpaAdapter implements ServicoRepositoryPort {
 
     @Override
     public boolean existeOrdemServicoAssociada(Long id) {
-        return osItemServicoRepository.existsByServicoId(id);
+        return osItemServicoJpaRepository.existsByServicoId(id);
     }
 
     @Override

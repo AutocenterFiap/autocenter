@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.adapter;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import br.com.autocenterfiap.veiculo.application.dto.PageResult;
 import br.com.autocenterfiap.veiculo.application.dto.PaginationRequest;
 import br.com.autocenterfiap.veiculo.application.port.VeiculoRepositoryPort;
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class VeiculoRepositoryJpaAdapter implements VeiculoRepositoryPort {
 
     private final VeiculoJpaRepository veiculoJpaRepository;
-    private final OrdemServicoRepository ordemServicoRepository;
+    private final OrdemServicoJpaRepository ordemServicoJpaRepository;
 
     @Override
     public Optional<Veiculo> buscarPorId(Long id) {
@@ -64,7 +64,7 @@ public class VeiculoRepositoryJpaAdapter implements VeiculoRepositoryPort {
 
     @Override
     public boolean existeOrdemServicoAssociada(Long veiculoId) {
-        return ordemServicoRepository.existsByVeiculoId(veiculoId);
+        return ordemServicoJpaRepository.existsByVeiculoId(veiculoId);
     }
 
     @Override

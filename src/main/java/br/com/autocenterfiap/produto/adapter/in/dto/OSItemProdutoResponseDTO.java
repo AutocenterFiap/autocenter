@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.produto.adapter.in.dto;
 
-import br.com.autocenterfiap.ordemservico.model.OSItemProduto;
+import br.com.autocenterfiap.ordemservico.domain.entity.OSItemProduto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;

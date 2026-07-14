@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,8 @@ public interface OSItemProdutoJpaRepository extends JpaRepository<OSItemProdutoJ
     Page<OSItemProdutoJpaEntity> findByOrdemServicoJpaEntityId(Long ordemServicoId, Pageable pageable);
 
     Optional<OSItemProdutoJpaEntity> findByOrdemServicoJpaEntityIdAndProdutoId(Long ordemServicoId, Long produtoId);
+
+    Page<OSItemProdutoJpaEntity> findAllByIdIn(Collection<Long> ids, Pageable pageable);
 
     @Query("""
             SELECT COALESCE(SUM(i.precoUnitarioNoMomento * i.quantidade), 0)

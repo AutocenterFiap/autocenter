@@ -12,9 +12,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Optional;
 
 public class OSItemProdutoRepositoryJpaAdapter implements OSItemProdutoRepositoryPort {
+    @Override
+    public PageResult<OSItemProduto> findAllByIdIn(Collection<Long> ids, PaginationRequest pagination) {
+
+        PageRequest pageRequest = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by(Sort.Direction.fromString(pagination.getSortDirection()), pagination.getSortBy())
+        );
+
+        Page<OSItemProdutoJpaEntity> page = this.osItemProdutoJpaRepository.findAllByIdIn(ids, pageRequest);
+
+        return new PageResult<>(
+                page.getContent().stream().map(OSItemProdutoJpaMapper::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+
+        );
+    }
 
     private final OSItemProdutoJpaRepository osItemProdutoJpaRepository;
 

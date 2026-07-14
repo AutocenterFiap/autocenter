@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public class OSItemServicoRepositoryJpaAdapter implements OSItemServicoRepositoryPort {
@@ -52,6 +53,25 @@ public class OSItemServicoRepositoryJpaAdapter implements OSItemServicoRepositor
 
         Page<OSItemServicoJpaEntity> page = this.osItemServicoJpaRepository
                 .findByOrdemServicoJpaEntityId(ordermServicoId, pageRequest);
+
+        return new PageResult<>(
+                page.getContent().stream().map(OSItemServicoJpaMapper::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
+    }
+
+    @Override
+    public PageResult<OSItemServico> findAllByIdIn(Collection<Long> ids, PaginationRequest pagination) {
+        PageRequest pageRequest = PageRequest.of(
+                pagination.getPageNumber(),
+                pagination.getPageSize(),
+                Sort.by(Sort.Direction.fromString(pagination.getSortDirection()), pagination.getSortBy())
+        );
+
+        Page<OSItemServicoJpaEntity> page = this.osItemServicoJpaRepository.findAllByIdIn(ids, pageRequest);
 
         return new PageResult<>(
                 page.getContent().stream().map(OSItemServicoJpaMapper::toDomain).toList(),

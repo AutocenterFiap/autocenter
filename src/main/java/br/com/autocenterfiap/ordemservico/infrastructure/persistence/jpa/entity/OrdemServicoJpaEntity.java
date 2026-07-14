@@ -59,10 +59,12 @@ public class OrdemServicoJpaEntity implements Serializable {
     private ClienteJpaEntity cliente;
 
     @OneToMany(mappedBy = "ordemServicoJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     @Schema(description = "Lista de serviços vinculados à Ordem de Serviço")
     private List<OSItemServicoJpaEntity> osItensServicos = new ArrayList<>();
 
     @OneToMany(mappedBy = "ordemServicoJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     @Schema(description = "Lista de produtos vinculados à Ordem de Serviço")
     private List<OSItemProdutoJpaEntity> osItensProdutos = new ArrayList<>();
 

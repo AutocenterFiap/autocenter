@@ -28,15 +28,15 @@ class ClienteValidatorTest {
     void devePassarSemExcecaoQuandoClienteExistir() {
         Long clienteId = 1L;
         when(clienteRepositoryPort.existePorId(clienteId)).thenReturn(true);
-        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, clienteId);
+        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, clienteId, java.util.List.of(), java.util.Map.of());
         Assertions.assertDoesNotThrow(() -> clienteValidator.validate(input));
-    }
+     }
 
     @Test
     void deveRetornarExcecaoQuandoClienteNaoExistir() {
         Long clienteId = 999L;
         when(clienteRepositoryPort.existePorId(clienteId)).thenReturn(false);
-        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, clienteId);
+        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, clienteId, java.util.List.of(), java.util.Map.of());
         assertThrows(ClienteNaoEncontradoException.class, () -> clienteValidator.validate(input));
     }
 }

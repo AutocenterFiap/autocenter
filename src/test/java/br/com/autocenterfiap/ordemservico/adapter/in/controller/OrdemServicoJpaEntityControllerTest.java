@@ -173,7 +173,7 @@ class OrdemServicoJpaEntityControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarOrdemServicoComSucesso() throws Exception {
-        OrdemServicoDTO dto = new OrdemServicoDTO(veiculo.getId(), cliente.getId());
+        OrdemServicoDTO dto = new OrdemServicoDTO(veiculo.getId(), cliente.getId(), java.util.List.of(), java.util.Map.of());
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/v1/ordem-servicos")
@@ -189,7 +189,7 @@ class OrdemServicoJpaEntityControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarOrdemServicoComDadosInvalidos() throws Exception {
-        OrdemServicoDTO dto = new OrdemServicoDTO(null, null);
+        OrdemServicoDTO dto = new OrdemServicoDTO(null, null, null, null);
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/v1/ordem-servicos")

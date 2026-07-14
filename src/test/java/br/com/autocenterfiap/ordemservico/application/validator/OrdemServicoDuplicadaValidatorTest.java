@@ -30,14 +30,14 @@ class OrdemServicoDuplicadaValidatorTest {
 
     @Test
     void devePassarQuandoNaoExistirOrdemServicoAbertaParaVeiculo() {
-        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, 1L);
+        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, 1L, List.of(), java.util.Map.of());
         doReturn(false).when(ordemServicoRepositoryPort).existsByVeiculoIdAndStatusOSIn(eq(1L), anyList());
         assertDoesNotThrow(() -> ordemServicoDuplicadaValidator.validate(input));
     }
 
     @Test
     void deveLancarExceptionQuandoExistirOrdemServicoAbertaParaVeiculo() {
-        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, 1L);
+        CriarOrdemServicoInput input = new CriarOrdemServicoInput(1L, 1L, List.of(), java.util.Map.of());
         doReturn(true).when(ordemServicoRepositoryPort).existsByVeiculoIdAndStatusOSIn(eq(1L), anyList());
         assertThrows(OrdemServicoJaAbertaParaVeiculoException.class,
                 () -> ordemServicoDuplicadaValidator.validate(input));

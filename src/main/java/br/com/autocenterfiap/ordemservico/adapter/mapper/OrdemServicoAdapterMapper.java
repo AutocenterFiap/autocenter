@@ -26,7 +26,8 @@ public class OrdemServicoAdapterMapper {
 
         return new CriarOrdemServicoInput(
                 dto.veiculoId(),
-                dto.clienteId()
-        );
+                dto.clienteId(),
+                dto.servicosIds(),
+                dto.produtosIdsAndQuantidades());
     }
 }

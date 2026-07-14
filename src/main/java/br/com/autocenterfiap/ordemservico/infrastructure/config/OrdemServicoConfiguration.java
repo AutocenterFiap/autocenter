@@ -1,6 +1,8 @@
 package br.com.autocenterfiap.ordemservico.infrastructure.config;
 
 import br.com.autocenterfiap.cliente.application.port.ClienteRepositoryPort;
+import br.com.autocenterfiap.ordemservico.application.port.OSItemProdutoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.usecase.OrdemServicoUseCase.*;
 import br.com.autocenterfiap.ordemservico.application.validator.ClienteValidator;
@@ -9,6 +11,8 @@ import br.com.autocenterfiap.ordemservico.application.validator.OrdemServicoVali
 import br.com.autocenterfiap.ordemservico.application.validator.VeiculoValidator;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.adapter.OrdemServicoRepositoryJpaAdapter;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
+import br.com.autocenterfiap.produto.application.port.ProdutoRepositoryPort;
+import br.com.autocenterfiap.servico.application.port.ServicoRepositoryPort;
 import br.com.autocenterfiap.veiculo.application.port.VeiculoRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +30,10 @@ public class OrdemServicoConfiguration {
     @Bean
     public CriarOrdemServicoUseCase criarOrdemServicoUseCase(
             OrdemServicoRepositoryPort ordemServicoRepositoryPort,
+            OSItemProdutoRepositoryPort osItemProdutoRepositoryPort,
+            OSItemServicoRepositoryPort osItemServicoRepositoryPort,
+            ProdutoRepositoryPort produtoRepositoryPort,
+            ServicoRepositoryPort servicoRepositoryPort,
             VeiculoRepositoryPort veiculoRepositoryPort,
             ClienteRepositoryPort clienteRepositoryPort,
             OrdemServicoDuplicadaValidator ordemServicoValidator,
@@ -33,7 +41,15 @@ public class OrdemServicoConfiguration {
             VeiculoValidator veiculoValidator
     ) {
         List<OrdemServicoValidator> validators = List.of(ordemServicoValidator, clienteValidator, veiculoValidator);
-        return new CriarOrdemServicoUseCase(ordemServicoRepositoryPort, veiculoRepositoryPort, clienteRepositoryPort, validators);
+        return new CriarOrdemServicoUseCase(
+                ordemServicoRepositoryPort,
+                osItemProdutoRepositoryPort,
+                osItemServicoRepositoryPort,
+                produtoRepositoryPort,
+                servicoRepositoryPort,
+                veiculoRepositoryPort,
+                clienteRepositoryPort,
+                validators);
     }
 
     @Bean

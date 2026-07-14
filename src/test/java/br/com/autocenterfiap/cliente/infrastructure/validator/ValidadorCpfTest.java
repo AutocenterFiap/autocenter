@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.cliente.validator;
+package br.com.autocenterfiap.cliente.infrastructure.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,19 +9,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("CPF Validator - Testes Unitários")
-class CpfValidatorTest {
+class ValidadorCpfTest {
 
-    private CpfValidator validator;
+    private ValidadorCpf validator;
 
     @BeforeEach
     void setUp() {
-        validator = new CpfValidator();
+        validator = new ValidadorCpf();
     }
 
     @Test
     void deveValidarCpfValido() {
         String cpfValido = "11144477735"; // CPF válido de teste
-        boolean resultado = validator.isValid(cpfValido);
+        boolean resultado = validator.validar(cpfValido);
         assertTrue(resultado, "CPF válido deve ser aceito");
     }
 
@@ -32,39 +32,39 @@ class CpfValidatorTest {
             "52998224725"
     })
     void deveValidarMultiplosCpfsValidos(String cpf) {
-        assertTrue(validator.isValid(cpf), "CPF " + cpf + " deveria ser válido");
+        assertTrue(validator.validar(cpf), "CPF " + cpf + " deveria ser válido");
     }
 
     @Test
     void deveRejeitarCpfComTodosDigitosIguais() {
-        assertFalse(validator.isValid("11111111111"));
-        assertFalse(validator.isValid("00000000000"));
-        assertFalse(validator.isValid("99999999999"));
+        assertFalse(validator.validar("11111111111"));
+        assertFalse(validator.validar("00000000000"));
+        assertFalse(validator.validar("99999999999"));
     }
 
     @Test
     void deveRejeitarCpfNulo() {
-        assertFalse(validator.isValid(null));
+        assertFalse(validator.validar(null));
     }
 
     @Test
     void deveRejeitarCpfComTamanhoIncorreto() {
-        assertFalse(validator.isValid("123456789"));     // muito curto
-        assertFalse(validator.isValid("123456789012"));  // muito longo
-        assertFalse(validator.isValid(""));              // vazio
+        assertFalse(validator.validar("123456789"));     // muito curto
+        assertFalse(validator.validar("123456789012"));  // muito longo
+        assertFalse(validator.validar(""));              // vazio
     }
 
     @Test
     void deveRejeitarCpfComCaracteresNaoNumericos() {
-        assertFalse(validator.isValid("111.444.777-35")); // com formatação
-        assertFalse(validator.isValid("111444777ab"));    // com letras
-        assertFalse(validator.isValid("111 444 777 35")); // com espaços
+        assertFalse(validator.validar("111.444.777-35")); // com formatação
+        assertFalse(validator.validar("111444777ab"));    // com letras
+        assertFalse(validator.validar("111 444 777 35")); // com espaços
     }
 
     @Test
     void deveRejeitarCpfComDigitoVerificadorIncorreto() {
         String cpfInvalido = "11144477700"; // dígito verificador errado
-        boolean resultado = validator.isValid(cpfInvalido);
+        boolean resultado = validator.validar(cpfInvalido);
         assertFalse(resultado, "CPF com dígito verificador incorreto deve ser rejeitado");
     }
 
@@ -74,7 +74,7 @@ class CpfValidatorTest {
             "11122233344"
     })
     void deveRejeitarMultiplosCpfsInvalidos(String cpf) {
-        assertFalse(validator.isValid(cpf), "CPF " + cpf + " deveria ser inválido");
+        assertFalse(validator.validar(cpf), "CPF " + cpf + " deveria ser inválido");
     }
 
     @Test

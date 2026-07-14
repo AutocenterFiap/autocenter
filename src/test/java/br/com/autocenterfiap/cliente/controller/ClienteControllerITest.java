@@ -1,9 +1,9 @@
 package br.com.autocenterfiap.cliente.controller;
 
-import br.com.autocenterfiap.cliente.enums.TipoCliente;
-import br.com.autocenterfiap.cliente.model.Cliente;
-import br.com.autocenterfiap.cliente.model.Endereco;
-import br.com.autocenterfiap.cliente.repository.ClienteRepository;
+import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.EnderecoJpaEntity;
+import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.repository.ClienteJpaRepository;
 import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,14 +39,14 @@ class ClienteControllerITest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteJpaRepository clienteRepository;
 
     @Autowired
     private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
-    private Cliente clientePF;
-    private Cliente clientePJ;
-    private Endereco endereco;
+    private ClienteJpaEntity clientePF;
+    private ClienteJpaEntity clientePJ;
+    private EnderecoJpaEntity endereco;
 
     @BeforeEach
     void setUp() {
@@ -56,7 +56,7 @@ class ClienteControllerITest {
         clienteRepository.flush();
 
         // Setup Endereço
-        endereco = new Endereco(
+        endereco = new EnderecoJpaEntity(
                 "01310100",
                 "Avenida Paulista",
                 "1578",
@@ -67,7 +67,7 @@ class ClienteControllerITest {
         );
 
         // Setup Cliente Pessoa Física
-        clientePF = new Cliente();
+        clientePF = new ClienteJpaEntity();
         clientePF.setNome("João da Silva");
         clientePF.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clientePF.setDocumento("11144477735");
@@ -77,7 +77,7 @@ class ClienteControllerITest {
         clientePF.setDataNascimento(LocalDate.of(1990, 5, 15));
 
         // Setup Cliente Pessoa Jurídica
-        clientePJ = new Cliente();
+        clientePJ = new ClienteJpaEntity();
         clientePJ.setNome("Empresa ABC LTDA");
         clientePJ.setTipoCliente(TipoCliente.PESSOA_JURIDICA);
         clientePJ.setDocumento("11222333000181");
@@ -117,7 +117,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarClientePorIdComSucesso() throws Exception {
-        Cliente clienteSalvo = clienteRepository.save(clientePF);
+        ClienteJpaEntity clienteSalvo = clienteRepository.save(clientePF);
 
         mockMvc.perform(get("/v1/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -186,7 +186,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarClienteComDadosInvalidos() throws Exception {
-        Cliente clienteInvalido = new Cliente();
+        ClienteJpaEntity clienteInvalido = new ClienteJpaEntity();
         clienteInvalido.setNome(""); // nome vazio - inválido
         clienteInvalido.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteInvalido.setDocumento("11144477735");
@@ -202,7 +202,7 @@ class ClienteControllerITest {
     void deveRetornar409AoCriarClienteComDocumentoJaCadastrado() throws Exception {
         clienteRepository.save(clientePF);
 
-        Cliente clienteDuplicado = new Cliente();
+        ClienteJpaEntity clienteDuplicado = new ClienteJpaEntity();
         clienteDuplicado.setNome("Maria da Silva");
         clienteDuplicado.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteDuplicado.setDocumento("11144477735"); // mesmo documento
@@ -221,7 +221,7 @@ class ClienteControllerITest {
     void deveRetornar409AoCriarClienteComEmailJaCadastrado() throws Exception {
         clienteRepository.save(clientePF);
 
-        Cliente clienteDuplicado = new Cliente();
+        ClienteJpaEntity clienteDuplicado = new ClienteJpaEntity();
         clienteDuplicado.setNome("Maria da Silva");
         clienteDuplicado.setTipoCliente(TipoCliente.PESSOA_FISICA);
         clienteDuplicado.setDocumento("52998224725");
@@ -260,7 +260,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveAtualizarClienteComSucesso() throws Exception {
-        Cliente clienteSalvo = clienteRepository.save(clientePF);
+        ClienteJpaEntity clienteSalvo = clienteRepository.save(clientePF);
 
         clienteSalvo.setNome("João da Silva Updated");
         clienteSalvo.setTelefone("11999998888");
@@ -286,9 +286,9 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoTentarAlterarDocumento() throws Exception {
-        Cliente clienteSalvo = clienteRepository.save(clientePF);
+        ClienteJpaEntity clienteSalvo = clienteRepository.save(clientePF);
 
-        Cliente clienteComDocumentoAlterado = new Cliente();
+        ClienteJpaEntity clienteComDocumentoAlterado = new ClienteJpaEntity();
         clienteComDocumentoAlterado.setId(clienteSalvo.getId());
         clienteComDocumentoAlterado.setNome(clienteSalvo.getNome());
         clienteComDocumentoAlterado.setTipoCliente(clienteSalvo.getTipoCliente());
@@ -307,7 +307,7 @@ class ClienteControllerITest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveDeletarClienteComSucesso() throws Exception {
-        Cliente clienteSalvo = clienteRepository.save(clientePF);
+        ClienteJpaEntity clienteSalvo = clienteRepository.save(clientePF);
 
         mockMvc.perform(delete("/v1/clientes/{id}", clienteSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))

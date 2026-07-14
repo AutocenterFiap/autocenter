@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.orcamento.adapter.in;
 
-import br.com.autocenterfiap.cliente.dto.ClienteResponseDTO;
+import br.com.autocenterfiap.cliente.adapter.in.dto.ClienteResponseDTO;
 import br.com.autocenterfiap.orcamento.adapter.in.dto.EnvioRequest;
 import br.com.autocenterfiap.orcamento.adapter.in.dto.OrcamentoResponse;
 import br.com.autocenterfiap.orcamento.adapter.mapper.OrcamentoAdapterMapper;

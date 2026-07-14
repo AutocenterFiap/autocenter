@@ -1,4 +1,4 @@
-package br.com.autocenterfiap.cliente.validator;
+package br.com.autocenterfiap.cliente.infrastructure.validator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,19 +9,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("CNPJ Validator - Testes Unitários")
-class CnpjValidatorTest {
+class ValidadorCnpjTest {
 
-    private CnpjValidator validator;
+    private ValidadorCnpj validator;
 
     @BeforeEach
     void setUp() {
-        validator = new CnpjValidator();
+        validator = new ValidadorCnpj();
     }
 
     @Test
     void deveValidarCnpjValido() {
         String cnpjValido = "11222333000181"; // CNPJ válido de teste
-        boolean resultado = validator.isValid(cnpjValido);
+        boolean resultado = validator.validar(cnpjValido);
         assertTrue(resultado, "CNPJ válido deve ser aceito");
     }
 
@@ -32,39 +32,39 @@ class CnpjValidatorTest {
             "60701190000104"
     })
     void deveValidarMultiplosCnpjsValidos(String cnpj) {
-        assertTrue(validator.isValid(cnpj), "CNPJ " + cnpj + " deveria ser válido");
+        assertTrue(validator.validar(cnpj), "CNPJ " + cnpj + " deveria ser válido");
     }
 
     @Test
     void deveRejeitarCnpjComTodosDigitosIguais() {
-        assertFalse(validator.isValid("11111111111111"));
-        assertFalse(validator.isValid("00000000000000"));
-        assertFalse(validator.isValid("99999999999999"));
+        assertFalse(validator.validar("11111111111111"));
+        assertFalse(validator.validar("00000000000000"));
+        assertFalse(validator.validar("99999999999999"));
     }
 
     @Test
     void deveRejeitarCnpjNulo() {
-        assertFalse(validator.isValid(null));
+        assertFalse(validator.validar(null));
     }
 
     @Test
     void deveRejeitarCnpjComTamanhoIncorreto() {
-        assertFalse(validator.isValid("1122233300018"));   // muito curto
-        assertFalse(validator.isValid("112223330001811")); // muito longo
-        assertFalse(validator.isValid(""));                // vazio
+        assertFalse(validator.validar("1122233300018"));   // muito curto
+        assertFalse(validator.validar("112223330001811")); // muito longo
+        assertFalse(validator.validar(""));                // vazio
     }
 
     @Test
     void deveRejeitarCnpjComCaracteresNaoNumericos() {
-        assertFalse(validator.isValid("11.222.333/0001-81")); // com formatação
-        assertFalse(validator.isValid("1122233300018X"));     // com letras
-        assertFalse(validator.isValid("11 222 333 0001 81")); // com espaços
+        assertFalse(validator.validar("11.222.333/0001-81")); // com formatação
+        assertFalse(validator.validar("1122233300018X"));     // com letras
+        assertFalse(validator.validar("11 222 333 0001 81")); // com espaços
     }
 
     @Test
     void deveRejeitarCnpjComDigitoVerificadorIncorreto() {
         String cnpjInvalido = "11222333000100"; // dígito verificador errado
-        boolean resultado = validator.isValid(cnpjInvalido);
+        boolean resultado = validator.validar(cnpjInvalido);
         assertFalse(resultado, "CNPJ com dígito verificador incorreto deve ser rejeitado");
     }
 
@@ -75,7 +75,7 @@ class CnpjValidatorTest {
             "11122233344455"
     })
     void deveRejeitarMultiplosCnpjsInvalidos(String cnpj) {
-        assertFalse(validator.isValid(cnpj), "CNPJ " + cnpj + " deveria ser inválido");
+        assertFalse(validator.validar(cnpj), "CNPJ " + cnpj + " deveria ser inválido");
     }
 
     @Test

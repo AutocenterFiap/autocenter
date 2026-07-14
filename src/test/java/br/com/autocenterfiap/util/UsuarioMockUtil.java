@@ -1,19 +1,19 @@
 package br.com.autocenterfiap.util;
 
-import br.com.autocenterfiap.security.controller.request.PerfilRequest;
-import br.com.autocenterfiap.security.controller.request.UsuarioRequest;
-import br.com.autocenterfiap.security.controller.response.PerfilResponse;
-import br.com.autocenterfiap.security.controller.response.UsuarioResponse;
-import br.com.autocenterfiap.security.repository.entity.Perfil;
-import br.com.autocenterfiap.security.repository.entity.Usuario;
+import br.com.autocenterfiap.security.adapter.in.request.PerfilRequest;
+import br.com.autocenterfiap.security.adapter.in.request.UsuarioRequest;
+import br.com.autocenterfiap.security.adapter.in.response.PerfilResponse;
+import br.com.autocenterfiap.security.adapter.in.response.UsuarioResponse;
+import br.com.autocenterfiap.security.infrastructure.persistence.jpa.entity.PerfilJpaEntity;
+import br.com.autocenterfiap.security.infrastructure.persistence.jpa.entity.UsuarioJpaEntity;
 
 import java.util.List;
 
 public final class UsuarioMockUtil {
     private UsuarioMockUtil() {
     }
-    public static Usuario createUsuarioMock(Long id, String nome, String senha, List<Perfil> perfis){
-        return new Usuario(id, nome, senha, perfis);
+    public static UsuarioJpaEntity createUsuarioMock(Long id, String nome, String senha, List<PerfilJpaEntity> perfis){
+        return new UsuarioJpaEntity(id, nome, senha, perfis);
     }
     public static UsuarioResponse createUsuarioResponseMock(Long id, String nome, List<PerfilResponse> perfis){
         return new UsuarioResponse(id, nome, perfis);

@@ -1,7 +1,7 @@
 package br.com.autocenterfiap.orcamento.adapter.exception;
 
 import br.com.autocenterfiap.comum.model.ErroResposta;
-import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
+import br.com.autocenterfiap.comum.exception.InformacaoNaoEncontradaException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

@@ -1,6 +1,6 @@
 package br.com.autocenterfiap.orcamento.application.exception;
 
-import br.com.autocenterfiap.security.exception.InformacaoNaoEncontradaException;
+import br.com.autocenterfiap.comum.exception.InformacaoNaoEncontradaException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

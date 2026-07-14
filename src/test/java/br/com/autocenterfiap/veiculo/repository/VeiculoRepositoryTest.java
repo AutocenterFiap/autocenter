@@ -1,9 +1,10 @@
 package br.com.autocenterfiap.veiculo.repository;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
-import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
+import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
+import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,22 +28,22 @@ class VeiculoRepositoryTest {
     private TestEntityManager entityManager;
 
     @Autowired
-    private VeiculoRepository repository;
+    private VeiculoJpaRepository repository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
-    private Veiculo veiculo;
-    private Veiculo veiculoSegundo;
+    private VeiculoJpaEntity veiculo;
+    private VeiculoJpaEntity veiculoSegundo;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
         repository.deleteAll();
         repository.flush();
 
-        veiculo = new Veiculo();
+        veiculo = new VeiculoJpaEntity();
         veiculo.setPlaca("ABC1D23");
         veiculo.setChassi("9BWZZZ377VT004251");
         veiculo.setRenavam("82106426707");
@@ -55,7 +56,7 @@ class VeiculoRepositoryTest {
         veiculo.setTipoCombustivel(TipoCombustivel.DIESEL);
         veiculo.setCategoriaVeiculo(CategoriaVeiculo.CARRO);
 
-        veiculoSegundo = new Veiculo();
+        veiculoSegundo = new VeiculoJpaEntity();
         veiculoSegundo.setPlaca("ABC1D26");
         veiculoSegundo.setChassi("8BWZZZ377VT004251");
         veiculoSegundo.setRenavam("23022215548");
@@ -71,7 +72,7 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveSalvarVeiculoQuandoValido(){
-        Veiculo salvo = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo = entityManager.persist(veiculo);
         entityManager.flush();
 
         assertNotNull(salvo.getId());
@@ -86,7 +87,7 @@ class VeiculoRepositoryTest {
         entityManager.persist(veiculoSegundo);
         entityManager.flush();
 
-        List<Veiculo> veiculos = repository.findAll();
+        List<VeiculoJpaEntity> veiculos = repository.findAll();
 
         assertNotNull(veiculos);
         assertEquals(2, veiculos.size());
@@ -94,13 +95,13 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveDeletarVeiculoQuandoIdExistir(){
-        Veiculo salvo = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo = entityManager.persist(veiculo);
         entityManager.flush();
 
         repository.deleteById(salvo.getId());
         entityManager.flush();
 
-        Optional<Veiculo> deletado = repository.findById(salvo.getId());
+        Optional<VeiculoJpaEntity> deletado = repository.findById(salvo.getId());
         assertTrue(deletado.isEmpty());
     }
 
@@ -109,7 +110,7 @@ class VeiculoRepositoryTest {
         entityManager.persist(veiculo);
         entityManager.flush();
         
-        Optional<Veiculo> encontrado = repository.findByPlaca("ABC1D23");
+        Optional<VeiculoJpaEntity> encontrado = repository.findByPlaca("ABC1D23");
         
         assertTrue(encontrado.isPresent());
         assertEquals("ABC1D23", encontrado.get().getPlaca());
@@ -117,7 +118,7 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarVazioQuandoBuscarPorPlacaInexistente(){
-        Optional<Veiculo> encontrado = repository.findByPlaca("ABC1D23");
+        Optional<VeiculoJpaEntity> encontrado = repository.findByPlaca("ABC1D23");
         assertTrue(encontrado.isEmpty());
     }
 
@@ -140,7 +141,7 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarFalseQuandoVerificarPlacaParaOMesmoVeiculoNaAtualizacao(){
-        Veiculo salvo = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo = entityManager.persist(veiculo);
         entityManager.flush();
 
         // Passando a PRÓPRIA placa e o PRÓPRIO ID. Isso significa: "Alguém MAIS tem essa placa?" -> Falso
@@ -150,8 +151,8 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarTrueQuandoVerificarPlacaQuePertenceAOutroVeiculoNaAtualizacao(){
-        Veiculo salvo1 = entityManager.persist(veiculo);
-        Veiculo salvo2 = entityManager.persist(veiculoSegundo);
+        VeiculoJpaEntity salvo1 = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo2 = entityManager.persist(veiculoSegundo);
         entityManager.flush();
 
         // O Veiculo 1 tenta atualizar para a placa do Veiculo 2
@@ -178,7 +179,7 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarFalseQuandoVerificarRenavamParaOMesmoVeiculoNaAtualizacao(){
-        Veiculo salvo = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo = entityManager.persist(veiculo);
         entityManager.flush();
 
         boolean encontrado = repository.existsByRenavamAndIdNot(salvo.getRenavam(), salvo.getId());
@@ -187,8 +188,8 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarTrueQuandoVerificarRenavamQuePertenceAOutroVeiculoNaAtualizacao(){
-        Veiculo salvo1 = entityManager.persist(veiculo);
-        Veiculo salvo2 = entityManager.persist(veiculoSegundo);
+        VeiculoJpaEntity salvo1 = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo2 = entityManager.persist(veiculoSegundo);
         entityManager.flush();
 
         boolean encontrado = repository.existsByRenavamAndIdNot(salvo2.getRenavam(), salvo1.getId());
@@ -214,7 +215,7 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarFalseQuandoVerificarChassiParaOMesmoVeiculoNaAtualizacao(){
-        Veiculo salvo = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo = entityManager.persist(veiculo);
         entityManager.flush();
 
         boolean encontrado = repository.existsByChassiAndIdNot(salvo.getChassi(), salvo.getId());
@@ -223,8 +224,8 @@ class VeiculoRepositoryTest {
 
     @Test
     public void deveRetornarTrueQuandoVerificarChassiQuePertenceAOutroVeiculoNaAtualizacao(){
-        Veiculo salvo1 = entityManager.persist(veiculo);
-        Veiculo salvo2 = entityManager.persist(veiculoSegundo);
+        VeiculoJpaEntity salvo1 = entityManager.persist(veiculo);
+        VeiculoJpaEntity salvo2 = entityManager.persist(veiculoSegundo);
         entityManager.flush();
 
         boolean encontrado = repository.existsByChassiAndIdNot(salvo2.getChassi(), salvo1.getId());

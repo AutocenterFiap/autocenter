@@ -1,11 +1,11 @@
 package br.com.autocenterfiap.veiculo.controller;
 
-import br.com.autocenterfiap.ordemservico.repository.OrdemServicoRepository;
-import br.com.autocenterfiap.veiculo.dto.VeiculoDTO;
-import br.com.autocenterfiap.veiculo.enums.CategoriaVeiculo;
-import br.com.autocenterfiap.veiculo.enums.TipoCombustivel;
-import br.com.autocenterfiap.veiculo.model.Veiculo;
-import br.com.autocenterfiap.veiculo.repository.VeiculoRepository;
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository.OrdemServicoJpaRepository;
+import br.com.autocenterfiap.veiculo.adapter.in.dto.VeiculoRequestDTO;
+import br.com.autocenterfiap.veiculo.domain.enums.CategoriaVeiculo;
+import br.com.autocenterfiap.veiculo.domain.enums.TipoCombustivel;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.entity.VeiculoJpaEntity;
+import br.com.autocenterfiap.veiculo.infrastructure.persistence.jpa.repository.VeiculoJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,22 +38,22 @@ class VeiculoControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private VeiculoRepository repository;
+    private VeiculoJpaRepository repository;
 
     @Autowired
-    private OrdemServicoRepository ordemServicoRepository;
+    private OrdemServicoJpaRepository ordemServicoJpaRepository;
 
-    private Veiculo veiculo;
-    private Veiculo veiculoSegundo;
+    private VeiculoJpaEntity veiculo;
+    private VeiculoJpaEntity veiculoSegundo;
 
     @BeforeEach
     void setUp() {
-        ordemServicoRepository.deleteAll();
-        ordemServicoRepository.flush();
+        ordemServicoJpaRepository.deleteAll();
+        ordemServicoJpaRepository.flush();
         repository.deleteAll();
         repository.flush();
 
-        veiculo = new Veiculo();
+        veiculo = new VeiculoJpaEntity();
         veiculo.setPlaca("ABC1D23");
         veiculo.setChassi("9BWZZZ377VT004251");
         veiculo.setRenavam("82106426707");
@@ -66,7 +66,7 @@ class VeiculoControllerTest {
         veiculo.setTipoCombustivel(TipoCombustivel.DIESEL);
         veiculo.setCategoriaVeiculo(CategoriaVeiculo.CARRO);
 
-        veiculoSegundo = new Veiculo();
+        veiculoSegundo = new VeiculoJpaEntity();
         veiculoSegundo.setPlaca("ABC1D26");
         veiculoSegundo.setChassi("8BWZZZ377VT004251");
         veiculoSegundo.setRenavam("23022215548");
@@ -105,7 +105,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveBuscarVeiculoPorIdComSucesso() throws Exception {
-        Veiculo saved = repository.save(veiculo);
+        VeiculoJpaEntity saved = repository.save(veiculo);
 
         mockMvc.perform(get("/v1/veiculos/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -164,7 +164,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveCriarVeiculoComSucesso() throws Exception {
-        VeiculoDTO veiculoValido = new VeiculoDTO(
+        VeiculoRequestDTO veiculoValido = new VeiculoRequestDTO(
                 "ABC1D23",
                 "9BWZZZ377VT004251",
                 "82106426707",
@@ -199,7 +199,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarVeiculoComDadosInvalidos() throws Exception {
-        VeiculoDTO veiculoInvalido = new VeiculoDTO(
+        VeiculoRequestDTO veiculoInvalido = new VeiculoRequestDTO(
                 "",// Placa Inválida
                 "9BWZZZ377VT004251",
                 "82106426707",
@@ -224,7 +224,7 @@ class VeiculoControllerTest {
     void deveRetornar409AoCriarVeiculoComPlacaJaCadastrado() throws Exception {
         repository.save(veiculo);
 
-        VeiculoDTO veiculoConflito = new VeiculoDTO(
+        VeiculoRequestDTO veiculoConflito = new VeiculoRequestDTO(
                 "ABC1D23",// Mesma Placa
                 "3FAHP0HA6AR298374",
                 "17059907791",
@@ -248,7 +248,7 @@ class VeiculoControllerTest {
     void deveRetornar409AoCriarVeiculoComChassiJaCadastrado() throws Exception {
         repository.save(veiculo);
 
-        VeiculoDTO veiculoConflito = new VeiculoDTO(
+        VeiculoRequestDTO veiculoConflito = new VeiculoRequestDTO(
                 "ABC1D25",
                 "9BWZZZ377VT004251",// Mesmo Chassi
                 "17059907791",
@@ -272,7 +272,7 @@ class VeiculoControllerTest {
     void deveRetornar409AoCriarVeiculoComRenavamJaCadastrado() throws Exception {
         repository.save(veiculo);
 
-        VeiculoDTO veiculoConflito = new VeiculoDTO(
+        VeiculoRequestDTO veiculoConflito = new VeiculoRequestDTO(
                 "ABC1D25",
                 "3FAHP0HA6AR298374",
                 "82106426707", // Mesmo Renavam
@@ -294,7 +294,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarVeiculoComPlacaInvalida() throws Exception {
-        VeiculoDTO veiculoInvalido = new VeiculoDTO(
+        VeiculoRequestDTO veiculoInvalido = new VeiculoRequestDTO(
                 "",// Placa Inválida
                 "9BWZZZ377VT004251",
                 "82106426707",
@@ -317,7 +317,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarVeiculoComChassiInvalido() throws Exception {
-        VeiculoDTO veiculoInvalido = new VeiculoDTO(
+        VeiculoRequestDTO veiculoInvalido = new VeiculoRequestDTO(
                 "ABC1D23",
                 "xyz", // Chassi Inválido
                 "82106426707",
@@ -340,7 +340,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar400AoCriarVeiculoComRenavamInvalido() throws Exception {
-        VeiculoDTO veiculoInvalido = new VeiculoDTO(
+        VeiculoRequestDTO veiculoInvalido = new VeiculoRequestDTO(
                 "ABC1D23",
                 "9BWZZZ377VT004251",
                 "xyz", // Renavam Inválido
@@ -363,9 +363,9 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveAtualizarVeiculoComSucesso() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
 
-        VeiculoDTO veiculoUpdate = new VeiculoDTO(
+        VeiculoRequestDTO veiculoUpdate = new VeiculoRequestDTO(
                 veiculoSalvo.getPlaca(),
                 veiculoSalvo.getChassi(),
                 veiculoSalvo.getRenavam(),
@@ -392,9 +392,9 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar404AoAtualizarVeiculoInexistente() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
 
-        VeiculoDTO veiculoUpdate = new VeiculoDTO(
+        VeiculoRequestDTO veiculoUpdate = new VeiculoRequestDTO(
                 veiculoSalvo.getPlaca(),
                 veiculoSalvo.getChassi(),
                 veiculoSalvo.getRenavam(),
@@ -417,10 +417,10 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar409AoAtualizarPlacaDoVeiculoComOutroVeiculoComPlacaJaEmUso() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
         repository.save(veiculoSegundo);
 
-        VeiculoDTO veiculoUpdate = new VeiculoDTO(
+        VeiculoRequestDTO veiculoUpdate = new VeiculoRequestDTO(
                 "ABC1D26",
                 veiculoSalvo.getChassi(),
                 veiculoSalvo.getRenavam(),
@@ -444,10 +444,10 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar409AoAtualizarChassiDoVeiculoComOutroVeiculoComChassiJaEmUso() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
         repository.save(veiculoSegundo);
 
-        VeiculoDTO veiculoUpdate = new VeiculoDTO(
+        VeiculoRequestDTO veiculoUpdate = new VeiculoRequestDTO(
                 veiculoSalvo.getPlaca(),
                 "8BWZZZ377VT004251",
                 veiculoSalvo.getRenavam(),
@@ -471,9 +471,9 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveRetornar409AoAtualizarRenavamDoVeiculoComOutroVeiculoComRenavamJaEmUso() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
         repository.save(veiculoSegundo);
-        VeiculoDTO veiculoUpdate = new VeiculoDTO(
+        VeiculoRequestDTO veiculoUpdate = new VeiculoRequestDTO(
                 veiculoSalvo.getPlaca(),
                 veiculoSalvo.getChassi(),
                 "23022215548",
@@ -496,7 +496,7 @@ class VeiculoControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void deveDeletarVeiculoComSucesso() throws Exception {
-        Veiculo veiculoSalvo = repository.save(veiculo);
+        VeiculoJpaEntity veiculoSalvo = repository.save(veiculo);
 
         mockMvc.perform(delete("/v1/veiculos/{id}", veiculoSalvo.getId())
                         .contentType(MediaType.APPLICATION_JSON))

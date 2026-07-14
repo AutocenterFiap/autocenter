@@ -1,0 +1,35 @@
+package br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.repository;
+
+import br.com.autocenterfiap.ordemservico.infrastructure.persistence.jpa.entity.OSItemProdutoJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Optional;
+
+@Repository
+public interface OSItemProdutoJpaRepository extends JpaRepository<OSItemProdutoJpaEntity, Long> {
+
+    Page<OSItemProdutoJpaEntity> findByOrdemServicoJpaEntityId(Long ordemServicoId, Pageable pageable);
+
+    Optional<OSItemProdutoJpaEntity> findByOrdemServicoJpaEntityIdAndProdutoId(Long ordemServicoId, Long produtoId);
+
+    Page<OSItemProdutoJpaEntity> findAllByIdIn(Collection<Long> ids, Pageable pageable);
+
+    @Query("""
+            SELECT COALESCE(SUM(i.precoUnitarioNoMomento * i.quantidade), 0)
+            FROM OSItemProdutoJpaEntity i
+            WHERE i.ordemServicoJpaEntity.id = :ordemServicoId
+            """)
+    BigDecimal calcularTotalProdutosPorOS(@Param("ordemServicoId") Long ordemServicoId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM OSItemProdutoJpaEntity o WHERE o.id = :id")
+    void deleteByIdDirect(Long id);
+}

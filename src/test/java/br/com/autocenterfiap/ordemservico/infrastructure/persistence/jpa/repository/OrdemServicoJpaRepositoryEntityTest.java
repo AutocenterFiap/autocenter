@@ -193,6 +193,65 @@ class OrdemServicoJpaRepositoryEntityTest {
     }
 
 
+    private OrdemServicoJpaEntity novaOrdem(Long numero, StatusOS status) {
+        OrdemServicoJpaEntity os = new OrdemServicoJpaEntity();
+        os.setNumeroOrdemServico(numero);
+        os.setStatusOS(status);
+        os.setValorTotal(BigDecimal.ZERO);
+        os.setCliente(cliente);
+        os.setVeiculo(veiculo);
+        return os;
+    }
+
+    @Test
+    public void deveExcluirDaListagemAsOrdensFinalizadasEEntregues() {
+        persistDependencies();
+        entityManager.persist(novaOrdem(2001L, StatusOS.RECEBIDA));
+        entityManager.persist(novaOrdem(2002L, StatusOS.FINALIZADA));
+        entityManager.persist(novaOrdem(2003L, StatusOS.ENTREGUE));
+        entityManager.flush();
+
+        List<OrdemServicoJpaEntity> ativas =
+                repository.findAtivasOrdenadasPorPrioridade(Pageable.unpaged()).getContent();
+
+        assertEquals(1, ativas.size());
+        assertEquals(StatusOS.RECEBIDA, ativas.get(0).getStatusOS());
+    }
+
+    @Test
+    public void deveOrdenarPorPrioridadeDeStatus() {
+        persistDependencies();
+        entityManager.persist(novaOrdem(3001L, StatusOS.RECEBIDA));
+        entityManager.persist(novaOrdem(3002L, StatusOS.EM_EXECUCAO));
+        entityManager.persist(novaOrdem(3003L, StatusOS.EM_DIAGNOSTICO));
+        entityManager.persist(novaOrdem(3004L, StatusOS.AGUARDANDO_APROVACAO));
+        entityManager.flush();
+
+        List<OrdemServicoJpaEntity> ativas =
+                repository.findAtivasOrdenadasPorPrioridade(Pageable.unpaged()).getContent();
+
+        assertEquals(4, ativas.size());
+        assertEquals(StatusOS.EM_EXECUCAO, ativas.get(0).getStatusOS());
+        assertEquals(StatusOS.AGUARDANDO_APROVACAO, ativas.get(1).getStatusOS());
+        assertEquals(StatusOS.EM_DIAGNOSTICO, ativas.get(2).getStatusOS());
+        assertEquals(StatusOS.RECEBIDA, ativas.get(3).getStatusOS());
+    }
+
+    @Test
+    public void deveOrdenarMaisAntigasPrimeiroDentroDoMesmoStatus() {
+        persistDependencies();
+        OrdemServicoJpaEntity maisAntiga = entityManager.persist(novaOrdem(4001L, StatusOS.RECEBIDA));
+        OrdemServicoJpaEntity maisNova = entityManager.persist(novaOrdem(4002L, StatusOS.RECEBIDA));
+        entityManager.flush();
+
+        List<OrdemServicoJpaEntity> ativas =
+                repository.findAtivasOrdenadasPorPrioridade(Pageable.unpaged()).getContent();
+
+        assertEquals(2, ativas.size());
+        assertEquals(maisAntiga.getId(), ativas.get(0).getId());
+        assertEquals(maisNova.getId(), ativas.get(1).getId());
+    }
+
     @Test
     public void deveRetornarTrueQuandoVeiculoTiverOrdemServicoComStatusEspecifico() {
         persistDependencies();

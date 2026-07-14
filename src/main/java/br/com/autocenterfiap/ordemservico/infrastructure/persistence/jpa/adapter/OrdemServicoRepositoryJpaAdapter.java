@@ -24,15 +24,14 @@ public class OrdemServicoRepositoryJpaAdapter implements OrdemServicoRepositoryP
     }
 
     @Override
-    public PageResult<OrdemServico> findAll(PaginationRequest pagination) {
+    public PageResult<OrdemServico> listarAtivasOrdenadasPorPrioridade(PaginationRequest pagination) {
 
         PageRequest pageRequest = PageRequest.of(
                 pagination.getPageNumber(),
-                pagination.getPageSize(),
-                Sort.by(Sort.Direction.fromString(pagination.getSortDirection()), pagination.getSortBy())
+                pagination.getPageSize()
         );
 
-        Page<OrdemServicoJpaEntity> page = this.ordemServicoJpaRepository.findAll(pageRequest);
+        Page<OrdemServicoJpaEntity> page = this.ordemServicoJpaRepository.findAtivasOrdenadasPorPrioridade(pageRequest);
         return new PageResult<>(
                 page.getContent().stream().map(OrdemServicoJpaMapper::toDomain).toList(),
                 page.getNumber(),

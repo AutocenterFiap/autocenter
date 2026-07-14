@@ -46,8 +46,14 @@ public class OrdemServicoController {
     }
 
     @Operation(
-            summary = "Listar todas as ordens de serviço",
-            description = "Retorna uma lista paginada com todas as ordens de serviço cadastradas no sistema"
+            summary = "Listar ordens de serviço ativas",
+            description = """
+                    Retorna uma lista paginada das ordens de serviço ativas.
+                    Regras aplicadas:
+                    - Exclui (exclusão lógica) as OS com status FINALIZADA e ENTREGUE;
+                    - Ordena por prioridade de status: EM_EXECUCAO > AGUARDANDO_APROVACAO > EM_DIAGNOSTICO > RECEBIDA;
+                    - Dentro do mesmo status, as mais antigas aparecem primeiro.
+                    """
     )
     @ApiResponse(
             responseCode = "200",

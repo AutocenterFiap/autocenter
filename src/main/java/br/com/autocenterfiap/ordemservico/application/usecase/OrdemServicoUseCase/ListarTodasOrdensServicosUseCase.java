@@ -16,7 +16,7 @@ public class ListarTodasOrdensServicosUseCase {
 
     public PageResult<OrdemServicoOutput> executar(PaginationRequest pagination) {
 
-        return this.repositoryPort.findAll(pagination)
+        return this.repositoryPort.listarAtivasOrdenadasPorPrioridade(pagination)
                 .map(OrdemServicoApplicationMapper::toOutput);
     }
 }

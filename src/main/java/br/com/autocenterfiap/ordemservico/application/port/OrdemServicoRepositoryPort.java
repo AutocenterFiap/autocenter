@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface OrdemServicoRepositoryPort {
 
-    PageResult<OrdemServico> findAll(PaginationRequest pagination);
+    PageResult<OrdemServico> listarAtivasOrdenadasPorPrioridade(PaginationRequest pagination);
 
     PageResult<OrdemServico> findByStatus(StatusOS status, PaginationRequest pagination);
 

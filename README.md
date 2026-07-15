@@ -167,7 +167,7 @@ Rel(atendente, swaggerUI, "Consulta/testa contratos de API")
 @enduml
 ```
 
-**Explicação:** o sistema é consumido por quatro perfis de usuário internos da oficina (Atendente, Mecânico, Gestor, Administrador), todos autenticados via JWT emitido pelo próprio sistema (`/v1/oauth/token`). Não há integração com sistemas externos de negócio (ex.: gateways de pagamento, ERPs); a única dependência externa identificada no código é o **Infisical**, utilizado exclusivamente pela infraestrutura de produção (init container do Deployment Kubernetes) para buscar segredos, e o próprio **Swagger UI**, que é parte do processo da aplicação (springdoc), não um sistema externo real, mas está listado como ponto de acesso à documentação viva da API.
+**Explicação:** o sistema é consumido por quatro perfis de usuário internos da oficina (Atendente, Mecânico, Gestor, Administrador), todos autenticados via JWT emitido pelo próprio sistema (`/v1/oauth/token`). A infraestrutura de produção (init container do Deployment Kubernetes) se integra com o **Infisical** para buscar segredos de configuração. Adicionalmente, o **Swagger UI** está embarcado na aplicação para visualização e testes da documentação interativa da API.
 
 #### 2.5.2 Diagrama de Contêineres (Container Diagram)
 
@@ -197,7 +197,7 @@ Rel(api, infisical, "Init container busca credenciais na subida do pod (produç�
 @enduml
 ```
 
-**Explicação:** a aplicação é um **monólito modular** — um único contêiner de execução (`app.jar`, Spring Boot embarcado com Tomcat) que concentra API REST, o *scheduler* de orçamentos e o cache de tokens em memória (Caffeine). Não existe mensageria (fila/broker), nem *workers* separados, nem outro serviço de backend independente. A persistência é feita em um único banco relacional, com Flyway controlando o versionamento de schema. O Migration path do Flyway aponta para `db/migration` (produção) via `filesystem:` (Dockerfile copia a pasta `db/` para dentro da imagem) ou `classpath:db/migration` (ambiente Kubernetes/ConfigMap).
+**Explicação:** a aplicação é um **monólito modular** — um único contêiner de execução (`app.jar`, Spring Boot embarcado com Tomcat) que concentra API REST, o *scheduler* de orçamentos e o cache de tokens em memória (Caffeine). A persistência é feita em um único banco relacional, com Flyway controlando o versionamento do schema (copiado para a imagem em `/app/db` no build ou apontado via classpath).
 
 #### 2.5.3 Diagrama de Componentes (Component Diagram)
 
@@ -287,11 +287,7 @@ Cada módulo expõe seus casos de uso como classes simples de aplicação, sem a
 
 - **Caffeine** (`com.github.ben-manes.caffeine`), configurado em `CacheConfig` (`security.infrastructure.config`): cache nomeado `"tokens"`, com expiração após escrita (`expireAfterWrite`) configurável via `sistema.cache.expiracao.minutos` (25 minutos nos perfis padrão) e tamanho máximo de 1000 entradas. Usado por `Auth0TokenAdapter.gerarToken()` (`@Cacheable`) e invalidado por `limparCache()` (`@CacheEvict`).
 
-### 3.6 Mensageria
-
-Não identificada nenhuma mensageria (RabbitMQ, Kafka, SQS etc.) no repositório. Toda comunicação entre módulos ocorre em processo (chamadas Java diretas via ports/interfaces).
-
-### 3.7 Serviços Externos
+### 3.6 Serviços Externos
 
 - **Infisical** (`https://app.infisical.com`): utilizado exclusivamente pela infraestrutura Kubernetes/Terraform, através de um *init container* Alpine que autentica via **Universal Auth** (Client ID/Secret) e busca segredos do projeto/ambiente configurado, gravando-os em `/vault-secrets/application.properties` para serem lidos pelo Spring Boot via `SPRING_CONFIG_ADDITIONAL_LOCATION`.
 - **Swagger UI / OpenAPI** (springdoc): embarcado na própria aplicação, expõe a documentação interativa em `/swagger-ui.html` (ou `/swagger-ui/index.html`) e o contrato OpenAPI em `/api-docs`.
@@ -324,7 +320,7 @@ Ambos os caminhos convergem para o mesmo conjunto lógico de recursos, descrito 
 
 **Volumes:** apenas dois tipos de volume são usados — `PersistentVolumeClaim` (dados do MySQL, 10Gi) e `emptyDir` com `medium: Memory` (segredos do Infisical, nunca gravados em disco persistente, apenas em RAM do pod).
 
-**Ingress:** não há recurso `Ingress` no repositório. A exposição externa é feita via `Service` do tipo `LoadBalancer` (manifesto `k8s/app-service.yaml`, indicado para cloud providers) ou `NodePort` na porta `30080` (Terraform, adequado para o cluster Kind local).
+**Ingress:** A exposição externa é configurada diretamente via `Service` do tipo `LoadBalancer` (manifesto `k8s/app-service.yaml`, indicado para ambientes em nuvem) ou `NodePort` na porta `30080` (Terraform, utilizado no cluster Kind local).
 
 **Secrets:** compostos por credenciais de banco (`MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`) e credenciais do Infisical (`INFISICAL_CLIENT_ID`, `INFISICAL_CLIENT_SECRET`, `INFISICAL_PROJECT_ID`). As credenciais de banco são também injetadas diretamente como variáveis de ambiente (`SPRING_DATASOURCE_USERNAME`/`SPRING_DATASOURCE_PASSWORD`) no container principal, garantindo precedência sobre qualquer valor equivalente vindo do arquivo gerado pelo Infisical.
 
@@ -338,16 +334,12 @@ Provisiona a infraestrutura completa localmente via **Kind** (Kubernetes-in-Dock
 4. Instalação do Metrics Server via Helm;
 5. Todos os recursos Kubernetes descritos na seção 4.1.
 
-### 4.3 Cloud Provider
-
-Não há cloud provider gerenciado (AWS/GCP/Azure) provisionado no Terraform atual — o cluster é **local (Kind)**. O `k8s/app-service.yaml` (tipo `LoadBalancer`) sinaliza compatibilidade com um cloud provider real caso o cluster seja migrado, mas isso não está implementado nos módulos Terraform (`terraform/main.tf`, `terraform/kubernetes.tf`).
-
-### 4.4 Load Balancer
+### 4.3 Load Balancer
 
 - **Terraform (Kind):** `Service` do tipo `NodePort`, porta `30080`, acessado via `kubectl port-forward` ou diretamente pelo IP do nó.
 - **Manifestos k8s (alternativa):** `Service` do tipo `LoadBalancer`, porta 80 → 8097, adequado a um cluster com provedor de LoadBalancer real (cloud) ou MetalLB (on-premise).
 
-### 4.5 Diagrama de Infraestrutura (PlantUML)
+### 4.4 Diagrama de Infraestrutura (PlantUML)
 
 ```plantuml
 @startuml Infraestrutura_AutoCenterFIAP
@@ -741,7 +733,6 @@ terraform destroy -auto-approve
 
 - **Swagger UI:** `http://<host>:8097/swagger-ui.html` (ou `/swagger-ui/index.html`), configurado em `SwaggerConfig` e `SwaggerSecurityConfig` (`br.com.autocenterfiap.config` / `br.com.autocenterfiap.security.infrastructure.config`), com esquema de segurança `bearerAuth` (HTTP Bearer/JWT).
 - **OpenAPI JSON:** `http://<host>:8097/api-docs`.
-- **Postman Collection:** não identificada no repositório.
 
 ### 9.2 Autenticação
 

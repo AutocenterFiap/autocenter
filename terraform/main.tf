@@ -92,6 +92,35 @@ provider "helm" {
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
+# PRE-LOAD METRICS SERVER IMAGE
+# Os nos Kind nao conseguem acessar registry.k8s.io diretamente.
+# Solucao: baixar a imagem no host e carregar no cluster via "kind load".
+# ──────────────────────────────────────────────────────────────────────────────
+locals {
+  metrics_server_image = "registry.k8s.io/metrics-server/metrics-server:v0.7.2"
+}
+
+resource "null_resource" "metrics_server_image_load" {
+  triggers = {
+    cluster_ready        = null_resource.kind_cluster.id
+    metrics_server_image = local.metrics_server_image
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      echo "[Docker] Baixando imagem do Metrics Server no host..."
+      docker pull ${local.metrics_server_image}
+      echo "[Kind] Carregando imagem do Metrics Server no cluster '${var.cluster_name}'..."
+      kind load docker-image ${local.metrics_server_image} --name ${var.cluster_name}
+      echo "[OK] Imagem do Metrics Server disponivel no cluster!"
+    EOT
+  }
+
+  depends_on = [null_resource.kind_cluster]
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
 # METRICS SERVER
 # Necessario para o HPA funcionar (coleta metricas de CPU/memoria).
 # ──────────────────────────────────────────────────────────────────────────────
@@ -99,13 +128,41 @@ resource "helm_release" "metrics_server" {
   name       = "metrics-server"
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
+  version    = "3.12.2"
   namespace  = "kube-system"
+  timeout    = 300
+  wait       = true
 
-  # Kind usa TLS auto-assinado nos nos — kubelet-insecure-tls e necessario
+  # Kind usa TLS auto-assinado nos nos
   set {
     name  = "args[0]"
     value = "--kubelet-insecure-tls"
   }
 
-  depends_on = [null_resource.docker_build_and_load]
+  # Kind nao resolve hostnames dos nos — forcar uso do IP interno
+  set {
+    name  = "args[1]"
+    value = "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+  }
+
+  # Usar a imagem ja carregada no cluster (evita pull externo)
+  set {
+    name  = "image.repository"
+    value = "registry.k8s.io/metrics-server/metrics-server"
+  }
+
+  set {
+    name  = "image.tag"
+    value = "v0.7.2"
+  }
+
+  set {
+    name  = "image.pullPolicy"
+    value = "IfNotPresent"
+  }
+
+  depends_on = [
+    null_resource.docker_build_and_load,
+    null_resource.metrics_server_image_load,
+  ]
 }

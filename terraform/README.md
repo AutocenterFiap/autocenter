@@ -129,7 +129,34 @@ terraform init
 
 ### 3. Subir tudo
 
+> **Por que nao usar `terraform apply -auto-approve` diretamente?**
+>
+> Os providers `kubernetes` e `helm` precisam que o cluster Kind **ja exista** para se inicializarem.
+> Como o cluster e criado por um `null_resource` dentro do proprio Terraform, existe um problema de
+> "chicken-and-egg": o apply falha antes mesmo de criar o cluster.
+>
+> A solucao e executar o deploy em **2 fases** automaticamente via script ou Makefile.
+
+**Opcao A — Script (recomendado):**
+
 ```bash
+# A partir da raiz do projeto:
+./terraform/deploy.sh
+```
+
+**Opcao B — Makefile (a partir da raiz do projeto):**
+
+```bash
+make deploy
+```
+
+**Opcao C — manualmente (dentro da pasta terraform/):**
+
+```bash
+# Fase 1: cria o cluster Kind
+terraform apply -target=null_resource.kind_cluster -auto-approve
+
+# Fase 2: deploy de todos os recursos
 terraform apply -auto-approve
 ```
 
@@ -208,6 +235,20 @@ kubectl get events -n auto-center --sort-by='.lastTimestamp'
 ---
 
 ## Solucao de problemas
+
+### Erro ao inicializar providers kubernetes/helm (cluster nao existe)
+
+O provider `kubernetes` e `helm` tentam se conectar ao cluster na fase de inicializacao do Terraform,
+antes de qualquer resource ser criado. Se o cluster ainda nao existe, o apply falha.
+
+**Nao use** `terraform apply -auto-approve` diretamente. Use o script ou o Makefile:
+
+```bash
+# Da raiz do projeto:
+./terraform/deploy.sh
+# ou
+make deploy
+```
 
 ### Erro: cluster already exists
 

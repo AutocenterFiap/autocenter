@@ -86,4 +86,11 @@ public class OrdemServicoConfiguration {
     ) {
         return new DeletarOrdemServicoUseCase(ordemServicoRepositoryPort);
     }
+
+    @Bean
+    public ConsultaStatusOrdemServicoUseCase consultaStatusOrdemServicoUseCase(
+            OrdemServicoRepositoryPort ordemServicoRepositoryPort
+    ) {
+        return new ConsultaStatusOrdemServicoUseCase(ordemServicoRepositoryPort);
+    }
 }

@@ -1,10 +1,12 @@
 package br.com.autocenterfiap.ordemservico.adapter.in.controller;
 
+import br.com.autocenterfiap.ordemservico.adapter.in.dto.ConsultaStatusOrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoDTO;
 import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoResponseDTO;
 import br.com.autocenterfiap.ordemservico.adapter.in.dto.OrdemServicoUpdateDTO;
 import br.com.autocenterfiap.ordemservico.adapter.mapper.OrdemServicoAdapterMapper;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.AtualizarOrdemServicoInput;
+import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.ConsultaStatusOrdemServicoOutput;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.CriarOrdemServicoInput;
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServicoOutput;
 import br.com.autocenterfiap.ordemservico.application.dto.PageResult;
@@ -34,15 +36,17 @@ public class OrdemServicoController {
     private final BuscarOrdemServicoPorNumeroUseCase buscarOrdemServicoPorNumeroUseCase;
     private final AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase;
     private final DeletarOrdemServicoUseCase deletarOrdemServicoUseCase;
+    private final ConsultaStatusOrdemServicoUseCase consultaStatusOrdemServicoUseCase;
 
 
-    public OrdemServicoController(CriarOrdemServicoUseCase criarOrdemServicoUseCase, ListarTodasOrdensServicosUseCase listarTodasOrdensServicosUseCase, BuscarOrdemServicoPorIdUseCase buscarOrdemServicoPorIdUseCase, BuscarOrdemServicoPorNumeroUseCase buscarOrdemServicoPorNumeroUseCase, AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase, DeletarOrdemServicoUseCase deletarOrdemServicoUseCase) {
+    public OrdemServicoController(CriarOrdemServicoUseCase criarOrdemServicoUseCase, ListarTodasOrdensServicosUseCase listarTodasOrdensServicosUseCase, BuscarOrdemServicoPorIdUseCase buscarOrdemServicoPorIdUseCase, BuscarOrdemServicoPorNumeroUseCase buscarOrdemServicoPorNumeroUseCase, AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase, DeletarOrdemServicoUseCase deletarOrdemServicoUseCase, ConsultaStatusOrdemServicoUseCase consultaStatusOrdemServicoUseCase) {
         this.criarOrdemServicoUseCase = criarOrdemServicoUseCase;
         this.listarTodasOrdensServicosUseCase = listarTodasOrdensServicosUseCase;
         this.buscarOrdemServicoPorIdUseCase = buscarOrdemServicoPorIdUseCase;
         this.buscarOrdemServicoPorNumeroUseCase = buscarOrdemServicoPorNumeroUseCase;
         this.atualizarOrdemServicoUseCase = atualizarOrdemServicoUseCase;
         this.deletarOrdemServicoUseCase = deletarOrdemServicoUseCase;
+        this.consultaStatusOrdemServicoUseCase = consultaStatusOrdemServicoUseCase;
     }
 
     @Operation(
@@ -207,5 +211,29 @@ public class OrdemServicoController {
                                         @PathVariable Long id) {
         this.deletarOrdemServicoUseCase.executar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Consultar o status da ordem de serviço por ID",
+            description = "Retorna o status da ordem de serviço específica pelo seu identificador único"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Ordem de serviço encontrada",
+                    content = @Content(schema = @Schema(implementation = OrdemServicoResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Ordem de serviço não encontrada"
+            )
+    })
+
+    @GetMapping("/status/{id}")
+    public ResponseEntity<ConsultaStatusOrdemServicoResponseDTO> consultarStatusOrdemServico(@Parameter(description = "ID da Ordem de Serviço a ser consultada", required = true)
+                                                               @PathVariable Long id) {
+
+        ConsultaStatusOrdemServicoOutput output = this.consultaStatusOrdemServicoUseCase.executar(id);
+        return ResponseEntity.ok(new ConsultaStatusOrdemServicoResponseDTO(output.statusOS()));
     }
 }

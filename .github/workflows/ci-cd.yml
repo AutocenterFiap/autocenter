@@ -1,24 +1,47 @@
 name: CI/CD — Auto Center FIAP
 
+# ──────────────────────────────────────────────────────────────────────────────
+# REQUISITO: self-hosted runner instalado e rodando na sua máquina local.
+#
+# Instalação rápida:
+#   1. Acesse: GitHub → Repositório → Settings → Actions → Runners → New self-hosted runner
+#   2. Siga as instruções para Linux (baixar, configurar e iniciar o runner)
+#   3. O runner precisa ter instalado: Docker, kubectl e minikube (ou kind)
+#
+# GitHub Secrets necessários (Settings → Secrets and variables → Actions):
+#   MYSQL_ROOT_PASSWORD   — senha root do MySQL
+#   MYSQL_DATABASE        — nome do banco (ex: autocenter)
+#   MYSQL_USER            — usuário da aplicação (ex: autocenter_user)
+#   MYSQL_PASSWORD        — senha do usuário
+#   INFISICAL_CLIENT_ID   — client ID do Infisical
+#   INFISICAL_CLIENT_SECRET — client secret do Infisical
+#   INFISICAL_PROJECT_ID  — project ID do Infisical
+# ──────────────────────────────────────────────────────────────────────────────
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - master
+      - clean-architecture
+      - clean/ci-cd
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - master
+      - clean-architecture
+      - clean/ci-cd
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: auto-center-fiap
+  K8S_NAMESPACE: auto-center
   JAVA_VERSION: '21'
 
-# ──────────────────────────────────────────────────────────────────────────────
-# JOBS
-# ──────────────────────────────────────────────────────────────────────────────
 jobs:
 
   # ─────────────────────────────────────────────────────────────────
-  # JOB 1 — Build e Testes
-  # Compila a aplicação e executa os testes automatizados com Maven.
+  # JOB 1 — Build da aplicação + Execução dos testes automatizados
+  # Roda no runner do GitHub — não precisa de recursos locais.
   # ─────────────────────────────────────────────────────────────────
   build-and-test:
     name: 🔨 Build e Testes
@@ -35,10 +58,10 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build e execução dos testes (Maven)
-        run: mvn clean verify --batch-mode
+      - name: Build e execução dos testes automatizados (Maven + JaCoCo)
+        run: mvn clean verify --batch-mode --no-transfer-progress
 
-      - name: Publicar relatório de testes
+      - name: Publicar relatório de testes (Surefire)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -54,99 +77,89 @@ jobs:
           path: target/site/jacoco/
           retention-days: 7
 
+      - name: Salvar JAR como artefato para o job de Docker
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/auto-center-fiap-*.jar
+          if-no-files-found: error
+          retention-days: 1
+
   # ─────────────────────────────────────────────────────────────────
-  # JOB 2 — Build e Push da imagem Docker
-  # Executa apenas no push para main (não em PRs).
-  # Publica no GitHub Container Registry (GHCR) — gratuito.
+  # JOB 2 — Build da imagem Docker
+  # Roda no self-hosted runner (máquina local) para que a imagem
+  # fique disponível no daemon Docker acessado pelo cluster local.
   # ─────────────────────────────────────────────────────────────────
-  docker:
-    name: 🐳 Build e Push Docker
-    runs-on: ubuntu-latest
+  docker-build:
+    name: 🐳 Build da Imagem Docker
+    runs-on: self-hosted
     needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    permissions:
-      contents: read
-      packages: write   # necessário para publicar no GHCR
-
-    outputs:
-      image-tag: ${{ steps.meta.outputs.version }}
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Login no GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build da imagem Docker
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            .
+          echo "✅ Imagem ${{ env.IMAGE_NAME }}:latest construída."
 
-      - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Carregar imagem no Minikube (se disponível)
+        run: |
+          if command -v minikube &>/dev/null && minikube status 2>/dev/null | grep -q "Running"; then
+            echo "Carregando imagem no Minikube..."
+            minikube image load ${{ env.IMAGE_NAME }}:latest
+            echo "✅ Imagem carregada no Minikube."
+          else
+            echo "ℹ️  Minikube não ativo. Pulando carga de imagem."
+          fi
 
-      - name: Extrair metadados da imagem
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            # Tag com SHA curto do commit (ex: sha-a1b2c3d)
-            type=sha,prefix=sha-,format=short
-            # Tag "latest" sempre atualizada na main
-            type=raw,value=latest,enable=true
-
-      - name: Build e Push da imagem Docker
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          # Cache de camadas para acelerar builds futuros
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Carregar imagem no Kind (se disponível)
+        run: |
+          if command -v kind &>/dev/null && kind get clusters 2>/dev/null | grep -q .; then
+            CLUSTER=$(kind get clusters | head -1)
+            echo "Carregando imagem no Kind (cluster: $CLUSTER)..."
+            kind load docker-image ${{ env.IMAGE_NAME }}:latest --name "$CLUSTER"
+            echo "✅ Imagem carregada no Kind."
+          else
+            echo "ℹ️  Kind não ativo. Pulando carga de imagem."
+          fi
 
   # ─────────────────────────────────────────────────────────────────
-  # JOB 3 — Deploy do Banco de Dados
-  # Aplica os manifestos do MySQL no cluster Kubernetes.
-  # Requer o secret KUBECONFIG configurado no repositório.
+  # JOB 3 — Deploy do banco de dados MySQL no cluster Kubernetes local
   # ─────────────────────────────────────────────────────────────────
   deploy-database:
-    name: 🗄️ Deploy Banco de Dados
-    runs-on: ubuntu-latest
-    needs: docker
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: production
+    name: 🗄️ Deploy Banco de Dados (MySQL)
+    runs-on: self-hosted
+    needs: docker-build
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Configurar kubectl
-        uses: azure/setup-kubectl@v4
-
-      - name: Configurar kubeconfig
+      - name: Verificar conexão com o cluster
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-          kubectl cluster-info
+          echo "Cluster atual: $(kubectl config current-context)"
+          kubectl get nodes
 
-      - name: Criar/Atualizar Namespace
+      - name: Criar namespace (se não existir)
         run: kubectl apply -f k8s/namespace.yaml
 
-      - name: Criar/Atualizar ConfigMap
+      - name: Criar/atualizar ConfigMap
         run: kubectl apply -f k8s/configmap.yaml
 
-      - name: Criar/Atualizar Secret
-        # Os secrets vêm do GitHub Secrets (Settings → Secrets and variables → Actions)
+      - name: Criar/atualizar Secrets (a partir dos GitHub Secrets)
         run: |
           kubectl create secret generic auto-center-secrets \
-            --namespace=auto-center \
+            --namespace=${{ env.K8S_NAMESPACE }} \
             --from-literal=MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}" \
-            --from-literal=MYSQL_DATABASE="autocenter" \
+            --from-literal=MYSQL_DATABASE="${{ secrets.MYSQL_DATABASE }}" \
             --from-literal=MYSQL_USER="${{ secrets.MYSQL_USER }}" \
             --from-literal=MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}" \
             --from-literal=INFISICAL_CLIENT_ID="${{ secrets.INFISICAL_CLIENT_ID }}" \
@@ -155,11 +168,12 @@ jobs:
             --save-config \
             --dry-run=client \
             -o yaml | kubectl apply -f -
+          echo "✅ Secrets criados/atualizados."
 
-      - name: Deploy do PVC do MySQL
+      - name: Aplicar PVC do MySQL
         run: kubectl apply -f k8s/mysql-pvc.yaml
 
-      - name: Deploy do MySQL
+      - name: Deploy do MySQL (Deployment + Service)
         run: |
           kubectl apply -f k8s/mysql-deployment.yaml
           kubectl apply -f k8s/mysql-service.yaml
@@ -168,64 +182,52 @@ jobs:
         run: |
           kubectl wait --for=condition=ready pod \
             -l app=mysql \
-            -n auto-center \
+            -n ${{ env.K8S_NAMESPACE }} \
             --timeout=180s
+          echo "✅ MySQL pronto."
 
   # ─────────────────────────────────────────────────────────────────
-  # JOB 4 — Deploy da Aplicação
-  # Aplica os manifestos da API Spring Boot e o HPA.
+  # JOB 4 — Deploy da aplicação + aplicação dos manifestos YAML
+  # Aplica todos os manifestos via Kustomize e aguarda o rollout.
   # ─────────────────────────────────────────────────────────────────
   deploy-app:
-    name: 🚀 Deploy da Aplicação
-    runs-on: ubuntu-latest
-    needs: [docker, deploy-database]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: production
+    name: 🚀 Deploy da Aplicação (Kubernetes local)
+    runs-on: self-hosted
+    needs: deploy-database
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Configurar kubectl
-        uses: azure/setup-kubectl@v4
-
-      - name: Configurar kubeconfig
+      - name: Aplicar todos os manifestos YAML com Kustomize
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-
-      - name: Substituir tag da imagem no Deployment
-        run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${SHORT_SHA}"
-          sed -i "s|image: auto-center-fiap:latest|image: ${IMAGE}|g" k8s/app-deployment.yaml
-          echo "Imagem configurada: ${IMAGE}"
-
-      - name: Aplicar manifestos da aplicação
-        run: |
-          kubectl apply -f k8s/app-deployment.yaml
-          kubectl apply -f k8s/app-service.yaml
-          kubectl apply -f k8s/hpa.yaml
+          echo "--- Aplicando manifestos via kustomize ---"
+          kubectl apply -k k8s/
+          echo "✅ Manifestos aplicados."
 
       - name: Aguardar rollout da aplicação
         run: |
           kubectl rollout status deployment/auto-center-fiap \
-            -n auto-center \
-            --timeout=180s
+            -n ${{ env.K8S_NAMESPACE }} \
+            --timeout=300s
+          echo "✅ Aplicação implantada com sucesso."
 
       - name: Verificar status final do deploy
+        if: always()
         run: |
-          echo "====== Pods ======"
-          kubectl get pods -n auto-center
+          echo "========== PODS =========="
+          kubectl get pods -n ${{ env.K8S_NAMESPACE }} -o wide
 
-          echo "====== Services ======"
-          kubectl get services -n auto-center
+          echo "========== SERVICES =========="
+          kubectl get services -n ${{ env.K8S_NAMESPACE }}
 
-          echo "====== HPA ======"
-          kubectl get hpa -n auto-center
+          echo "========== DEPLOYMENTS =========="
+          kubectl get deployments -n ${{ env.K8S_NAMESPACE }}
 
-          echo "====== Imagem em uso ======"
-          kubectl get deployment auto-center-fiap -n auto-center \
-            -o jsonpath='{.spec.template.spec.containers[0].image}'
-          echo ""
+          echo "========== HPA =========="
+          kubectl get hpa -n ${{ env.K8S_NAMESPACE }} || true
 
+          echo "========== EVENTOS RECENTES =========="
+          kubectl get events -n ${{ env.K8S_NAMESPACE }} \
+            --sort-by='.lastTimestamp' | tail -20

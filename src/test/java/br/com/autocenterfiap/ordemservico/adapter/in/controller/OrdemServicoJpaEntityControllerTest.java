@@ -261,4 +261,23 @@ class OrdemServicoJpaEntityControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void deveRetornarStatusDaOrdemServico() throws Exception {
+        OrdemServicoJpaEntity saved = repository.save(ordemServicoJpaEntity);
+
+        mockMvc.perform(get("/v1/ordem-servicos/status/{id}", saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusOS", is("ABERTA")));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void deveRetornar404AoConsultarStatusDeOrdemServicoInexistente() throws Exception {
+        mockMvc.perform(get("/v1/ordem-servicos/status/{id}", 999L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }

@@ -65,7 +65,6 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.GET, "/v1/servicos/status/{status}").hasAnyRole("ADMIN", "READ");
 
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos").hasAnyRole("ADMIN", "READ");
-                            req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.GET, "/v1/ordem-servicos/numero/{numeroOrdemServico}").hasAnyRole("ADMIN", "READ");
                             req.requestMatchers(HttpMethod.POST, "/v1/ordem-servicos").hasAnyRole("ADMIN", "WRITE");
                             req.requestMatchers(HttpMethod.PATCH, "/v1/ordem-servicos/{idOrdemServico}").hasAnyRole("ADMIN", "WRITE");

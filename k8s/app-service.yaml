@@ -8,14 +8,15 @@ metadata:
     component: api
 spec:
   # ─── Use LoadBalancer para cloud providers (AWS, GCP, Azure) ───────
-  # ─── Use NodePort para ambientes locais / on-premise ───────────────
-  type: LoadBalancer
+  # ─── NodePort expõe no host local via <IP-do-nó>:30097 ─────────────
+  type: NodePort
   selector:
     app: auto-center-fiap
   ports:
     - name: http
       port: 80
       targetPort: 8097
+      nodePort: 30097   # acesse em http://localhost:30097 (Minikube: use o IP do minikube)
       protocol: TCP
   # sessionAffinity: ClientIP   # descomente se precisar de sticky session
 

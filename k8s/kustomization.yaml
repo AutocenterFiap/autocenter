@@ -7,8 +7,9 @@ resources:
   # 1. Namespace (deve ser aplicado primeiro)
   - namespace.yaml
   # 2. Configurações
+  # secret.yaml é criado pelo pipeline CI/CD via 'kubectl create secret generic'
+  # e NÃO deve ser versionado no repositório por segurança.
   - configmap.yaml
-  - secret.yaml
   # 3. Banco de dados
   - mysql-pvc.yaml
   - mysql-deployment.yaml
@@ -19,7 +20,12 @@ resources:
   # 5. Autoscaling
   - hpa.yaml
 
-commonLabels:
-  managed-by: kustomize
-  project: auto-center-fiap
+# 'labels' com includeSelectors: false evita modificar spec.selector
+# (que é imutável após criação do Deployment).
+labels:
+  - pairs:
+      managed-by: kustomize
+      project: auto-center-fiap
+    includeSelectors: false
+    includeTemplates: true
 

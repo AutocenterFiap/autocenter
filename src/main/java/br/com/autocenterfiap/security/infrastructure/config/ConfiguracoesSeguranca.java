@@ -30,7 +30,7 @@ public class ConfiguracoesSeguranca {
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(
                         req -> {
-                             req.requestMatchers("/h2-console/**").permitAll();// Libera o console H2
+                            req.requestMatchers("/h2-console/**").permitAll();// Libera o console H2
 
                             req.requestMatchers("/v1/oauth/token", "/v1/oauth/refresh-token").permitAll();
 
@@ -99,6 +99,9 @@ public class ConfiguracoesSeguranca {
 
                             // H2 Console - público (apenas para desenvolvimento)
                             req.requestMatchers("/h2-console/**").permitAll();
+
+                            // Actuator health - necessário para as probes do Kubernetes (liveness, readiness, startup)
+                            req.requestMatchers("/actuator/health", "/actuator/health/**").permitAll();
 
                             req.anyRequest().authenticated();
                         }

@@ -170,8 +170,23 @@ jobs:
             -o yaml | kubectl apply -f -
           echo "✅ Secrets criados/atualizados."
 
-      - name: Aplicar PVC do MySQL
-        run: kubectl apply -f k8s/mysql-pvc.yaml
+      - name: Recriar PVC do MySQL (garante inicialização limpa com as credenciais atuais)
+        run: |
+          # Se o MySQL subiu com um PVC antigo, ele ignora MYSQL_USER/MYSQL_PASSWORD
+          # e usa os dados já existentes em disco — causando "Access denied".
+          # Apagar o PVC força o MySQL a reinicializar do zero com os secrets corretos.
+          # O Flyway recria todo o schema automaticamente na sequência.
+          echo "--- Removendo Deployment e PVC antigos do MySQL ---"
+          kubectl delete deployment mysql -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
+          kubectl delete pvc mysql-pvc -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
+
+          echo "--- Aguardando remoção completa do PVC ---"
+          kubectl wait --for=delete pvc/mysql-pvc \
+            -n ${{ env.K8S_NAMESPACE }} --timeout=60s || true
+
+          echo "--- Recriando PVC ---"
+          kubectl apply -f k8s/mysql-pvc.yaml
+          echo "✅ PVC recriado."
 
       - name: Deploy do MySQL (Deployment + Service)
         run: |
@@ -199,6 +214,13 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+
+      - name: Remover Deployments antigos (evita erro de spec.selector imutável)
+        run: |
+          echo "--- Removendo deployments antigos para recriação limpa ---"
+          kubectl delete deployment auto-center-fiap mysql \
+            -n ${{ env.K8S_NAMESPACE }} --ignore-not-found=true
+          echo "✅ Deployments antigos removidos (serão recriados a seguir)."
 
       - name: Aplicar todos os manifestos YAML com Kustomize
         run: |

@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.cliente.domain.entity;
 
+import br.com.autocenterfiap.cliente.domain.enums.StatusCliente;
 import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class Cliente {
     private String documento;
     private String email;
     private String telefone;
+    private StatusCliente status;
     private Endereco endereco;
     private LocalDate dataNascimento;
     private LocalDateTime dataCriacao;
@@ -92,6 +94,7 @@ public class Cliente {
             .documento(this.documento)
             .email(email)
             .telefone(telefone)
+            .status(this.status)
             .endereco(endereco)
             .dataNascimento(dataNascimento)
             .dataCriacao(this.dataCriacao)

@@ -2,6 +2,7 @@ package br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.mapper;
 
 import br.com.autocenterfiap.cliente.domain.entity.Cliente;
 import br.com.autocenterfiap.cliente.domain.entity.Endereco;
+import br.com.autocenterfiap.cliente.domain.enums.StatusCliente;
 import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.ClienteJpaEntity;
 import br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity.EnderecoJpaEntity;
 
@@ -21,6 +22,7 @@ public class ClienteJpaMapper {
             .documento(jpaEntity.getDocumento())
             .email(jpaEntity.getEmail())
             .telefone(jpaEntity.getTelefone())
+            .status(jpaEntity.getStatus())
             .endereco(endereco)
             .dataNascimento(jpaEntity.getDataNascimento())
             .dataCriacao(jpaEntity.getDataCriacao())
@@ -42,6 +44,7 @@ public class ClienteJpaMapper {
         jpaEntity.setDocumento(domain.getDocumento());
         jpaEntity.setEmail(domain.getEmail());
         jpaEntity.setTelefone(domain.getTelefone());
+        jpaEntity.setStatus(domain.getStatus() != null ? domain.getStatus() : StatusCliente.ATIVO);
         jpaEntity.setEndereco(endereco);
         jpaEntity.setDataNascimento(domain.getDataNascimento());
         jpaEntity.setDataCriacao(domain.getDataCriacao());

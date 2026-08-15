@@ -1,5 +1,6 @@
 package br.com.autocenterfiap.cliente.infrastructure.persistence.jpa.entity;
 
+import br.com.autocenterfiap.cliente.domain.enums.StatusCliente;
 import br.com.autocenterfiap.cliente.domain.enums.TipoCliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,10 @@ public class ClienteJpaEntity implements Serializable {
 
     @Column(nullable = false, length = 20)
     private String telefone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private StatusCliente status = StatusCliente.ATIVO;
 
     @Embedded
     private EnderecoJpaEntity endereco;

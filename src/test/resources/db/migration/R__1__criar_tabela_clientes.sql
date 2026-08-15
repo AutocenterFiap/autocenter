@@ -15,6 +15,7 @@ CREATE TABLE clientes (
     documento VARCHAR(14) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     telefone VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
     data_nascimento DATE,
 
     -- Endereço (Embedded)

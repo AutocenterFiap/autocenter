@@ -7,18 +7,23 @@ name: Deploy AWS — Auto Center FIAP
 #   AWS_ACCESS_KEY_ID      — credencial temporaria da sessao do AWS Academy Lab
 #   AWS_SECRET_ACCESS_KEY  — idem
 #   AWS_SESSION_TOKEN      — idem (expira; atualizar quando a sessao do lab reiniciar)
-#   ECR_REPOSITORY_URL     — URL do repositorio ECR (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap)
 #   TF_API_TOKEN           — token de API do Terraform Cloud (organizacao autocenter-fiap)
+#
+# O repositorio ECR (nome fixo "autocenter-fiap") e criado automaticamente
+# pelo Terraform do repositorio "infraestrutura" (ecr.tf). A URL e resolvida
+# dinamicamente em runtime via `aws sts get-caller-identity`, sem necessidade
+# de secret adicional.
 # ──────────────────────────────────────────────────────────────────────────────
 
 on:
   push:
     branches:
-      - develop
+      - deploy-aws
 
 env:
   AWS_REGION: us-east-1
   JAVA_VERSION: '21'
+  ECR_REPOSITORY_NAME: autocenter-fiap
 
 jobs:
 
@@ -55,6 +60,7 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
+      ecr_repository_url: ${{ steps.ecr-url.outputs.repository_url }}
 
     steps:
       - name: Checkout do código
@@ -75,15 +81,24 @@ jobs:
       - name: Login no Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Resolver URL do repositorio ECR (criado pelo repo infraestrutura)
+        id: ecr-url
+        run: |
+          REPO_URL=$(aws ecr describe-repositories \
+            --repository-names "${{ env.ECR_REPOSITORY_NAME }}" \
+            --query 'repositories[0].repositoryUri' \
+            --output text)
+          echo "repository_url=${REPO_URL}" >> "${GITHUB_OUTPUT}"
+
       - name: Build e push da imagem Docker
         run: |
           docker build \
             -f docker/Dockerfile \
-            -t ${{ secrets.ECR_REPOSITORY_URL }}:latest \
-            -t ${{ secrets.ECR_REPOSITORY_URL }}:${{ steps.vars.outputs.image_tag }} \
+            -t ${{ steps.ecr-url.outputs.repository_url }}:latest \
+            -t ${{ steps.ecr-url.outputs.repository_url }}:${{ steps.vars.outputs.image_tag }} \
             .
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:latest
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:${{ steps.vars.outputs.image_tag }}
+          docker push ${{ steps.ecr-url.outputs.repository_url }}:latest
+          docker push ${{ steps.ecr-url.outputs.repository_url }}:${{ steps.vars.outputs.image_tag }}
 
   terraform-apply:
     name: 🚀 Terraform Apply (EKS)
@@ -115,7 +130,7 @@ jobs:
         working-directory: terraform
         run: |
           terraform apply -auto-approve \
-            -var="app_image=${{ secrets.ECR_REPOSITORY_URL }}:${{ needs.docker-build-push.outputs.image_tag }}"
+            -var="app_image=${{ needs.docker-build-push.outputs.ecr_repository_url }}:${{ needs.docker-build-push.outputs.image_tag }}"
 
       - name: Exibir hostname do LoadBalancer
         working-directory: terraform

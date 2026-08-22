@@ -727,18 +727,37 @@ terraform destroy -auto-approve
 
 ---
 
-## 9. APIs
+## 9. Deploy na AWS (Terraform Cloud + EKS + RDS)
 
-### 9.1 Documentação Interativa
+Diferente da seção anterior (Kind local), este fluxo implanta a aplicação
+num cluster EKS real, já provisionado pelo repositório `infraestrutura`,
+conectando a um RDS MySQL já provisionado pelo repositório `database`.
+
+- Workspace Terraform Cloud: `aplicacao` (organização `autocenter-fiap`),
+  configuração em `terraform/` — veja `terraform/README.md` para as
+  variáveis a cadastrar.
+- Pipeline: `.github/workflows/deploy-aws.yml`, disparado em push (direto
+  ou via merge) na branch `develop`.
+- Imagem Docker publicada no Amazon ECR a cada execução do pipeline.
+- Credenciais (banco de dados e chave JWT) ficam exclusivamente em
+  variáveis sensíveis do workspace Terraform Cloud — não usa Infisical
+  neste fluxo.
+- Namespace Kubernetes usado: `autocenter` (distinto do `auto-center` do
+  fluxo local, para não colidir).
+
+
+## 10. APIs
+
+### 10.1 Documentação Interativa
 
 - **Swagger UI:** `http://<host>:8097/swagger-ui.html` (ou `/swagger-ui/index.html`), configurado em `SwaggerConfig` e `SwaggerSecurityConfig` (`br.com.autocenterfiap.config` / `br.com.autocenterfiap.security.infrastructure.config`), com esquema de segurança `bearerAuth` (HTTP Bearer/JWT).
 - **OpenAPI JSON:** `http://<host>:8097/api-docs`.
 
-### 9.2 Autenticação
+### 10.2 Autenticação
 
 Todos os endpoints, à exceção dos listados como **Pública**, exigem header `Authorization: Bearer <token>` e o perfil (`ROLE_ADMIN`, `ROLE_READ` ou `ROLE_WRITE`) adequado, conforme definido em `ConfiguracoesSeguranca` (`SecurityFilterChain`).
 
-### 9.3 Tabela de Endpoints
+### 10.3 Tabela de Endpoints
 
 #### Autenticação (`/v1/oauth`) — `AutenticacaoController`
 
@@ -849,7 +868,7 @@ Todos os endpoints, à exceção dos listados como **Pública**, exigem header `
 
 ---
 
-## 10. Estrutura do Projeto
+## 11. Estrutura do Projeto
 
 ```
 auto-center-fiap/
@@ -887,7 +906,7 @@ auto-center-fiap/
 
 ---
 
-## 11. Tecnologias Utilizadas
+## 12. Tecnologias Utilizadas
 
 | Tecnologia | Versão | Finalidade |
 |---|---|---|
@@ -917,7 +936,7 @@ auto-center-fiap/
 
 ---
 
-## 12. Decisões Técnicas
+## 13. Decisões Técnicas
 
 1. **Arquitetura Hexagonal replicada por módulo, e não uma camada única compartilhada.** Cada *bounded context* (Cliente, Veículo, Serviço, Produto, Ordem de Serviço, Orçamento, Segurança) possui sua própria hierarquia `domain/application/infrastructure/adapter`, favorecendo baixo acoplamento entre módulos e permitindo evolução/deploy independente no futuro (ex.: extração para microsserviços), mesmo operando hoje como monólito.
 2. **Entidades de domínio e entidades JPA desacopladas.** Embora aumente a quantidade de classes e mappers, essa decisão garante que a regra de negócio (`Produto.decrementarEstoque()`, `Cliente.validarDominio()`) seja testável isoladamente, sem inicializar o contexto Spring ou o Hibernate — refletido nos testes unitários puros (`ClienteTest`, `ProdutoTest` implícitos via testes de UseCase com Mockito).
@@ -932,7 +951,7 @@ auto-center-fiap/
 
 ---
 
-## 13. Melhorias Futuras
+## 14. Melhorias Futuras
 
 Com base em lacunas identificadas na implementação atual:
 

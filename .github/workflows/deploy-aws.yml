@@ -1,7 +1,7 @@
 name: Deploy AWS — Auto Center FIAP
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Dispara so em push na branch "develop" (via merge de outra branch ou push direto).
+# Dispara so em push na branch "deploy-aws" (via merge de outra branch ou push direto).
 #
 # GitHub Secrets necessarios (Settings → Secrets and variables → Actions):
 #   AWS_ACCESS_KEY_ID      — credencial temporaria da sessao do AWS Academy Lab

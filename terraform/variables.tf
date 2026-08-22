@@ -4,9 +4,9 @@ variable "app_image" {
 }
 
 variable "app_replicas" {
-  description = "Numero inicial de replicas do Deployment"
+  description = "Numero inicial de replicas do Deployment (default reduzido para 1 devido a capacidade limitada dos nodes t3.micro do cluster EKS)"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "db_name" {

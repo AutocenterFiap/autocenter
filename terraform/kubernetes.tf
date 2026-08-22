@@ -112,12 +112,12 @@ resource "kubernetes_deployment" "autocenter_app" {
 
           resources {
             requests = {
-              cpu    = "250m"
-              memory = "512Mi"
+              cpu    = "100m"
+              memory = "256Mi"
             }
             limits = {
-              cpu    = "1000m"
-              memory = "1Gi"
+              cpu    = "500m"
+              memory = "400Mi"
             }
           }
 
@@ -199,7 +199,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "autocenter_app" {
       name        = kubernetes_deployment.autocenter_app.metadata[0].name
     }
 
-    min_replicas = 2
+    min_replicas = 1
     max_replicas = 10
 
     metric {

@@ -1,0 +1,128 @@
+name: Deploy AWS Manual — Auto Center FIAP
+
+# Executa manualmente pelo GitHub Actions em qualquer branch selecionada.
+#
+# GitHub Secrets necessarios (Settings → Secrets and variables → Actions):
+#   AWS_ACCESS_KEY_ID      — credencial temporaria da sessao do AWS Academy Lab
+#   AWS_SECRET_ACCESS_KEY  — idem
+#   AWS_SESSION_TOKEN      — idem (expira; atualizar quando a sessao do lab reiniciar)
+#   TF_API_TOKEN           — token de API do Terraform Cloud (organizacao autocenter-fiap)
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  JAVA_VERSION: '21'
+  ECR_REPOSITORY_NAME: autocenter-fiap
+
+jobs:
+
+  build-and-test:
+    name: 🔨 Build e Testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build e execução dos testes automatizados (Maven + JaCoCo)
+        run: mvn clean verify --batch-mode --no-transfer-progress
+
+      - name: Salvar JAR como artefato para o job de Docker
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/auto-center-fiap-*.jar
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-build-push:
+    name: 🐳 Build e Push da Imagem (ECR)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+      ecr_repository_url: ${{ steps.ecr-url.outputs.repository_url }}
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Definir tag da imagem
+        id: vars
+        run: echo "image_tag=${{ github.sha }}" >> "${GITHUB_OUTPUT}"
+
+      - name: Configurar credenciais AWS (sessão temporária do lab)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Resolver URL do repositorio ECR (criado pelo repo infraestrutura)
+        id: ecr-url
+        run: |
+          REPO_URL=$(aws ecr describe-repositories \
+            --repository-names "${{ env.ECR_REPOSITORY_NAME }}" \
+            --query 'repositories[0].repositoryUri' \
+            --output text)
+          echo "repository_url=${REPO_URL}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build e push da imagem Docker
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t ${{ steps.ecr-url.outputs.repository_url }}:latest \
+            -t ${{ steps.ecr-url.outputs.repository_url }}:${{ steps.vars.outputs.image_tag }} \
+            .
+          docker push ${{ steps.ecr-url.outputs.repository_url }}:latest
+          docker push ${{ steps.ecr-url.outputs.repository_url }}:${{ steps.vars.outputs.image_tag }}
+
+  terraform-apply:
+    name: 🚀 Terraform Apply (EKS)
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS (sessão temporária do lab)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configurar Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve \
+            -var="app_image=${{ needs.docker-build-push.outputs.ecr_repository_url }}:${{ needs.docker-build-push.outputs.image_tag }}"
+
+      - name: Exibir hostname do LoadBalancer
+        working-directory: terraform
+        run: terraform output -raw app_service_hostname || true

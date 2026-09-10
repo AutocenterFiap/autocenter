@@ -1,76 +1,34 @@
-# ─── Cluster ──────────────────────────────────────────────────────────────────
-variable "cluster_name" {
-  description = "Nome do cluster Kind"
-  type        = string
-  default     = "auto-center"
-}
-
-# ─── Imagem da aplicação ───────────────────────────────────────────────────────
 variable "app_image" {
-  description = "Imagem Docker da aplicação (registry/nome:tag)"
+  description = "Imagem Docker da aplicacao no ECR, com tag (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap:abc1234)"
   type        = string
-  default     = "auto-center-fiap:latest"
 }
 
 variable "app_replicas" {
-  description = "Número inicial de réplicas da aplicação"
+  description = "Numero inicial de replicas do Deployment (default reduzido para 1 devido a capacidade limitada dos nodes t3.micro do cluster EKS)"
   type        = number
-  default     = 2
+  default     = 1
 }
 
-# ─── MySQL ────────────────────────────────────────────────────────────────────
-variable "mysql_root_password" {
-  description = "Senha root do MySQL"
-  type        = string
-  sensitive   = true
-}
-
-variable "mysql_database" {
-  description = "Nome do banco de dados"
+variable "db_name" {
+  description = "Nome do banco de dados no RDS (deve ser igual ao db_name do workspace 'database')"
   type        = string
   default     = "autocenter"
 }
 
-variable "mysql_user" {
-  description = "Usuário da aplicação no MySQL"
-  type        = string
-  default     = "autocenter_user"
-}
-
-variable "mysql_password" {
-  description = "Senha do usuário da aplicação no MySQL"
+variable "db_username" {
+  description = "Usuario do MySQL no RDS (deve ser igual ao db_username do workspace 'database')"
   type        = string
   sensitive   = true
 }
 
-# ─── Infisical ────────────────────────────────────────────────────────────────
-variable "infisical_client_id" {
-  description = "Client ID da Machine Identity do Infisical"
+variable "db_password" {
+  description = "Senha do MySQL no RDS (deve ser igual ao db_password do workspace 'database')"
   type        = string
   sensitive   = true
 }
 
-variable "infisical_client_secret" {
-  description = "Client Secret da Machine Identity do Infisical"
+variable "jwt_secret" {
+  description = "Valor de sistema.seguranca.chave.secreta em producao"
   type        = string
   sensitive   = true
 }
-
-variable "infisical_project_id" {
-  description = "Project ID do Infisical"
-  type        = string
-  sensitive   = true
-}
-
-variable "infisical_environment" {
-  description = "Environment do Infisical (prod, staging, dev)"
-  type        = string
-  default     = "prod"
-}
-
-variable "infisical_secret_path" {
-  description = "Secret path do Infisical"
-  type        = string
-  default     = "/"
-}
-

@@ -99,8 +99,8 @@ public class ConfiguracoesSeguranca {
                             // H2 Console - público (apenas para desenvolvimento)
                             req.requestMatchers("/h2-console/**").permitAll();
 
-                            // Actuator health - necessário para as probes do Kubernetes (liveness, readiness, startup)
-                            req.requestMatchers("/actuator/health", "/actuator/health/**").permitAll();
+                            // Actuator (health e prometheus) - necessário para probes do K8s e Datadog OpenMetrics
+                            req.requestMatchers("/actuator/**").permitAll();
 
                             req.anyRequest().authenticated();
                         }

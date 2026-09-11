@@ -1,0 +1,26 @@
+{
+    "id": 320829852,
+    "name": "⚠️ [AutoCenter FIAP] Alerta de Falhas no Processamento de Ordens de Serviço",
+    "type": "query alert",
+    "query": "sum(last_5m):sum:autocenter.autocenter_erros_total{*}.as_count() > 5",
+    "message": "⚠️ **Atenção!** Ocorreram falhas no processamento de Ordens de Serviço / Integrações na aplicação AutoCenter FIAP.\n\nVerifique os logs no Datadog: `service:auto-center-fiap status:error`\n\n@all",
+    "tags": [
+        "service:auto-center-fiap",
+        "env:dev",
+        "team:autocenter"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 5
+        },
+        "notify_audit": false,
+        "renotify_interval": 0,
+        "include_tags": true,
+        "escalation_message": "",
+        "on_missing_data": "show_no_data",
+        "new_host_delay": 300
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

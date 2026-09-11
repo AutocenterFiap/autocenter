@@ -8,6 +8,7 @@ import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServ
 import br.com.autocenterfiap.ordemservico.application.mapper.OrdemServicoApplicationMapper;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemProdutoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.application.port.ObservabilidadePort;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.validator.OrdemServicoValidator;
 import br.com.autocenterfiap.ordemservico.domain.entity.OSItemProduto;
@@ -43,6 +44,7 @@ public class CriarOrdemServicoUseCase {
     private final VeiculoRepositoryPort veiculoRepositoryPort;
     private final ClienteRepositoryPort clienteRepositoryPort;
     private final List<OrdemServicoValidator> validators;
+    private final ObservabilidadePort observabilidadePort;
 
     public CriarOrdemServicoUseCase(
             OrdemServicoRepositoryPort ordemServicoRepositoryPort,
@@ -52,7 +54,8 @@ public class CriarOrdemServicoUseCase {
             ServicoRepositoryPort servicoRepositoryPort,
             VeiculoRepositoryPort veiculoRepositoryPort,
             ClienteRepositoryPort clienteRepositoryPort,
-            List<OrdemServicoValidator> validators) {
+            List<OrdemServicoValidator> validators,
+            ObservabilidadePort observabilidadePort) {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
         this.osItemProdutoRepositoryPort = osItemProdutoRepositoryPort;
         this.osItemServicoRepositoryPort = osItemServicoRepositoryPort;
@@ -61,6 +64,7 @@ public class CriarOrdemServicoUseCase {
         this.veiculoRepositoryPort = veiculoRepositoryPort;
         this.clienteRepositoryPort = clienteRepositoryPort;
         this.validators = validators;
+        this.observabilidadePort = observabilidadePort;
     }
 
     public OrdemServicoOutput executar(CriarOrdemServicoInput input) {
@@ -82,6 +86,10 @@ public class CriarOrdemServicoUseCase {
 
         ordemServicoSalvo.setValorTotal(Util.calcularValorTotal(ordemServicoSalvo));
         this.ordemServicoRepositoryPort.save(ordemServicoSalvo);
+
+        if (this.observabilidadePort != null) {
+            this.observabilidadePort.registrarOrdemCriada();
+        }
 
         return OrdemServicoApplicationMapper.toOutput(ordemServicoSalvo);
     }

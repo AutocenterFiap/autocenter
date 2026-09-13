@@ -84,6 +84,26 @@ resource "kubernetes_deployment" "autocenter_app" {
           app       = "autocenter-fiap"
           component = "api"
         }
+
+        annotations = {
+          "ad.datadoghq.com/autocenter-fiap.checks" = jsonencode({
+            openmetrics = {
+              instances = [
+                {
+                  prometheus_url = "http://%%host%%:8097/actuator/prometheus"
+                  namespace      = "autocenter"
+                  metrics        = ["autocenter_*"]
+                }
+              ]
+            }
+          })
+          "ad.datadoghq.com/autocenter-fiap.logs" = jsonencode([
+            {
+              source  = "spring-boot"
+              service = "auto-center-fiap"
+            }
+          ])
+        }
       }
 
       spec {
@@ -96,6 +116,35 @@ resource "kubernetes_deployment" "autocenter_app" {
             container_port = 8097
             name           = "http"
             protocol       = "TCP"
+          }
+
+          env {
+            name = "DD_AGENT_HOST"
+            value_from {
+              field_ref {
+                field_path = "status.hostIP"
+              }
+            }
+          }
+
+          env {
+            name  = "DD_ENV"
+            value = "prod"
+          }
+
+          env {
+            name  = "DD_SERVICE"
+            value = "auto-center-fiap"
+          }
+
+          env {
+            name  = "DD_VERSION"
+            value = "1.0.0"
+          }
+
+          env {
+            name  = "DD_LOGS_INJECTION"
+            value = "true"
           }
 
           env_from {

@@ -26,6 +26,8 @@ service, hpa).
    | `db_username` | Sim | Deve ser igual ao `db_username` do workspace `database` |
    | `db_password` | Sim | Deve ser igual ao `db_password` do workspace `database` |
    | `jwt_secret` | Sim | Valor de `sistema.seguranca.chave.secreta` em producao |
+   | `dd_api_key` | Sim | API Key da organizacao Datadog (ver secao "Datadog" abaixo) |
+   | `dd_site` | Nao | Site do Datadog (padrao `datadoghq.com`; use `us5.datadoghq.com`, `datadoghq.eu` etc. conforme a regiao da conta) |
 
    A variavel `app_image` **nao** deve ser cadastrada manualmente — ela e
    passada pelo pipeline de CI/CD (`terraform apply -var="app_image=..."`)
@@ -47,3 +49,21 @@ terraform validate
 
 Apos o apply, o workspace expoe `app_service_hostname` — hostname do
 LoadBalancer para acessar `/actuator/health`, `/swagger-ui/index.html` etc.
+
+## Datadog
+
+O `datadog.tf` instala o Datadog Agent (DaemonSet, via Helm chart oficial
+`datadog/datadog`) no namespace `autocenter`, habilitando:
+
+- **Logs** dos containers (`containerCollectAll`), com injecao automatica
+  de `dd.trace_id`/`dd.span_id` nos logs da aplicacao (`DD_LOGS_INJECTION`).
+- **APM** (traces).
+- **Metricas Prometheus/OpenMetrics** via autodiscovery, usando as
+  anotacoes `ad.datadoghq.com/autocenter-fiap.checks` presentes no
+  Deployment (scrape de `/actuator/prometheus`).
+
+O Cluster Agent e o Process Agent estao desabilitados para reduzir o
+consumo de CPU/memoria nos nodes `t3.micro`/`t3.small` do EKS.
+
+Veja a raiz do repositorio (`README.md` ou secao "Configurar a conta
+Datadog") para o passo a passo de criacao da API Key.

@@ -32,3 +32,15 @@ variable "jwt_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "dd_api_key" {
+  description = "API Key da organizacao Datadog (Organization Settings > API Keys)"
+  type        = string
+  sensitive   = true
+}
+
+variable "dd_site" {
+  description = "Site do Datadog (ex: datadoghq.com, us5.datadoghq.com, datadoghq.eu)"
+  type        = string
+  default     = "datadoghq.com"
+}

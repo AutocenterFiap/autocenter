@@ -4,6 +4,7 @@ import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.produto.domain.exception.EstoqueInsuficienteException;
 import br.com.autocenterfiap.produto.domain.exception.ProdutoInativoException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -13,15 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * Handler centralizado para exceções de negócio compartilhadas entre diferentes domínios.
- *
- * Diferente do GlobalExceptionHandler, que trata erros técnicos e inesperados,
- * o NegocioExceptionHandler foca em exceções de negócio que podem ser propagadas
- * entre múltiplos módulos da aplicação, garantindo consistência na resposta.
- *
- * Exemplo de uso:
- * - Ordem de Serviço chama Produto e este lança EstoqueInsuficienteException.
- * - A exceção é capturada aqui e retorna 422 para o cliente.
  */
+@Slf4j
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class CompartilhadoExceptionHandler {
@@ -29,6 +23,7 @@ public class CompartilhadoExceptionHandler {
     public ResponseEntity<ErroResposta> handleEstoqueInsuficiente(
             EstoqueInsuficienteException ex, HttpServletRequest request) {
 
+        log.warn("Estoque insuficiente na URI={}: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErroResposta(
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Estoque Insuficiente",
@@ -41,6 +36,7 @@ public class CompartilhadoExceptionHandler {
     public ResponseEntity<ErroResposta> handleProdutoInativo(
             ProdutoInativoException ex, HttpServletRequest request) {
 
+        log.warn("Produto inativo na URI={}: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErroResposta(
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Operação Não Permitida",

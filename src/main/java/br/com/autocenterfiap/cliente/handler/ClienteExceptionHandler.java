@@ -8,6 +8,7 @@ import br.com.autocenterfiap.cliente.domain.exception.ClienteEmailJaCadastradoEx
 import br.com.autocenterfiap.cliente.domain.exception.ClienteNaoEncontradoException;
 import br.com.autocenterfiap.comum.model.ErroResposta;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ClienteExceptionHandler {
@@ -23,6 +25,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleClienteNaoEncontrado(
             ClienteNaoEncontradoException ex,
             HttpServletRequest request) {
+        log.warn("Cliente não encontrado na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.NOT_FOUND.value(),
                 "Cliente não encontrado",
@@ -36,6 +39,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleDocumentoJaCadastrado(
             ClienteDocumentoJaCadastradoException ex,
             HttpServletRequest request) {
+        log.warn("Documento já cadastrado na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.CONFLICT.value(),
                 "Documento já cadastrado",
@@ -49,6 +53,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleEmailJaCadastrado(
             ClienteEmailJaCadastradoException ex,
             HttpServletRequest request) {
+        log.warn("Email já cadastrado na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.CONFLICT.value(),
                 "Email já cadastrado",
@@ -62,6 +67,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleDocumentoInvalido(
             ClienteDocumentoInvalidoException ex,
             HttpServletRequest request) {
+        log.warn("Documento inválido na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.BAD_REQUEST.value(),
                 "Documento inválido",
@@ -75,6 +81,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleDocumentoNaoPodeSerAlterado(
             ClienteDocumentoNaoPodeSerAlteradoException ex,
             HttpServletRequest request) {
+        log.warn("Documento não pode ser alterado na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.BAD_REQUEST.value(),
                 "Alteração de documento não permitida",
@@ -88,6 +95,7 @@ public class ClienteExceptionHandler {
     public ResponseEntity<ErroResposta> handleClienteEmUso(
             ClienteEmUsoException ex,
             HttpServletRequest request) {
+        log.warn("Cliente em uso na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erro = new ErroResposta(
                 HttpStatus.CONFLICT.value(),
                 "Cliente em uso",

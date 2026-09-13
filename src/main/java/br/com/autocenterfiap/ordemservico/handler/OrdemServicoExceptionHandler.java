@@ -2,9 +2,11 @@ package br.com.autocenterfiap.ordemservico.handler;
 
 import br.com.autocenterfiap.comum.model.ErroResposta;
 import br.com.autocenterfiap.ordemservico.application.exception.*;
+import br.com.autocenterfiap.ordemservico.application.port.ObservabilidadePort;
 import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.domain.exception.ServicoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -12,12 +14,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice(basePackages = "br.com.autocenterfiap.ordemservico")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class OrdemServicoExceptionHandler {
 
+    private final ObservabilidadePort observabilidadePort;
+
+    public OrdemServicoExceptionHandler() {
+        this.observabilidadePort = null;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public OrdemServicoExceptionHandler(ObservabilidadePort observabilidadePort) {
+        this.observabilidadePort = observabilidadePort;
+    }
+
     @ExceptionHandler(OrdemServicoJaAbertaParaVeiculoException.class)
     public ResponseEntity<ErroResposta> handleConflitoDeDados(OrdemServicoJaAbertaParaVeiculoException ex, HttpServletRequest request){
+        log.warn("Conflito de dados OS na URI={}: {}", request.getRequestURI(), ex.getMessage());
+        if (observabilidadePort != null) {
+            observabilidadePort.registrarErroIntegracao("ordem_servico", "CONFLITO_DADOS");
+        }
         ErroResposta erro = new ErroResposta(
                 HttpStatus.CONFLICT.value(),
                 "Conflito de Dados",
@@ -29,6 +47,10 @@ public class OrdemServicoExceptionHandler {
 
     @ExceptionHandler(OrdemServicoNaoEncontradaException.class)
     public ResponseEntity<ErroResposta> handleOrdemServicoNaoEncontrada(OrdemServicoNaoEncontradaException ex, HttpServletRequest request){
+        log.warn("Ordem de serviço não encontrada na URI={}: {}", request.getRequestURI(), ex.getMessage());
+        if (observabilidadePort != null) {
+            observabilidadePort.registrarErroIntegracao("ordem_servico", "NAO_ENCONTRADA");
+        }
         ErroResposta erro = new ErroResposta(
                 HttpStatus.NOT_FOUND.value(),
                 "Recurso Não Encontrado",

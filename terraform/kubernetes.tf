@@ -230,6 +230,7 @@ resource "kubernetes_service" "autocenter_app" {
       name        = "http"
       port        = 80
       target_port = 8097
+      node_port   = 30097
       protocol    = "TCP"
     }
   }

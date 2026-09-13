@@ -220,7 +220,7 @@ resource "kubernetes_service" "autocenter_app" {
   }
 
   spec {
-    type = "LoadBalancer"
+    type = "NodePort"
 
     selector = {
       app = "autocenter-fiap"

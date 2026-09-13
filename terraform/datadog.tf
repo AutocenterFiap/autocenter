@@ -41,8 +41,14 @@ resource "helm_release" "datadog" {
           containerCollectAll = true
         }
 
+        # APM (traces) desabilitado: o escopo e metricas (openmetrics) + logs,
+        # e a aplicacao nao possui instrumentacao de tracing. Alem disso, com
+        # o Cluster Agent desabilitado (para economizar recursos nos nodes
+        # t3.micro), o container trace-agent falha ao escrever o token de
+        # autenticacao compartilhado em /etc/datadog-agent/auth/token
+        # ("read-only file system"), entao mantemos APM desligado.
         apm = {
-          portEnabled = true
+          portEnabled = false
         }
 
         # Habilita a coleta via anotacoes ad.datadoghq.com/* (autodiscovery)

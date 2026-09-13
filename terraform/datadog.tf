@@ -36,6 +36,9 @@ resource "helm_release" "datadog" {
 
         apiKeyExistingSecret = kubernetes_secret.datadog.metadata[0].name
 
+        # Nome do cluster para agrupar hosts/checks no Datadog
+        clusterName = "eks-autocenter-fiap"
+
         logs = {
           enabled             = true
           containerCollectAll = true
@@ -54,6 +57,19 @@ resource "helm_release" "datadog" {
         # Habilita a coleta via anotacoes ad.datadoghq.com/* (autodiscovery)
         kubelet = {
           tlsVerify = false
+        }
+      }
+
+      # No EKS, o endpoint de metadados EC2 (IMDS) nao e alcancavel de dentro
+      # dos pods, entao o Agent nao consegue detectar o hostname via IMDS e
+      # falha com "unable to reliably determine the host name". Esta flag faz
+      # o Agent ler o hostname a partir do arquivo local do host
+      # (/var/lib/cloud/data/instance-id) em vez de consultar o IMDS.
+      providers = {
+        eks = {
+          ec2 = {
+            useHostnameFromFile = true
+          }
         }
       }
 

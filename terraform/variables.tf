@@ -1,5 +1,5 @@
 variable "app_image" {
-  description = "Imagem Docker da aplicacao no ECR, com tag (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap:abc1234)"
+  description = "Imagem Docker da aplicacao no ECR, com tag (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap:abc123)"
   type        = string
 }
 

@@ -7,3 +7,8 @@ output "application_service_name" {
   description = "Nome do Service Kubernetes do app"
   value       = kubernetes_service.autocenter_app.metadata[0].name
 }
+
+output "application_namespace" {
+  description = "Namespace Kubernetes do app"
+  value       = kubernetes_namespace.autocenter.metadata[0].name
+}

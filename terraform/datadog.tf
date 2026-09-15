@@ -26,7 +26,7 @@ resource "helm_release" "datadog" {
   name       = "datadog"
   repository = "https://helm.datadoghq.com"
   chart      = "datadog"
-  version    = "3.90.0"
+  version    = "3.99.0"
   namespace  = kubernetes_namespace.autocenter.metadata[0].name
 
   values = [
@@ -76,6 +76,9 @@ resource "helm_release" "datadog" {
       # Process Agent e Orchestrator Explorer desabilitados para reduzir
       # consumo de CPU/memoria nos nodes t3.micro do cluster.
       agents = {
+        image = {
+          tag = "7.83.1"
+        }
         containers = {
           agent = {
             resources = {

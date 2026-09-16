@@ -7,6 +7,7 @@ import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.CriarOrde
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServicoOutput;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemProdutoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.application.port.ObservabilidadePort;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.validator.OrdemServicoValidator;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
@@ -59,6 +60,8 @@ class CriarOrdemServicoUseCaseTest {
     private ClienteRepositoryPort clienteRepositoryPort;
     @Mock
     private OrdemServicoValidator validator;
+    @Mock
+    private ObservabilidadePort observabilidadePort;
 
     private CriarOrdemServicoUseCase useCase;
 
@@ -75,7 +78,8 @@ class CriarOrdemServicoUseCaseTest {
                 servicoRepositoryPort,
                 veiculoRepositoryPort,
                 clienteRepositoryPort,
-                List.of(validator));
+                List.of(validator),
+                observabilidadePort);
 
         veiculo = Veiculo.builder().id(1L).placa("ABC1D23").build();
         cliente = Cliente.builder().id(2L).nome("João").build();
@@ -110,6 +114,7 @@ class CriarOrdemServicoUseCaseTest {
         assertEquals(2L, output.clienteId());
         verify(validator).validate(input);
         verify(ordemServicoRepositoryPort, times(2)).save(any(OrdemServico.class));
+        verify(observabilidadePort).registrarOrdemCriada();
     }
 
     @Test
@@ -140,6 +145,7 @@ class CriarOrdemServicoUseCaseTest {
         verify(produtoRepositoryPort).salvar(produto);
         verify(osItemProdutoRepositoryPort).save(any());
         verify(osItemServicoRepositoryPort).save(any());
+        verify(observabilidadePort).registrarOrdemCriada();
     }
 
     @Test

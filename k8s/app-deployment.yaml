@@ -21,6 +21,25 @@ spec:
       labels:
         app: auto-center-fiap
         component: api
+      annotations:
+        ad.datadoghq.com/auto-center-fiap.checks: |
+          {
+            "openmetrics": {
+              "instances": [
+                {
+                  "prometheus_url": "http://%%host%%:8097/actuator/prometheus",
+                  "namespace": "autocenter",
+                  "metrics": [
+                    "autocenter_*"
+                  ]
+                }
+              ]
+            }
+          }
+        ad.datadoghq.com/auto-center-fiap.logs: |
+          [
+            {"source": "spring-boot", "service": "auto-center-fiap"}
+          ]
     spec:
       initContainers:
         # ── 1. Aguarda o MySQL estar disponível ──────────────────────
@@ -116,6 +135,21 @@ spec:
             - containerPort: 8097
               name: http
               protocol: TCP
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              value: "prod"
+            - name: DD_SERVICE
+              value: "auto-center-fiap"
+            - name: DD_VERSION
+              value: "1.0.0"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/app/dd-java-agent.jar"
           # ─── Variáveis não-sensíveis via ConfigMap ──────────────────
           # SPRING_CONFIG_ADDITIONAL_LOCATION aponta para /vault-secrets/
           # onde o init container gravou as credenciais do HCP.

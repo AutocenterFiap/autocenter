@@ -1,5 +1,5 @@
 variable "app_image" {
-  description = "Imagem Docker da aplicacao no ECR, com tag (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap:abc1234)"
+  description = "Imagem Docker da aplicacao no ECR, com tag (ex: 123456789012.dkr.ecr.us-east-1.amazonaws.com/autocenter-fiap:abc123)"
   type        = string
 }
 
@@ -31,4 +31,16 @@ variable "jwt_secret" {
   description = "Valor de sistema.seguranca.chave.secreta em producao"
   type        = string
   sensitive   = true
+}
+
+variable "dd_api_key" {
+  description = "API Key da organizacao Datadog (Organization Settings > API Keys)"
+  type        = string
+  sensitive   = true
+}
+
+variable "dd_site" {
+  description = "Site do Datadog (ex: datadoghq.com, us5.datadoghq.com, datadoghq.eu)"
+  type        = string
+  default     = "datadoghq.com"
 }

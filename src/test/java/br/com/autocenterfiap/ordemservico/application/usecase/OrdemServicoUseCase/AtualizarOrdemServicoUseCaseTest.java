@@ -5,6 +5,7 @@ import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.Atualizar
 import br.com.autocenterfiap.ordemservico.application.dto.OrdemServico.OrdemServicoOutput;
 import br.com.autocenterfiap.ordemservico.application.exception.OrdemServicoNaoEncontradaException;
 import br.com.autocenterfiap.ordemservico.application.exception.StatusOSInvalidoException;
+import br.com.autocenterfiap.ordemservico.application.port.ObservabilidadePort;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
@@ -28,6 +29,8 @@ class AtualizarOrdemServicoUseCaseTest {
 
     @Mock
     private OrdemServicoRepositoryPort ordemServicoRepositoryPort;
+    @Mock
+    private ObservabilidadePort observabilidadePort;
 
     @InjectMocks
     private AtualizarOrdemServicoUseCase useCase;
@@ -38,6 +41,7 @@ class AtualizarOrdemServicoUseCaseTest {
                 .statusOS(StatusOS.ABERTA)
                 .veiculo(Veiculo.builder().id(5L).build())
                 .cliente(Cliente.builder().id(7L).build())
+                .dataCriacao(java.time.LocalDateTime.now().minusMinutes(10))
                 .build();
     }
 
@@ -52,6 +56,7 @@ class AtualizarOrdemServicoUseCaseTest {
 
         assertEquals(StatusOS.RECEBIDA, output.statusOS());
         verify(ordemServicoRepositoryPort).save(ordemServico);
+        verify(observabilidadePort).registrarTempoStatus(eq(StatusOS.ABERTA), anyDouble());
     }
 
     @Test

@@ -3,6 +3,7 @@ package br.com.autocenterfiap.ordemservico.infrastructure.config;
 import br.com.autocenterfiap.cliente.application.port.ClienteRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemProdutoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.port.OSItemServicoRepositoryPort;
+import br.com.autocenterfiap.ordemservico.application.port.ObservabilidadePort;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.application.usecase.OrdemServicoUseCase.*;
 import br.com.autocenterfiap.ordemservico.application.validator.ClienteValidator;
@@ -38,7 +39,8 @@ public class OrdemServicoConfiguration {
             ClienteRepositoryPort clienteRepositoryPort,
             OrdemServicoDuplicadaValidator ordemServicoValidator,
             ClienteValidator clienteValidator,
-            VeiculoValidator veiculoValidator
+            VeiculoValidator veiculoValidator,
+            ObservabilidadePort observabilidadePort
     ) {
         List<OrdemServicoValidator> validators = List.of(ordemServicoValidator, clienteValidator, veiculoValidator);
         return new CriarOrdemServicoUseCase(
@@ -49,7 +51,8 @@ public class OrdemServicoConfiguration {
                 servicoRepositoryPort,
                 veiculoRepositoryPort,
                 clienteRepositoryPort,
-                validators);
+                validators,
+                observabilidadePort);
     }
 
     @Bean
@@ -75,9 +78,10 @@ public class OrdemServicoConfiguration {
 
     @Bean
     public AtualizarOrdemServicoUseCase atualizarOrdemServicoUseCase(
-            OrdemServicoRepositoryPort ordemServicoRepositoryPort
+            OrdemServicoRepositoryPort ordemServicoRepositoryPort,
+            ObservabilidadePort observabilidadePort
     ) {
-        return new AtualizarOrdemServicoUseCase(ordemServicoRepositoryPort);
+        return new AtualizarOrdemServicoUseCase(ordemServicoRepositoryPort, observabilidadePort);
     }
 
     @Bean

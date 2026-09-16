@@ -8,6 +8,7 @@ import br.com.autocenterfiap.ordemservico.application.dto.PaginationRequest;
 import br.com.autocenterfiap.ordemservico.application.port.OrdemServicoRepositoryPort;
 import br.com.autocenterfiap.ordemservico.domain.entity.OrdemServico;
 import br.com.autocenterfiap.ordemservico.domain.enums.StatusOS;
+import org.springframework.transaction.annotation.Transactional;
 
 public class GerarOrcamentoUseCase {
 
@@ -21,6 +22,7 @@ public class GerarOrcamentoUseCase {
         this.ordemServicoRepositoryPort = ordemServicoRepositoryPort;
     }
 
+    @Transactional
     public void executar() {
         PaginationRequest pagination = new PaginationRequest(0, 100);
         PageResult<OrdemServico> ordens = this.ordemServicoRepositoryPort.findByStatus(StatusOS.AGUARDANDO_APROVACAO, pagination);

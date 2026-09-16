@@ -5,6 +5,7 @@ import br.com.autocenterfiap.servico.domain.exception.ServicoInativoException;
 import br.com.autocenterfiap.servico.domain.exception.ServicoNaoEncontradoException;
 import br.com.autocenterfiap.servico.domain.exception.ServicoEmUsoException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice(basePackages = "br.com.autocenterfiap.servico")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ServicoExceptionHandler {
@@ -21,6 +23,7 @@ public class ServicoExceptionHandler {
             ServicoNaoEncontradoException ex,
             HttpServletRequest request) {
 
+        log.warn("Serviço não encontrado na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erroResposta = new ErroResposta(
                 HttpStatus.NOT_FOUND.value(),
                 "Recurso Não Encontrado",
@@ -36,6 +39,7 @@ public class ServicoExceptionHandler {
             ServicoInativoException ex,
             HttpServletRequest request) {
 
+        log.warn("Serviço inativo na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erroResposta = new ErroResposta(
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Operação Não Permitida",
@@ -51,6 +55,7 @@ public class ServicoExceptionHandler {
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
+        log.warn("Argumento inválido de serviço na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erroResposta = new ErroResposta(
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de Validação",
@@ -66,6 +71,7 @@ public class ServicoExceptionHandler {
             ServicoEmUsoException ex,
             HttpServletRequest request) {
 
+        log.warn("Serviço em uso na URI={}: {}", request.getRequestURI(), ex.getMessage());
         ErroResposta erroResposta = new ErroResposta(
                 HttpStatus.CONFLICT.value(),
                 "Conflito de Dados",

@@ -21,11 +21,10 @@ COPY --from=build /app/target/*.jar app.jar
 
 COPY --from=build /app/db ./db
 
+# Baixa o agente APM do Datadog
+ADD https://dtdg.co/latest-java-tracer /app/dd-java-agent.jar
+
 EXPOSE 8097
 
-ENTRYPOINT ["java", \
-    "-Djava.security.egd=file:/dev/./urandom", \
-    "-Dspring.profiles.active=prod", \
-    "-jar", \
-    "app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=prod -jar app.jar"]
 
